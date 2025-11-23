@@ -16,6 +16,9 @@
       --card:#17181d; --soft:#20222a; --text:#f5f5f7; --muted:#b7bbc7;
       --accent:#ffb347; --accent2:#ff6f61; --ok:#9be7a1;
       --radius:18px; --shadow: 0 10px 30px rgba(0,0,0,.35);
+
+      /* escala TV (se puede sobreescribir con ?tvscale=0.75) */
+      --tv-scale: .85;
     }
     *{box-sizing:border-box}
     body{
@@ -262,47 +265,38 @@
     .userRight{ white-space:nowrap; font-weight:800; }
 
     /* =======================
-       TV 32" FULLSCREEN DASHBOARD (layout)
+       TV LAYOUT (dashboard)
        ======================= */
     body.tv header{
       position: fixed; top:0; left:0; right:0;
       z-index: 50;
     }
     body.tv #dashboard.wrap{
-      max-width: none;
-      padding: 0;
-      margin: 0;
-      padding-top: 78px;
-      height: 100vh;
+      max-width: none; padding: 0; margin: 0;
+      padding-top: 78px; height: 100vh;
     }
     body.tv #dashGrid{
       grid-template-columns: 1fr !important;
-      gap: 0 !important;
-      margin-top: 0 !important;
+      gap: 0 !important; margin-top: 0 !important;
       height: calc(100vh - 78px);
       padding: 10px 14px 12px;
     }
     body.tv #dashGrid .card{
       height: 100%;
-      display: flex;
-      flex-direction: column;
-      padding: 18px 20px;
-      border-radius: 18px;
+      display: flex; flex-direction: column;
+      padding: 18px 20px; border-radius: 18px;
     }
 
     .tvLayout{
       display: grid;
       grid-template-columns: 1.1fr 0.9fr;
       gap: 16px;
-      flex: 1;
-      min-height: 0;
+      flex: 1; min-height: 0;
       margin-top: 6px;
     }
     .tvCol{
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      min-height: 0;
+      display: flex; flex-direction: column;
+      gap: 12px; min-height: 0;
     }
     .tvBlock{
       background:#111218;
@@ -315,14 +309,12 @@
     body.tv .noseMouthRow{
       display:grid;
       grid-template-columns: 1fr 1fr;
-      gap:16px;
-      align-items:start;
+      gap:16px; align-items:start;
     }
 
     /* ⭐ Estrellas doradas en el dashboard */
     #dashboard .dashStar{
-      color:#3b3f52;
-      letter-spacing:2px;
+      color:#3b3f52; letter-spacing:2px;
       text-shadow:0 2px 6px rgba(0,0,0,.45);
     }
     #dashboard .dashStar.filled{
@@ -332,75 +324,67 @@
         0 2px 10px rgba(0,0,0,.6);
     }
     #dashboard .dashStarsWrap{
-      display:inline-flex;
-      gap:2px;
+      display:inline-flex; gap:2px;
       transform: translateY(2px);
     }
 
-    /* Header del dashboard (derecha) compacto */
     body.tv .tvHeader .meta{ margin-top: 4px; }
     body.tv .tvHeader .progress{ margin-top: 8px; }
     body.tv .tvHeader .steps{ margin-top: 6px; }
 
     /* =======================
-       TV RESPONSIVE (FireTV safe)
-       Sustituye tamaños fijos por clamp()
+       TV RESPONSIVE v2 (más pequeño)
+       Pensado para 32" 720p + Firestick
        ======================= */
-
     body.tv{
-      font-size: clamp(18px, 2.2vw, 30px);
+      font-size: clamp(14px, 1.6vw, 22px);
     }
-
     body.tv h3{
-      font-size: clamp(1.2rem, 2.0vw, 2.0rem) !important;
+      font-size: clamp(1.0rem, 1.5vw, 1.6rem) !important;
       letter-spacing: .2px;
     }
-
     body.tv .note{
-      font-size: clamp(1.0rem, 1.6vw, 1.55rem);
-      line-height: 1.55;
+      font-size: clamp(.95rem, 1.2vw, 1.35rem);
+      line-height: 1.5;
     }
-
     body.tv .pill{
-      font-size: clamp(.9rem, 1.4vw, 1.2rem);
-      padding: 6px 10px;
+      font-size: clamp(.8rem, 1.0vw, 1.05rem);
+      padding: 5px 8px;
     }
-
     body.tv .userRow{
-      padding: clamp(8px, 1.2vw, 16px) 0 !important;
+      padding: clamp(6px, .9vw, 12px) 0 !important;
     }
-
     body.tv .userName{
-      font-size: clamp(1.4rem, 2.6vw, 2.4rem) !important;
+      font-size: clamp(1.15rem, 1.9vw, 1.85rem) !important;
       font-weight: 900;
-      letter-spacing: .35px;
     }
-
     body.tv .userRight{
-      font-size: clamp(1.15rem, 2.2vw, 2.0rem) !important;
+      font-size: clamp(1.0rem, 1.6vw, 1.55rem) !important;
       font-weight: 900;
-      letter-spacing: .5px;
       white-space: nowrap;
-      filter: saturate(1.1);
     }
-
     #dashboard .dashStar{
-      font-size: clamp(1.4rem, 2.4vw, 2.4rem);
-      letter-spacing: 3px;
+      font-size: clamp(1.2rem, 1.8vw, 1.9rem);
+      letter-spacing: 2px;
       text-shadow: 0 3px 8px rgba(0,0,0,.55);
     }
-
     body.tv .tvBlock div[style*="height:8px"]{
-      height: clamp(10px, 1.2vw, 16px) !important;
+      height: clamp(8px, .9vw, 12px) !important;
       border-radius: 999px;
     }
-
     body.tv .tvBlock .small{
-      font-size: clamp(.9rem, 1.2vw, 1.2rem);
+      font-size: clamp(.75rem, .9vw, 1.0rem);
+    }
+    body.tv .card .meta{
+      font-size: clamp(.95rem, 1.1vw, 1.25rem) !important;
     }
 
-    body.tv .card .meta{
-      font-size: clamp(1.0rem, 1.45vw, 1.5rem) !important;
+    /* Fire TV / Silk suele pintar enorme → reducimos escala global */
+    body.tv.silk{
+      transform: scale(var(--tv-scale, .85));
+      transform-origin: top left;
+      width: calc(100% / var(--tv-scale, .85));
+      height: calc(100% / var(--tv-scale, .85));
     }
   </style>
 </head>
@@ -420,12 +404,10 @@
 <section id="dashboard" class="wrap" style="display:none; padding-top:14px;">
   <div class="card">
     <div class="pill">Dashboard en vivo</div>
-
     <div class="row" style="margin-top:10px">
       <button id="fsBtn" class="primary">⛶ Pantalla completa</button>
     </div>
   </div>
-
   <div id="dashGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin-top:12px;"></div>
 </section>
 
@@ -690,6 +672,19 @@
   const qs = new URLSearchParams(location.search);
   const isHost = qs.get("host") === "1";
   const isDashboard = qs.get("dashboard") === "1";
+
+  // --- FireTV/Silk auto-scale + override manual ---
+  if (isDashboard) {
+    const ua = navigator.userAgent || "";
+    const isSilk = /Silk/i.test(ua) || /AFT/i.test(ua); // AFT = Amazon Fire TV
+    if (isSilk) document.body.classList.add("silk");
+
+    // Ajuste manual: ?tvscale=0.75
+    const tvScaleParam = parseFloat(qs.get("tvscale"));
+    if (!isNaN(tvScaleParam) && tvScaleParam > 0.5 && tvScaleParam < 1.2) {
+      document.documentElement.style.setProperty("--tv-scale", String(tvScaleParam));
+    }
+  }
 
   // ✅ Ocultar "Estado" y "Orden de servicio" a invitados
   if(!isHost && !isDashboard){
@@ -1478,10 +1473,10 @@
 
             <div class="tvBlock tvHeader">
               <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
-              <div style="margin-top:4px; font-weight:900; font-size:2.4rem; font-family:'Playfair Display', serif;">
+              <div style="margin-top:4px; font-weight:900; font-size:2.1rem; font-family:'Playfair Display', serif;">
                 ${w.name}
               </div>
-              <div class="meta" style="font-size:1.3rem; margin-bottom:2px;">
+              <div class="meta" style="margin-bottom:2px;">
                 ${w.winery} · ${w.type}
               </div>
               ${dashboardProgressHTML(w.id)}
@@ -1489,7 +1484,7 @@
 
             <div class="tvBlock">
               <h3>⭐ Valoración</h3>
-              <div class="note" style="font-size:1.45rem; margin-bottom:8px">
+              <div class="note" style="margin-bottom:8px">
                 Media: <b>${stats.avg ? stats.avg.toFixed(1) : "—"}</b> / 5 · votos: <b>${stats.total}</b>
               </div>
               ${ratingHistogramHTML(rForWine)}
@@ -1511,7 +1506,7 @@
             <div class="tvBlock">
               <h3>❓ Quiz</h3>
               ${showQuiz ? `
-                <div class="note" style="margin-bottom:8px; font-size:1.45rem">
+                <div class="note" style="margin-bottom:8px">
                   Aciertos: <b>${qsLocal.correct}</b> / ${qsLocal.total}
                   <span class="small">(${qsLocal.pct}%)</span>
                 </div>
