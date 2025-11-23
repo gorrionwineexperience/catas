@@ -262,11 +262,8 @@
     .userRight{ white-space:nowrap; font-weight:800; }
 
     /* =======================
-       TV 32" FULLSCREEN DASHBOARD
+       TV 32" FULLSCREEN DASHBOARD (layout)
        ======================= */
-    body.tv{
-      font-size: 26px;
-    }
     body.tv header{
       position: fixed; top:0; left:0; right:0;
       z-index: 50;
@@ -299,6 +296,7 @@
       gap: 16px;
       flex: 1;
       min-height: 0;
+      margin-top: 6px;
     }
     .tvCol{
       display: flex;
@@ -313,33 +311,7 @@
       padding:12px 14px;
     }
 
-    body.tv h3{
-      font-size: 1.7rem !important;
-    }
-    body.tv .note{
-      font-size: 1.35rem;
-      line-height:1.55;
-    }
-    body.tv .pill{
-      font-size: 1.05rem;
-    }
-
-    /* rating barras más altas */
-    body.tv .tvBlock div[style*="height:8px"]{
-      height: 14px !important;
-    }
-
-    /* usuarios 1 columna */
-    body.tv .userGrid{
-      grid-template-columns: 1fr !important;
-      gap:14px;
-    }
-    body.tv .userCol{
-      padding:14px 16px;
-      border-radius:14px;
-    }
-
-    /* ✅ Nariz y boca en la misma línea (2 columnas) */
+    /* Nariz y boca en la misma línea (2 columnas) */
     body.tv .noseMouthRow{
       display:grid;
       grid-template-columns: 1fr 1fr;
@@ -350,7 +322,6 @@
     /* ⭐ Estrellas doradas en el dashboard */
     #dashboard .dashStar{
       color:#3b3f52;
-      font-size:1.9rem;
       letter-spacing:2px;
       text-shadow:0 2px 6px rgba(0,0,0,.45);
     }
@@ -366,89 +337,71 @@
       transform: translateY(2px);
     }
 
+    /* Header del dashboard (derecha) compacto */
+    body.tv .tvHeader .meta{ margin-top: 4px; }
+    body.tv .tvHeader .progress{ margin-top: 8px; }
+    body.tv .tvHeader .steps{ margin-top: 6px; }
+
     /* =======================
-       EXTRA BIG TV DASHBOARD
-       (sobrescribe tamaños)
+       TV RESPONSIVE (FireTV safe)
+       Sustituye tamaños fijos por clamp()
        ======================= */
 
     body.tv{
-      font-size: 32px;
+      font-size: clamp(18px, 2.2vw, 30px);
     }
 
     body.tv h3{
-      font-size: 2.15rem !important;
+      font-size: clamp(1.2rem, 2.0vw, 2.0rem) !important;
       letter-spacing: .2px;
     }
 
     body.tv .note{
-      font-size: 1.65rem;
-      line-height: 1.6;
+      font-size: clamp(1.0rem, 1.6vw, 1.55rem);
+      line-height: 1.55;
     }
 
     body.tv .pill{
-      font-size: 1.25rem;
-      padding: 8px 12px;
+      font-size: clamp(.9rem, 1.4vw, 1.2rem);
+      padding: 6px 10px;
     }
 
     body.tv .userRow{
-      padding: 16px 0 !important;
+      padding: clamp(8px, 1.2vw, 16px) 0 !important;
     }
 
     body.tv .userName{
-      font-size: 2.6rem !important;
+      font-size: clamp(1.4rem, 2.6vw, 2.4rem) !important;
       font-weight: 900;
-      letter-spacing: .4px;
+      letter-spacing: .35px;
     }
 
     body.tv .userRight{
-      font-size: 2.2rem !important;
+      font-size: clamp(1.15rem, 2.2vw, 2.0rem) !important;
       font-weight: 900;
-      letter-spacing: .6px;
+      letter-spacing: .5px;
       white-space: nowrap;
-    }
-
-    body.tv .userRight span,
-    body.tv .userRight{
-      filter: saturate(1.15);
+      filter: saturate(1.1);
     }
 
     #dashboard .dashStar{
-      font-size: 2.6rem;
+      font-size: clamp(1.4rem, 2.4vw, 2.4rem);
       letter-spacing: 3px;
       text-shadow: 0 3px 8px rgba(0,0,0,.55);
     }
-    #dashboard .dashStar.filled{
-      text-shadow:
-        0 0 10px rgba(246,196,83,.75),
-        0 3px 12px rgba(0,0,0,.7);
-    }
-    #dashboard .dashStarsWrap{
-      gap: 3px;
-      transform: translateY(3px);
-    }
 
     body.tv .tvBlock div[style*="height:8px"]{
-      height: 18px !important;
+      height: clamp(10px, 1.2vw, 16px) !important;
       border-radius: 999px;
     }
 
     body.tv .tvBlock .small{
-      font-size: 1.25rem;
+      font-size: clamp(.9rem, 1.2vw, 1.2rem);
     }
 
-    body.tv .card > div[style*="font-size:2.4rem"]{
-      font-size: 2.9rem !important;
-    }
     body.tv .card .meta{
-      font-size: 1.6rem !important;
+      font-size: clamp(1.0rem, 1.45vw, 1.5rem) !important;
     }
-
-    /* Header del dashboard (derecha) compacto */
-    body.tv .tvHeader .meta{
-      margin-top: 4px;
-    }
-    body.tv .tvHeader .progress{ margin-top: 8px; }
-    body.tv .tvHeader .steps{ margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -1224,7 +1177,7 @@
     });
 
     prevBtn.onclick = () => {
-      const cur = window.__activewine ?? 1;
+      const cur = window.__activeWine ?? 1;
       let next = cur === 0 ? wines.length : cur - 1;
       if(next < 1) next = wines.length;
       set(ref(db,"activeWine"), next);
@@ -1510,13 +1463,9 @@
 
     const showQuiz = quizAnswered >= expectedCount;
 
-    // ✅ CAMBIO CLAVE:
-    // Muevo "Vino activo + nombre + bodega + progreso" al bloque derecho superior
-    // para que la lista de participantes suba y no haga scroll.
     dashGrid.innerHTML = `
       <div class="card">
-
-        <div class="tvLayout" style="margin-top:6px">
+        <div class="tvLayout">
 
           <div class="tvCol">
             <div class="tvBlock" style="flex:1; overflow:hidden;">
@@ -1579,7 +1528,6 @@
 
           </div>
         </div>
-
       </div>
     `;
   }
