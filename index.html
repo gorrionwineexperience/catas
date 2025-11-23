@@ -339,22 +339,6 @@
       border-radius:14px;
     }
 
-    /* ✅ AÚN MÁS GRANDE PARTICIPANTES EN DASHBOARD */
-    body.tv .userRow{
-      padding:14px 0 !important;
-    }
-    body.tv .userName{
-      font-size: 2.05rem !important;
-      font-weight: 900;
-      letter-spacing: .3px;
-    }
-    body.tv .userRight{
-      font-size: 1.75rem !important;
-      font-weight: 900;
-      letter-spacing: .5px;
-      white-space:nowrap;
-    }
-
     /* ✅ Nariz y boca en la misma línea (2 columnas) */
     body.tv .noseMouthRow{
       display:grid;
@@ -387,56 +371,49 @@
        (sobrescribe tamaños)
        ======================= */
 
-    /* subimos el “zoom” general del modo TV */
     body.tv{
-      font-size: 32px;          /* antes 26px */
+      font-size: 32px;
     }
 
-    /* títulos de bloques */
     body.tv h3{
-      font-size: 2.15rem !important;  /* antes 1.7rem */
+      font-size: 2.15rem !important;
       letter-spacing: .2px;
     }
 
-    /* textos normales */
     body.tv .note{
-      font-size: 1.65rem;       /* antes 1.35rem */
+      font-size: 1.65rem;
       line-height: 1.6;
     }
 
-    /* pastillas tipo “Vino activo”, etc. */
     body.tv .pill{
-      font-size: 1.25rem;       /* antes 1.05rem */
+      font-size: 1.25rem;
       padding: 8px 12px;
     }
 
-    /* --- PARTICIPANTES MÁS GRANDES --- */
     body.tv .userRow{
       padding: 16px 0 !important;
     }
 
     body.tv .userName{
-      font-size: 2.6rem !important;   /* antes 2.05rem */
+      font-size: 2.6rem !important;
       font-weight: 900;
       letter-spacing: .4px;
     }
 
     body.tv .userRight{
-      font-size: 2.2rem !important;   /* antes 1.75rem */
+      font-size: 2.2rem !important;
       font-weight: 900;
       letter-spacing: .6px;
       white-space: nowrap;
     }
 
-    /* emojis dentro del “userRight” aún más visibles */
     body.tv .userRight span,
     body.tv .userRight{
       filter: saturate(1.15);
     }
 
-    /* --- ESTRELLAS MÁS GRANDES EN DASHBOARD --- */
     #dashboard .dashStar{
-      font-size: 2.6rem;        /* antes 1.9rem */
+      font-size: 2.6rem;
       letter-spacing: 3px;
       text-shadow: 0 3px 8px rgba(0,0,0,.55);
     }
@@ -450,24 +427,28 @@
       transform: translateY(3px);
     }
 
-    /* --- HISTOGRAMA VALORACIÓN MÁS GORDO --- */
     body.tv .tvBlock div[style*="height:8px"]{
-      height: 18px !important;  /* antes 14px */
+      height: 18px !important;
       border-radius: 999px;
     }
 
-    /* números del histograma */
     body.tv .tvBlock .small{
-      font-size: 1.25rem;       /* sube porcentajes/contadores */
+      font-size: 1.25rem;
     }
 
-    /* títulos grandes del vino en dashboard */
     body.tv .card > div[style*="font-size:2.4rem"]{
       font-size: 2.9rem !important;
     }
     body.tv .card .meta{
       font-size: 1.6rem !important;
     }
+
+    /* Header del dashboard (derecha) compacto */
+    body.tv .tvHeader .meta{
+      margin-top: 4px;
+    }
+    body.tv .tvHeader .progress{ margin-top: 8px; }
+    body.tv .tvHeader .steps{ margin-top: 6px; }
   </style>
 </head>
 <body>
@@ -1243,7 +1224,7 @@
     });
 
     prevBtn.onclick = () => {
-      const cur = window.__activeWine ?? 1;
+      const cur = window.__activewine ?? 1;
       let next = cur === 0 ? wines.length : cur - 1;
       if(next < 1) next = wines.length;
       set(ref(db,"activeWine"), next);
@@ -1482,16 +1463,16 @@
   function dashboardProgressHTML(activeId){
     if(activeId === 0){
       return `
-        <div class="progress" style="margin-top:10px"><div style="width:0%"></div></div>
-        <div class="steps" style="margin-top:8px">
+        <div class="progress" style="margin-top:8px"><div style="width:0%"></div></div>
+        <div class="steps" style="margin-top:6px">
           ${wines.map(()=>`<div class="dot"></div>`).join("")}
         </div>
       `;
     }
     const w = wines.find(x=>x.id===activeId) || wines[0];
     return `
-      <div class="progress" style="margin-top:10px"><div style="width:${progressPercent(w.id)}%"></div></div>
-      <div class="steps" style="margin-top:8px">
+      <div class="progress" style="margin-top:8px"><div style="width:${progressPercent(w.id)}%"></div></div>
+      <div class="steps" style="margin-top:6px">
         ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
       </div>
     `;
@@ -1529,20 +1510,13 @@
 
     const showQuiz = quizAnswered >= expectedCount;
 
+    // ✅ CAMBIO CLAVE:
+    // Muevo "Vino activo + nombre + bodega + progreso" al bloque derecho superior
+    // para que la lista de participantes suba y no haga scroll.
     dashGrid.innerHTML = `
       <div class="card">
 
-        <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
-        <div style="margin-top:4px; font-weight:900; font-size:2.4rem; font-family:'Playfair Display', serif;">
-          ${w.name}
-        </div>
-        <div class="meta" style="font-size:1.3rem; margin-bottom:6px;">
-          ${w.winery} · ${w.type}
-        </div>
-
-        ${dashboardProgressHTML(w.id)}
-
-        <div class="tvLayout" style="margin-top:12px">
+        <div class="tvLayout" style="margin-top:6px">
 
           <div class="tvCol">
             <div class="tvBlock" style="flex:1; overflow:hidden;">
@@ -1552,6 +1526,17 @@
           </div>
 
           <div class="tvCol">
+
+            <div class="tvBlock tvHeader">
+              <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
+              <div style="margin-top:4px; font-weight:900; font-size:2.4rem; font-family:'Playfair Display', serif;">
+                ${w.name}
+              </div>
+              <div class="meta" style="font-size:1.3rem; margin-bottom:2px;">
+                ${w.winery} · ${w.type}
+              </div>
+              ${dashboardProgressHTML(w.id)}
+            </div>
 
             <div class="tvBlock">
               <h3>⭐ Valoración</h3>
