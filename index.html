@@ -142,6 +142,16 @@
       background: linear-gradient(145deg, #2a1f1f, #1a1414);
       border-color:#4a3030;
     }
+    button.danger{
+      background: linear-gradient(145deg, #3a1212, #240b0b);
+      border:1px solid #6a1f1f;
+      color:#ffd7d7;
+      font-weight:900;
+    }
+    button.danger:hover{
+      border-color:#8a2a2a;
+      transform: translateY(-1px) scale(1.02);
+    }
 
     .hostBox{
       margin-top:12px; padding:12px; border-radius:14px;
@@ -226,55 +236,6 @@
     .pauseSub{ color:var(--muted); font-size:1.05rem; }
 
     /* =======================
-       HISTÓRICO / CONTEXTO DASHBOARD
-       ======================= */
-    .historyBar{
-      margin-top:14px;
-      display:flex;
-      gap:12px;
-      align-items:stretch;
-      flex-wrap:nowrap;
-      overflow-x:auto;
-      padding-bottom:4px;
-    }
-    .historyItem{
-      min-width: 260px;
-      flex: 1 0 auto;
-      background: #12131a;
-      border:1px solid #2a2d3a;
-      border-radius:16px;
-      padding:12px 14px;
-    }
-    .historyItem.active{
-      background:
-        linear-gradient(180deg, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%),
-        #141622;
-      border-color: rgba(255,255,255,.16);
-      box-shadow: 0 0 18px color-mix(in oklab, var(--accent2) 35%, transparent);
-    }
-    .historyLabel{
-      font-weight:900;
-      font-size:.9rem;
-      color:var(--muted);
-      margin-bottom:4px;
-    }
-    .historyTitle{
-      font-weight:900;
-      font-size:1.05rem;
-      line-height:1.2;
-    }
-    .historyMeta{
-      color:var(--muted);
-      font-size:.9rem;
-      margin-top:2px;
-    }
-    .historyStats{
-      margin-top:6px;
-      font-size:.95rem;
-    }
-    .historyStats b{font-weight:900}
-
-    /* =======================
        LISTA USUARIOS TV 2 COLUMNAS
        ======================= */
     .userGrid{
@@ -332,7 +293,6 @@
       border-radius: 18px;
     }
 
-    /* Layout interno 2 columnas sin scroll */
     .tvLayout{
       display: grid;
       grid-template-columns: 1.1fr 0.9fr; /* izquierda más ancha */
@@ -357,21 +317,6 @@
     body.tv .note{ font-size: 1.15rem; line-height:1.55; }
     body.tv h3{ font-size: 1.35rem !important; }
     body.tv .tvBlock div[style*="height:8px"]{ height: 10px !important; }
-
-    body.tv .historyBar{
-      margin-top: 10px;
-      padding-top: 6px;
-      border-top: 1px dashed #2b2f3d;
-    }
-    body.tv .historyItem{
-      min-width: 340px;
-      padding:16px 18px;
-      border-radius:18px;
-    }
-    body.tv .historyLabel{ font-size:1.05rem; }
-    body.tv .historyTitle{ font-size:1.35rem; }
-    body.tv .historyMeta{ font-size:1.05rem; }
-    body.tv .historyStats{ font-size:1.1rem; }
 
     body.tv .userGrid{ gap:14px 26px; }
     body.tv .userCol{ padding:12px 14px; border-radius:14px; }
@@ -451,6 +396,14 @@
           <button id="pauseBtn" class="warn">⏸ Intermedio</button>
         </div>
         <div id="hostButtons" class="nav"></div>
+
+        <!-- 🧨 RESET DB -->
+        <div class="row" style="margin-top:10px">
+          <button id="resetDbBtn" class="danger">🧨 Resetear DB (borrar votos)</button>
+        </div>
+        <div class="small" style="margin-top:6px; opacity:.9">
+          Esto borra ratings, quiz, nariz, boca y acciones. No borra tus vinos.
+        </div>
 
         <div style="margin-top:10px; font-weight:800;">Nota del host (sale en todos)</div>
         <input id="hostNoteInput" class="input" placeholder="Ej: Fijaos en la acidez y el toque salino…" />
@@ -723,6 +676,7 @@
   }
 
   function progressPercent(activeId){
+    if(activeId <= 0) return 0;
     return (activeId-1)/(wines.length-1)*100;
   }
 
@@ -1183,6 +1137,34 @@
         if(expectedHint) expectedHint.textContent = `Guardado: esperas ${n} participantes.`;
       };
     }
+
+    // 🧨 RESET DB con confirmación (solo host)
+    const resetDbBtn = document.getElementById("resetDbBtn");
+    if(resetDbBtn){
+      resetDbBtn.onclick = async () => {
+        const ok = confirm(
+          "⚠️ Vas a borrar TODAS las puntuaciones y respuestas.\n\n" +
+          "Esto no se puede deshacer.\n\n" +
+          "¿Seguro que quieres resetear la base de datos?"
+        );
+        if(!ok) return;
+
+        const expectedUsers = Number(expectedInput?.value || 12);
+
+        await set(ref(db, "/"), {
+          activeWine: 1,
+          hostNote: "",
+          expectedUsers,
+          ratings: {},
+          quiz: {},
+          notes: {},
+          mouth: {},
+          userActions: {}
+        });
+
+        alert("✅ DB reseteada. Todo vuelve a 0.");
+      };
+    }
   }
 
   // ===== DASHBOARD MODE =====
@@ -1345,6 +1327,25 @@
     `;
   }
 
+  /* Barra de progreso arriba del dashboard */
+  function dashboardProgressHTML(activeId){
+    if(activeId === 0){
+      return `
+        <div class="progress" style="margin-top:10px"><div style="width:0%"></div></div>
+        <div class="steps" style="margin-top:8px">
+          ${wines.map(()=>`<div class="dot"></div>`).join("")}
+        </div>
+      `;
+    }
+    const w = wines.find(x=>x.id===activeId) || wines[0];
+    return `
+      <div class="progress" style="margin-top:10px"><div style="width:${progressPercent(w.id)}%"></div></div>
+      <div class="steps" style="margin-top:8px">
+        ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
+      </div>
+    `;
+  }
+
   // ✅ Dashboard: usuarios a la izquierda, stats a la derecha
   //    Quiz sólo aparece cuando TODOS han respondido (según expectedCount)
   function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}, expectedCount=12){
@@ -1354,10 +1355,11 @@
       dashGrid.innerHTML = `
         <div class="card">
           <div class="pill">Intermedio</div>
-          <div style="margin-top:8px; font-weight:900; font-size:2rem; font-family:'Playfair Display', serif;">
+          <div style="margin-top:6px; font-weight:900; font-size:2.2rem; font-family:'Playfair Display', serif;">
             Pausa Mediterránea
           </div>
-          <div class="note" style="margin-top:6px">
+          ${dashboardProgressHTML(0)}
+          <div class="note" style="margin-top:8px">
             Ahora mismo no hay vino activo. En cuanto el host siga, saldrá aquí el siguiente resumen.
           </div>
         </div>
@@ -1370,35 +1372,6 @@
     const rForWine = ratingsMap[w.id] || {};
     const stats = computeRatingStats(rForWine);
     const qsLocal = quizCorrectStats(w, quizMap[w.id] || {});
-
-    // Histórico (Opción B)
-    const last1Id = (activeId - 1) < 1 ? wines.length : (activeId - 1);
-    const last2Id = (activeId - 2) < 1 ? wines.length + (activeId - 2) : (activeId - 2);
-
-    function wineSummaryHTML(id, label, isActive=false){
-      const ww = wines.find(x=>x.id===id);
-      if(!ww) return "";
-
-      const r = ratingsMap[id] || {};
-      const st = computeRatingStats(r);
-      const qst = quizCorrectStats(ww, quizMap[id] || {});
-      const avgTxt = st.avg ? st.avg.toFixed(1) : "—";
-      const votesTxt = st.total || 0;
-      const qPctTxt = qst.total ? `${qst.pct}%` : "—";
-
-      return `
-        <div class="historyItem ${isActive ? "active" : ""}">
-          <div class="historyLabel">${label}</div>
-          <div class="historyTitle">Vino ${id}: ${ww.name}</div>
-          <div class="historyMeta">${ww.winery} · ${ww.type}</div>
-          <div class="historyStats">
-            ⭐ Media: <b>${avgTxt}</b> (${votesTxt} votos)
-            <br/>
-            ❓ Quiz: <b>${qPctTxt}</b> acierto
-          </div>
-        </div>
-      `;
-    }
 
     // Usuarios y control de quiz
     const actionsForWine = userActionsMap[w.id] || {};
@@ -1415,11 +1388,13 @@
         <div style="margin-top:4px; font-weight:900; font-size:2.3rem; font-family:'Playfair Display', serif;">
           ${w.name}
         </div>
-        <div class="meta" style="font-size:1.2rem; margin-bottom:8px;">
+        <div class="meta" style="font-size:1.2rem; margin-bottom:6px;">
           ${w.winery} · ${w.type}
         </div>
 
-        <div class="tvLayout">
+        ${dashboardProgressHTML(w.id)}
+
+        <div class="tvLayout" style="margin-top:10px">
 
           <!-- IZQUIERDA: USUARIOS EN VIVO -->
           <div class="tvCol">
@@ -1469,12 +1444,6 @@
             </div>
 
           </div>
-        </div>
-
-        <div class="historyBar" aria-label="Histórico de cata">
-          ${wineSummaryHTML(last2Id, "Hace 2 vinos")}
-          ${wineSummaryHTML(last1Id, "Anterior")}
-          ${wineSummaryHTML(activeId, "Actual", true)}
         </div>
 
       </div>
