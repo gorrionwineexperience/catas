@@ -413,12 +413,15 @@
     <section id="wineCard" class="card fade-in"></section>
 
     <aside class="card">
-      <div class="pill">Estado</div>
-      <div id="status" class="note" style="margin-top:8px">Conectando…</div>
+      <!-- ✅ ESTADO (se oculta a invitados por JS) -->
+      <div id="statusWrap">
+        <div class="pill">Estado</div>
+        <div id="status" class="note" style="margin-top:8px">Conectando…</div>
 
-      <div class="toggle">
-        <input id="soundToggle" type="checkbox" />
-        <label for="soundToggle">Sonido al cambiar vino</label>
+        <div class="toggle">
+          <input id="soundToggle" type="checkbox" />
+          <label for="soundToggle">Sonido al cambiar vino</label>
+        </div>
       </div>
 
       <div id="hostPanel" class="hostBox" style="display:none">
@@ -462,7 +465,8 @@
         <div class="small" style="margin-top:6px">URL host: añade <b>?host=1</b></div>
       </div>
 
-      <div class="section">
+      <!-- ✅ ORDEN DE SERVICIO (se oculta a invitados por JS) -->
+      <div id="orderSection" class="section">
         <h3>Orden de servicio</h3>
         <ol class="note" id="orderList" style="margin-left:18px"></ol>
       </div>
@@ -650,7 +654,6 @@
   const pauseBtn    = document.getElementById("pauseBtn");
   const noteInput   = document.getElementById("hostNoteInput");
   const sendNoteBtn = document.getElementById("sendNote");
-  const clearNoteBtn= document.getElementById("clearNote");
 
   const overlay     = document.getElementById("overlay");
   const ovBig       = document.getElementById("ovBig");
@@ -658,12 +661,22 @@
   const ovSub       = document.getElementById("ovSub");
 
   const soundToggle = document.getElementById("soundToggle");
-  soundToggle.checked = localStorage.getItem("gw_sound") === "1";
-  soundToggle.onchange = () => localStorage.setItem("gw_sound", soundToggle.checked ? "1":"0");
+  if(soundToggle){
+    soundToggle.checked = localStorage.getItem("gw_sound") === "1";
+    soundToggle.onchange = () => localStorage.setItem("gw_sound", soundToggle.checked ? "1":"0");
+  }
 
   const qs = new URLSearchParams(location.search);
   const isHost = qs.get("host") === "1";
   const isDashboard = qs.get("dashboard") === "1";
+
+  // ✅ Ocultar "Estado" y "Orden de servicio" a invitados
+  if(!isHost && !isDashboard){
+    const sw = document.getElementById("statusWrap");
+    if(sw) sw.style.display = "none";
+    const os = document.getElementById("orderSection");
+    if(os) os.style.display = "none";
+  }
 
   // ===== 👤 IDENTIFICACIÓN SIMPLE (OBLIGATORIA) =====
   let guestName = (localStorage.getItem("gw_name") || "").trim();
@@ -718,6 +731,7 @@
   }
 
   function renderOrder(){
+    if(!orderList) return;
     orderList.innerHTML = wines.map(w =>
       `<li>${w.id}. ${w.name} – ${w.type}</li>`
     ).join("");
@@ -1155,14 +1169,19 @@
     };
     pauseBtn.onclick = () => set(ref(db,"activeWine"), 0);
 
-    sendNoteBtn.onclick = () => {
-      const v = noteInput.value.trim();
-      update(ref(db,"/"), { hostNote: v });
-    };
-    clearNoteBtn.onclick = () => {
-      noteInput.value="";
-      update(ref(db,"/"), { hostNote: "" });
-    };
+    const clearNoteBtn= document.getElementById("clearNote");
+    if(sendNoteBtn){
+      sendNoteBtn.onclick = () => {
+        const v = noteInput.value.trim();
+        update(ref(db,"/"), { hostNote: v });
+      };
+    }
+    if(clearNoteBtn){
+      clearNoteBtn.onclick = () => {
+        noteInput.value="";
+        update(ref(db,"/"), { hostNote: "" });
+      };
+    }
 
     // 👥 Participantes esperados -> Firebase (global)
     const expectedInput = document.getElementById("expectedInput");
@@ -1301,7 +1320,6 @@
     return { correct, total, pct };
   }
 
-  // 👥 lista TV hasta 12 usuarios, 1 columna, con nariz+boca
   function userListHTML(wineId, actionsForWine = {}){
     const ww = wines.find(x=>x.id===wineId);
 
@@ -1374,7 +1392,6 @@
     `;
   }
 
-  /* Barra de progreso arriba del dashboard */
   function dashboardProgressHTML(activeId){
     if(activeId === 0){
       return `
@@ -1393,8 +1410,6 @@
     `;
   }
 
-  // ✅ Dashboard: usuarios a la izquierda, stats a la derecha
-  //    Quiz sólo aparece cuando TODOS han respondido (según expectedCount)
   function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}, expectedCount=12){
     if(!dashGrid) return;
 
@@ -1442,7 +1457,6 @@
 
         <div class="tvLayout" style="margin-top:12px">
 
-          <!-- IZQUIERDA: USUARIOS EN VIVO -->
           <div class="tvCol">
             <div class="tvBlock" style="flex:1; overflow:hidden;">
               <h3>👥 Participantes (${participants}/${expectedCount})</h3>
@@ -1450,7 +1464,6 @@
             </div>
           </div>
 
-          <!-- DERECHA: RATING + NARIZ/BOCA EN 2 COLUMNAS + QUIZ -->
           <div class="tvCol">
 
             <div class="tvBlock">
@@ -1582,10 +1595,10 @@
     setTheme(activeId);
 
     if(activeId === 0){
-      statusEl.textContent = `Intermedio activo.`;
+      if(statusEl) statusEl.textContent = `Intermedio activo.`;
       renderPause(hostNote);
     }else{
-      statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
+      if(statusEl) statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
       renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
     }
 
@@ -1596,7 +1609,7 @@
     lastWine = activeId;
 
   }, (err)=>{
-    statusEl.textContent = "Error de conexión a Firebase.";
+    if(statusEl) statusEl.textContent = "Error de conexión a Firebase.";
     console.error(err);
   });
 
