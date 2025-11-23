@@ -319,14 +319,17 @@
       padding: 10px 14px;
       gap:10px;
     }
+
+    /* 🔥 Header vino más grande */
     body.tv .headerWineInfo{
-  display:inline-flex;
-  font-size: clamp(1.2rem, 2.2vw, 2.0rem); /* ⬆️ más grande */
-  padding: 8px 14px;                      /* ⬆️ más aire */
-  font-weight: 900;
-  letter-spacing: .3px;
-  border-width: 2px;                      /* un pelín más marcado */
+      display:inline-flex;
+      font-size: clamp(1.2rem, 2.2vw, 2.0rem);
+      padding: 8px 14px;
+      font-weight: 900;
+      letter-spacing: .3px;
+      border-width: 2px;
     }
+
     body.tv .headerControls{
       display:flex;
     }
@@ -336,7 +339,6 @@
       height: 8px;
     }
 
-    /* ↓ aumentamos el padding-top porque el header es más alto con la barra */
     body.tv #dashboard.wrap{
       max-width: none; padding: 0; margin: 0;
       padding-top: 96px; height: 100vh;
@@ -400,6 +402,11 @@
        ======================= */
     body.tv{
       font-size: clamp(14px, 1.6vw, 22px);
+
+      /* ✅ VARIABLES para auto-ajuste participantes (sin scroll) */
+      --p-name: clamp(1.0rem, 1.6vw, 1.7rem);
+      --p-right: clamp(.9rem, 1.3vw, 1.4rem);
+      --p-pad: clamp(4px, .6vw, 8px);
     }
     body.tv h3{
       font-size: clamp(1.0rem, 1.5vw, 1.6rem) !important;
@@ -413,18 +420,21 @@
       font-size: clamp(.8rem, 1.0vw, 1.05rem);
       padding: 5px 8px;
     }
-    body.tv .userRow{
-      padding: clamp(6px, .9vw, 12px) 0 !important;
+
+    /* ✅ Aplicación de variables a la lista participantes */
+    body.tv .participantsBlock .userRow{
+      padding: var(--p-pad) 0 !important;
     }
-    body.tv .userName{
-      font-size: clamp(1.15rem, 1.9vw, 1.85rem) !important;
+    body.tv .participantsBlock .userName{
+      font-size: var(--p-name) !important;
       font-weight: 900;
     }
-    body.tv .userRight{
-      font-size: clamp(1.0rem, 1.6vw, 1.55rem) !important;
+    body.tv .participantsBlock .userRight{
+      font-size: var(--p-right) !important;
       font-weight: 900;
       white-space: nowrap;
     }
+
     #dashboard .dashStar{
       font-size: clamp(1.2rem, 1.8vw, 1.9rem);
       letter-spacing: 2px;
@@ -441,7 +451,6 @@
       font-size: clamp(.95rem, 1.1vw, 1.25rem) !important;
     }
 
-    /* Fire TV / Silk suele pintar enorme → reducimos escala global */
     body.tv.silk{
       transform: scale(var(--tv-scale, .85));
       transform-origin: top left;
@@ -466,22 +475,18 @@
       </div>
     </div>
 
-    <!-- SOLO DASHBOARD: Vino activo + nombre -->
     <div id="headerWineInfo" class="headerWineInfo"></div>
 
-    <!-- SOLO DASHBOARD: Fullscreen -->
     <div class="headerControls">
       <button id="fsBtn" class="primary" style="padding:8px 10px; border-radius:10px;">⛶ Fullscreen</button>
     </div>
   </div>
 
-  <!-- SOLO DASHBOARD: Barra de progreso -->
   <div id="headerProgress" class="headerProgress">
     <div id="headerProgressBar"></div>
   </div>
 </header>
 
-<!-- DASHBOARD (TV) -->
 <section id="dashboard" class="wrap" style="display:none; padding-top:14px;">
   <div id="dashGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin-top:12px;"></div>
 </section>
@@ -491,7 +496,6 @@
     <section id="wineCard" class="card fade-in"></section>
 
     <aside class="card">
-      <!-- ✅ ESTADO (se oculta a invitados por JS) -->
       <div id="statusWrap">
         <div class="pill">Estado</div>
         <div id="status" class="note" style="margin-top:8px">Conectando…</div>
@@ -505,7 +509,6 @@
       <div id="hostPanel" class="hostBox" style="display:none">
         <div class="hostTitle">Modo Host</div>
 
-        <!-- 👥 Participantes esperados (global para toda la cata) -->
         <div class="section" style="margin-top:10px; padding-top:10px;">
           <h3 style="margin:0 0 6px; font-size:1rem;">👥 Participantes esperados</h3>
           <div class="row" style="align-items:center;">
@@ -526,7 +529,6 @@
         </div>
         <div id="hostButtons" class="nav"></div>
 
-        <!-- 🧨 RESET DB -->
         <div class="row" style="margin-top:10px">
           <button id="resetDbBtn" class="danger">🧨 Resetear DB (borrar votos)</button>
         </div>
@@ -543,7 +545,6 @@
         <div class="small" style="margin-top:6px">URL host: añade <b>?host=1</b></div>
       </div>
 
-      <!-- ✅ ORDEN DE SERVICIO (se oculta a invitados por JS) -->
       <div id="orderSection" class="section">
         <h3>Orden de servicio</h3>
         <ol class="note" id="orderList" style="margin-left:18px"></ol>
@@ -554,7 +555,6 @@
 
 <footer>🍷 Buona cata! · Gorrión Wine Experience · La degustazione de Puglia</footer>
 
-<!-- overlay show para cambio de vino -->
 <div id="overlay" class="overlay">
   <div class="ovCard">
     <div class="pill" style="justify-content:center">Ahora servimos</div>
@@ -564,7 +564,6 @@
   </div>
 </div>
 
-<!-- Name Gate obligatorio -->
 <div id="nameGate" class="overlay">
   <div class="ovCard" style="text-align:left">
     <div class="pill">Bienvenido/a</div>
@@ -590,7 +589,6 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
   import { getDatabase, ref, onValue, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
-  // 🔥 PEGA TU CONFIG REAL AQUÍ
   const firebaseConfig = {
   apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
   authDomain: "catas-9d780.firebaseapp.com",
@@ -748,7 +746,6 @@
   const isHost = qs.get("host") === "1";
   const isDashboard = qs.get("dashboard") === "1";
 
-  // --- FireTV/Silk auto-scale + override manual ---
   if (isDashboard) {
     const ua = navigator.userAgent || "";
     const isSilk = /Silk/i.test(ua) || /AFT/i.test(ua);
@@ -760,7 +757,6 @@
     }
   }
 
-  // ✅ Ocultar "Estado" y "Orden de servicio" a invitados
   if(!isHost && !isDashboard){
     const sw = document.getElementById("statusWrap");
     if(sw) sw.style.display = "none";
@@ -768,7 +764,6 @@
     if(os) os.style.display = "none";
   }
 
-  // ===== 👤 IDENTIFICACIÓN SIMPLE (OBLIGATORIA) =====
   let guestName = (localStorage.getItem("gw_name") || "").trim();
 
   function showNameGate(){
@@ -810,7 +805,6 @@
     return id;
   }
   const deviceId = getDeviceId();
-  // ===============================================
 
   function setTheme(id){
     const t = themes[id] || themes[1];
@@ -837,7 +831,6 @@
     return `img/maridaje-${n}.jpg`;
   }
 
-  // 👃 Checklist nariz
   const noteTags = [
     "Cítrico 🍋","Floral 🌸","Fruta roja 🍒","Fruta negra 🍇","Herbáceo 🌿",
     "Especias 🌶️","Madera / vainilla 🌳","Mineral / salino 🧂",
@@ -845,7 +838,6 @@
   ];
   function notesLSKey(wineId){ return `gw_notes_${wineId}`; }
 
-  // 👄 Checklist boca
   const mouthTags = [
     "Seco / nada dulce 🧊","Goloso / frutal 🍬","Acidez alta 🍋","Acidez suave 🙂",
     "Tanino suave 🤝","Tanino intenso 😬","Cuerpo ligero 💨","Cuerpo potente 🏋️",
@@ -853,7 +845,6 @@
   ];
   function mouthLSKey(wineId){ return `gw_mouth_${wineId}`; }
 
-  // ========= RATING =========
   function ratingLSKey(id){ return `gw_rating_${id}`; }
 
   function computeRatingStats(ratingsForWine = {}){
@@ -917,7 +908,6 @@
     });
   }
 
-  // ========= QUIZ =========
   function quizKey(id){ return `gw_quiz_${id}`; }
 
   function renderQuizSection(w, quizCounts=[0,0,0], hostNote=""){
@@ -979,7 +969,6 @@
     }
   }
 
-  // ========= CHECKLIST NARIZ =========
   function renderNotesSection(w, notesMap = {}){
     let selected = [];
     try { selected = JSON.parse(localStorage.getItem(notesLSKey(w.id)) || "[]"); }
@@ -1049,7 +1038,6 @@
     });
   }
 
-  // ========= CHECKLIST BOCA =========
   function renderMouthSection(w, mouthMap = {}){
     let selected = [];
     try { selected = JSON.parse(localStorage.getItem(mouthLSKey(w.id)) || "[]"); }
@@ -1134,7 +1122,6 @@
     `;
   }
 
-  // --- Header vino activo + barra progreso (solo dashboard) ---
   const headerWineInfo = document.getElementById("headerWineInfo");
   const headerProgress = document.getElementById("headerProgress");
   const headerProgressBar = document.getElementById("headerProgressBar");
@@ -1281,7 +1268,6 @@
       };
     }
 
-    // 👥 Participantes esperados -> Firebase (global)
     const expectedInput = document.getElementById("expectedInput");
     const setExpectedBtn = document.getElementById("setExpectedBtn");
     const expectedHint = document.getElementById("expectedHint");
@@ -1303,7 +1289,6 @@
       };
     }
 
-    // 🧨 RESET DB con confirmación (solo host)
     const resetDbBtn = document.getElementById("resetDbBtn");
     if(resetDbBtn){
       resetDbBtn.onclick = async () => {
@@ -1489,6 +1474,18 @@
     `;
   }
 
+  /* ✅ Auto-fit de participantes SIN SCROLL */
+  function fitParticipants(expectedUsers){
+    if(!isDashboard) return;
+
+    // 12 => factor ~0.83, 10 => 1.0, 8 => 1.1
+    const factor = Math.max(0.78, Math.min(1.12, 10 / expectedUsers));
+
+    document.body.style.setProperty("--p-name",  `clamp(${1.0*factor}rem, ${1.6*factor}vw, ${1.7*factor}rem)`);
+    document.body.style.setProperty("--p-right", `clamp(${0.9*factor}rem, ${1.3*factor}vw, ${1.4*factor}rem)`);
+    document.body.style.setProperty("--p-pad",   `clamp(${4*factor}px,  ${0.6*factor}vw, ${8*factor}px)`);
+  }
+
   function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}, expectedCount=12){
     if(!dashGrid) return;
 
@@ -1525,7 +1522,8 @@
         <div class="tvLayout">
 
           <div class="tvCol">
-            <div class="tvBlock" style="flex:1; overflow:hidden;">
+            <!-- ✅ participantsBlock + overflow hidden (0 scroll) -->
+            <div class="tvBlock participantsBlock" style="flex:1; overflow:hidden;">
               <h3>👥 Participantes (${participants}/${expectedCount})</h3>
               ${userListHTML(w.id, actionsForWine)}
             </div>
@@ -1588,7 +1586,6 @@
   }
   toggleDashboardUI();
 
-  // Fullscreen desde el header (solo dashboard)
   function setupFullscreenBtn(){
     if(!isDashboard) return;
     const fsBtn = document.getElementById("fsBtn");
@@ -1654,6 +1651,7 @@
     updateHeaderWine(activeId);
 
     if(isDashboard){
+      fitParticipants(expectedUsers);   // ✅ AUTO-FIT sin scroll
       renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap, expectedUsers);
       return;
     }
@@ -1703,4 +1701,3 @@
 
 </body>
 </html>
-
