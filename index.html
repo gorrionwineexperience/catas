@@ -236,12 +236,12 @@
     .pauseSub{ color:var(--muted); font-size:1.05rem; }
 
     /* =======================
-       LISTA USUARIOS TV 2 COLUMNAS
+       LISTA USUARIOS (base)
        ======================= */
     .userGrid{
       display:grid;
-      grid-template-columns: 1fr 1fr;
-      gap:10px 20px;
+      grid-template-columns: 1fr;
+      gap:10px;
       margin-top:6px;
     }
     .userCol{
@@ -265,7 +265,7 @@
        TV 32" FULLSCREEN DASHBOARD
        ======================= */
     body.tv{
-      font-size: 22px;
+      font-size: 26px; /* ✅ más grande base */
     }
     body.tv header{
       position: fixed; top:0; left:0; right:0;
@@ -313,17 +313,39 @@
       padding:12px 14px;
     }
 
-    body.tv .section{ margin-top: 10px; padding-top: 8px; }
-    body.tv .note{ font-size: 1.15rem; line-height:1.55; }
-    body.tv h3{ font-size: 1.35rem !important; }
-    body.tv .tvBlock div[style*="height:8px"]{ height: 10px !important; }
+    body.tv h3{
+      font-size: 1.7rem !important; /* ✅ títulos más grandes */
+    }
+    body.tv .note{
+      font-size: 1.35rem; /* ✅ texto más grande */
+      line-height:1.55;
+    }
+    body.tv .pill{
+      font-size: 1.05rem;
+    }
 
-    body.tv .userGrid{ gap:14px 26px; }
-    body.tv .userCol{ padding:12px 14px; border-radius:14px; }
-    body.tv .userRow{ padding:10px 0; }
-    body.tv .userName{ font-size:1.35rem; }
+    /* rating barras más altas */
+    body.tv .tvBlock div[style*="height:8px"]{
+      height: 14px !important;
+    }
+
+    /* ✅ usuarios 1 columna + más grande */
+    body.tv .userGrid{
+      grid-template-columns: 1fr !important;
+      gap:14px;
+    }
+    body.tv .userCol{
+      padding:14px 16px;
+      border-radius:14px;
+    }
+    body.tv .userRow{
+      padding:12px 0;
+    }
+    body.tv .userName{
+      font-size:1.55rem;
+    }
     body.tv .userRight{
-      font-size:1.25rem;
+      font-size:1.4rem;
       letter-spacing:.4px;
     }
   </style>
@@ -1177,8 +1199,8 @@
       const c = rForWine[s] || 0;
       const w = Math.round((c/max)*100);
       return `
-        <div style="display:grid; grid-template-columns:24px 1fr 28px; gap:6px; align-items:center; margin:4px 0;">
-          <div style="font-weight:800">${s}★</div>
+        <div style="display:grid; grid-template-columns:28px 1fr 34px; gap:8px; align-items:center; margin:6px 0;">
+          <div style="font-weight:900">${s}★</div>
           <div style="height:8px; background:#2a2e3e; border-radius:999px; overflow:hidden; border:1px solid #32364a;">
             <div style="height:100%; width:${w}%; background:linear-gradient(90deg,var(--accent),var(--accent2));"></div>
           </div>
@@ -1253,7 +1275,7 @@
     return { correct, total, pct };
   }
 
-  // 👥 lista TV 12 usuarios, 2 columnas, con nariz+boca
+  // 👥 lista TV hasta 12 usuarios, 1 columna, con nariz+boca
   function userListHTML(wineId, actionsForWine = {}){
     const ww = wines.find(x=>x.id===wineId);
 
@@ -1263,7 +1285,7 @@
       return em ? em.join("") : tag;
     }
 
-    const entriesAll = Object.values(actionsForWine || {})
+    const entries = Object.values(actionsForWine || {})
       .map(a => {
         const rating = a?.rating || 0;
 
@@ -1291,38 +1313,33 @@
       .sort((a,b)=>b.ts-a.ts)
       .slice(0,12);
 
-    if(!entriesAll.length) return `<div class="small">Aún no hay participaciones.</div>`;
+    if(!entries.length) return `<div class="small">Aún no hay participaciones.</div>`;
 
-    const left  = entriesAll.slice(0,6);
-    const right = entriesAll.slice(6,12);
+    const rows = entries.map(e=>{
+      const stars = e.rating
+        ? `${"★".repeat(e.rating)}${"☆".repeat(5-e.rating)}`
+        : "—";
 
-    function renderCol(list){
-      if(!list.length) return `<div class="small">—</div>`;
-      return list.map(e=>{
-        const stars = e.rating
-          ? `${"★".repeat(e.rating)}${"☆".repeat(5-e.rating)}`
-          : "—";
+      const quizMark =
+        e.isCorrect === null ? "—" : (e.isCorrect ? "✅" : "❌");
 
-        const quizMark =
-          e.isCorrect === null ? "—" : (e.isCorrect ? "✅" : "❌");
-
-        return `
-          <div class="userRow">
-            <div class="userName">${e.name}</div>
-            <div class="userRight">
-              ${stars} · ${quizMark}
-              ${e.top2Notes ? `· ${e.top2Notes}` : ""}
-              ${e.top2Mouth ? `· ${e.top2Mouth}` : ""}
-            </div>
+      return `
+        <div class="userRow">
+          <div class="userName">${e.name}</div>
+          <div class="userRight">
+            ${stars} · ${quizMark}
+            ${e.top2Notes ? `· ${e.top2Notes}` : ""}
+            ${e.top2Mouth ? `· ${e.top2Mouth}` : ""}
           </div>
-        `;
-      }).join("");
-    }
+        </div>
+      `;
+    }).join("");
 
     return `
       <div class="userGrid">
-        <div class="userCol">${renderCol(left)}</div>
-        <div class="userCol">${renderCol(right)}</div>
+        <div class="userCol">
+          ${rows}
+        </div>
       </div>
     `;
   }
@@ -1373,7 +1390,6 @@
     const stats = computeRatingStats(rForWine);
     const qsLocal = quizCorrectStats(w, quizMap[w.id] || {});
 
-    // Usuarios y control de quiz
     const actionsForWine = userActionsMap[w.id] || {};
     const participants = Object.keys(actionsForWine).length;
     const quizAnswered = Object.values(actionsForWine)
@@ -1385,16 +1401,16 @@
       <div class="card">
 
         <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
-        <div style="margin-top:4px; font-weight:900; font-size:2.3rem; font-family:'Playfair Display', serif;">
+        <div style="margin-top:4px; font-weight:900; font-size:2.4rem; font-family:'Playfair Display', serif;">
           ${w.name}
         </div>
-        <div class="meta" style="font-size:1.2rem; margin-bottom:6px;">
+        <div class="meta" style="font-size:1.3rem; margin-bottom:6px;">
           ${w.winery} · ${w.type}
         </div>
 
         ${dashboardProgressHTML(w.id)}
 
-        <div class="tvLayout" style="margin-top:10px">
+        <div class="tvLayout" style="margin-top:12px">
 
           <!-- IZQUIERDA: USUARIOS EN VIVO -->
           <div class="tvCol">
@@ -1409,7 +1425,7 @@
 
             <div class="tvBlock">
               <h3>⭐ Valoración</h3>
-              <div class="note" style="font-size:1.25rem; margin-bottom:6px">
+              <div class="note" style="font-size:1.45rem; margin-bottom:8px">
                 Media: <b>${stats.avg ? stats.avg.toFixed(1) : "—"}</b> / 5 · votos: <b>${stats.total}</b>
               </div>
               ${ratingHistogramHTML(rForWine)}
@@ -1428,7 +1444,7 @@
             <div class="tvBlock">
               <h3>❓ Quiz</h3>
               ${showQuiz ? `
-                <div class="note" style="margin-bottom:6px; font-size:1.2rem">
+                <div class="note" style="margin-bottom:8px; font-size:1.45rem">
                   Aciertos: <b>${qsLocal.correct}</b> / ${qsLocal.total}
                   <span class="small">(${qsLocal.pct}%)</span>
                 </div>
@@ -1437,7 +1453,7 @@
                 <div class="note">
                   Esperando respuestas… <b>${quizAnswered}/${expectedCount}</b>
                 </div>
-                <div class="small" style="margin-top:6px">
+                <div class="small" style="margin-top:8px">
                   El quiz se mostrará cuando hayan respondido todos.
                 </div>
               `}
