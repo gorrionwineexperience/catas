@@ -173,9 +173,7 @@
       text-shadow: 0 2px 8px rgba(0,0,0,.35);
       transform: translateY(1px);
     }
-    .star-btn:hover{
-      transform: translateY(0px) scale(1.05);
-    }
+    .star-btn:hover{ transform: translateY(0px) scale(1.05); }
     .star-btn.filled{
       color: #f6c453;
       text-shadow:
@@ -225,55 +223,120 @@
       font-family:"Playfair Display", serif; font-weight:900; font-size:2rem;
       margin:0 0 6px;
     }
-    .pauseSub{
-      color:var(--muted); font-size:1.05rem;
-    }
+    .pauseSub{ color:var(--muted); font-size:1.05rem; }
 
     /* =======================
        MODO TV PARA DASHBOARD
        ======================= */
-    body.tv{
-      font-size: 20px;
-    }
-    body.tv .wrap{
-      max-width: 1400px;
-      padding: 22px 26px;
-    }
-    body.tv #dashboard .card{
-      padding: 24px;
-      border-radius: 22px;
-    }
-    body.tv #dashboard h2{
-      font-size: 2.4rem !important;
-    }
-    body.tv #dashboard h3{
-      font-size: 1.35rem !important;
-      margin-bottom: 10px !important;
-    }
-    body.tv #dashboard .pill{
-      font-size: 1.05rem !important;
-      padding: 8px 14px !important;
-    }
-    body.tv #dashboard .note{
-      font-size: 1.15rem !important;
-      line-height: 1.7 !important;
-    }
-    body.tv #dashboard .small{
-      font-size: 1rem !important;
-    }
+    body.tv{ font-size: 20px; }
+    body.tv .wrap{ max-width: 1400px; padding: 22px 26px; }
+    body.tv #dashboard .card{ padding: 24px; border-radius: 22px; }
+    body.tv #dashboard h2{ font-size: 2.4rem !important; }
+    body.tv #dashboard h3{ font-size: 1.35rem !important; margin-bottom: 10px !important; }
+    body.tv #dashboard .pill{ font-size: 1.05rem !important; padding: 8px 14px !important; }
+    body.tv #dashboard .note{ font-size: 1.15rem !important; line-height: 1.7 !important; }
+    body.tv #dashboard .small{ font-size: 1rem !important; }
     body.tv #dashGrid{
       grid-template-columns: repeat(auto-fit, minmax(360px, 1fr)) !important;
       gap: 18px !important;
     }
-    body.tv #dashboard .pairing{
-      padding: 18px !important;
-      border-radius: 16px !important;
+    body.tv #dashboard .pairing{ padding: 18px !important; border-radius: 16px !important; }
+    body.tv #dashboard div[style*="height:8px"]{ height: 12px !important; }
+    body.tv #dashboard .section div[style*="border-bottom"]{ padding: 10px 0 !important; }
+
+    /* =======================
+       HISTÓRICO / CONTEXTO DASHBOARD
+       ======================= */
+    .historyBar{
+      margin-top:14px;
+      display:flex;
+      gap:12px;
+      align-items:stretch;
+      flex-wrap:nowrap;
+      overflow-x:auto;
+      padding-bottom:4px;
     }
-    body.tv #dashboard div[style*="height:8px"]{
-      height: 12px !important;
+    .historyItem{
+      min-width: 260px;
+      flex: 1 0 auto;
+      background: #12131a;
+      border:1px solid #2a2d3a;
+      border-radius:16px;
+      padding:12px 14px;
     }
-    body.tv #dashboard .section div[style*="border-bottom"]{
-      padding: 10px 0 !important;
+    .historyItem.active{
+      background:
+        linear-gradient(180deg, color-mix(in oklab, var(--accent) 10%, transparent), transparent 70%),
+        #141622;
+      border-color: rgba(255,255,255,.16);
+      box-shadow: 0 0 18px color-mix(in oklab, var(--accent2) 35%, transparent);
+    }
+    .historyLabel{
+      font-weight:900;
+      font-size:.9rem;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+    .historyTitle{
+      font-weight:900;
+      font-size:1.05rem;
+      line-height:1.2;
+    }
+    .historyMeta{
+      color:var(--muted);
+      font-size:.9rem;
+      margin-top:2px;
+    }
+    .historyStats{
+      margin-top:6px;
+      font-size:.95rem;
+    }
+    .historyStats b{font-weight:900}
+
+    body.tv .historyBar{ gap:16px; margin-top:18px; }
+    body.tv .historyItem{
+      min-width: 340px;
+      padding:16px 18px;
+      border-radius:18px;
+    }
+    body.tv .historyLabel{ font-size:1.05rem; }
+    body.tv .historyTitle{ font-size:1.35rem; }
+    body.tv .historyMeta{ font-size:1.05rem; }
+    body.tv .historyStats{ font-size:1.1rem; }
+
+    /* =======================
+       LISTA USUARIOS TV 2 COLUMNAS
+       ======================= */
+    .userGrid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px 20px;
+      margin-top:6px;
+    }
+    .userCol{
+      background:#111218;
+      border:1px dashed #2b2f3d;
+      border-radius:12px;
+      padding:8px 10px;
+    }
+    .userRow{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      padding:6px 0;
+      border-bottom:1px dashed #2b2f3d;
+    }
+    .userRow:last-child{ border-bottom:none; }
+    .userName{ font-weight:900; }
+    .userRight{ white-space:nowrap; font-weight:800; }
+
+    body.tv .userGrid{ gap:14px 26px; }
+    body.tv .userCol{ padding:12px 14px; border-radius:14px; }
+    body.tv .userRow{ padding:10px 0; }
+    body.tv .userName{ font-size:1.35rem; }
+    body.tv .userRight{
+      font-size:1.25rem;
+      letter-spacing:.4px;
     }
   </style>
 </head>
@@ -289,7 +352,7 @@
   </div>
 </header>
 
-<!-- DASHBOARD (solo host) -->
+<!-- DASHBOARD (TV) -->
 <section id="dashboard" class="wrap" style="display:none; padding-top:14px;">
   <div class="card">
     <div class="pill">Dashboard en vivo</div>
@@ -297,7 +360,6 @@
       Resumen de votos y percepciones
     </h2>
 
-    <!-- Botón pantalla completa -->
     <div class="row" style="margin-top:10px">
       <button id="fsBtn" class="primary">⛶ Pantalla completa</button>
     </div>
@@ -389,7 +451,7 @@
 
   // 🔥 PEGA TU CONFIG REAL AQUÍ
   const firebaseConfig = {
-apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
+  apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
   authDomain: "catas-9d780.firebaseapp.com",
   databaseURL: "https://catas-9d780-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "catas-9d780",
@@ -510,7 +572,6 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     }
   ];
 
-  // 🎨 temas por vino + intermedio (0)
   const themes = {
     0:{accent:"#b7bbc7", accent2:"#6b7280", bg:"#0c0d10", bg2:"#14161b"},
     1:{accent:"#ffd166", accent2:"#6ee7ff", bg:"#0d0f12", bg2:"#14202a"},
@@ -556,9 +617,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     gate.classList.add("show");
     document.body.style.overflow = "hidden";
 
-    const syncBtn = () => {
-      btn.disabled = input.value.trim().length === 0;
-    };
+    const syncBtn = () => { btn.disabled = input.value.trim().length === 0; };
     input.addEventListener("input", syncBtn);
     syncBtn();
     input.focus();
@@ -568,21 +627,17 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       if(!n) return;
       guestName = n.slice(0, 30);
       localStorage.setItem("gw_name", guestName);
-
       gate.classList.remove("show");
       document.body.style.overflow = "";
     };
   }
 
   if(!isHost && !isDashboard){
-    if(!guestName){
-      showNameGate(); // 🔒 bloquea acceso hasta escribir nombre
-    }
+    if(!guestName) showNameGate();
   }else{
     guestName = isHost ? "Host" : "Dashboard";
   }
 
-  // id local por dispositivo (para distinguir móviles)
   function getDeviceId(){
     let id = localStorage.getItem("gw_device");
     if(!id){
@@ -613,26 +668,42 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     return (activeId-1)/(wines.length-1)*100;
   }
 
-  // 📷 Imagen por orden de maridaje (template)
   function imageForMaridaje(id){
     const n = String(id).padStart(2, "0");
     return `img/maridaje-${n}.jpg`;
   }
 
-  // 👃 Checklist global de notas
+  // 👃 Checklist nariz
   const noteTags = [
     "Cítrico 🍋",
     "Floral 🌸",
     "Fruta roja 🍒",
-    "Fruta negra 🫐",
+    "Fruta negra 🍇",
     "Herbáceo 🌿",
     "Especias 🌶️",
-    "Madera / vainilla 🪵",
-    "Mineral / salino 🧂"
+    "Madera / vainilla 🌳",
+    "Mineral / salino 🧂",
+    "Tostado / café 🍫☕",
+    "Terroso / cuero 🍄"
   ];
   function notesLSKey(wineId){ return `gw_notes_${wineId}`; }
 
-  // ========= RATING 1-5 ESTRELLAS =========
+  // 👄 Checklist boca
+  const mouthTags = [
+    "Seco / nada dulce 🧊",
+    "Goloso / frutal 🍬",
+    "Acidez alta 🍋",
+    "Acidez suave 🙂",
+    "Tanino suave 🤝",
+    "Tanino intenso 😬",
+    "Cuerpo ligero 💨",
+    "Cuerpo potente 🏋️",
+    "Cremoso / untuoso 🥛",
+    "Final largo ⏳"
+  ];
+  function mouthLSKey(wineId){ return `gw_mouth_${wineId}`; }
+
+  // ========= RATING =========
   function ratingLSKey(id){ return `gw_rating_${id}`; }
 
   function computeRatingStats(ratingsForWine = {}){
@@ -653,11 +724,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
 
     const stars = [1,2,3,4,5].map(s=>{
       const filled = userRating >= s;
-      return `
-        <button data-rating="${s}" class="star-btn ${filled ? "filled" : ""}">
-          ★
-        </button>
-      `;
+      return `<button data-rating="${s}" class="star-btn ${filled ? "filled" : ""}">★</button>`;
     }).join("");
 
     return `
@@ -699,7 +766,6 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       };
     });
   }
-  // =======================================
 
   // ========= QUIZ =========
   function quizKey(id){ return `gw_quiz_${id}`; }
@@ -714,13 +780,9 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       const pct = Math.round((quizCounts[i]/totalAnswers)*100);
 
       return `
-        <button
-          data-quiz="${i}"
-          class="${isThis ? "primary" : ""}"
-          ${isAnswered ? "disabled style='opacity:.7; cursor:default'" : ""}
-        >
-          ${opt}
-          ${isAnswered ? ` · ${pct}%` : ""}
+        <button data-quiz="${i}" class="${isThis ? "primary" : ""}"
+          ${isAnswered ? "disabled style='opacity:.7; cursor:default'" : ""}>
+          ${opt} ${isAnswered ? ` · ${pct}%` : ""}
         </button>
       `;
     }).join("");
@@ -728,7 +790,6 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     return `
       <div class="section">
         <h3>Mini-quiz</h3>
-
         <div class="pairing" style="margin-top:6px">
           <strong>❓ ${w.quiz.q}</strong>
           <div id="quizBtns" class="nav" style="margin-top:8px">
@@ -744,9 +805,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
           </div>
         </div>
 
-        ${hostNote ? `
-          <div style="margin-top:10px" class="note">🗣️ Nota del host: <b>${hostNote}</b></div>
-        ` : ``}
+        ${hostNote ? `<div style="margin-top:10px" class="note">🗣️ Nota del host: <b>${hostNote}</b></div>` : ``}
       </div>
     `;
   }
@@ -769,9 +828,8 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       });
     }
   }
-  // =======================
 
-  // ========= CHECKLIST DE NOTAS =========
+  // ========= CHECKLIST NARIZ =========
   function renderNotesSection(w, notesMap = {}){
     let selected = [];
     try { selected = JSON.parse(localStorage.getItem(notesLSKey(w.id)) || "[]"); }
@@ -795,7 +853,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
 
     return `
       <div class="section">
-        <h3>¿Qué notas percibes?</h3>
+        <h3>👃 Notas en nariz</h3>
         <div id="notesPills" class="nav" style="margin-top:8px">
           ${pills}
         </div>
@@ -824,11 +882,8 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
         let selected = getSelected();
 
         const isOn = selected.includes(idx);
-        if(isOn){
-          selected = selected.filter(x=>x!==idx);
-        }else{
-          selected.push(idx);
-        }
+        if(isOn) selected = selected.filter(x=>x!==idx);
+        else selected.push(idx);
         setSelected(selected);
 
         const tagRef = ref(db, `notes/${w.id}/${idx}`);
@@ -843,7 +898,76 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       };
     });
   }
-  // ====================================
+
+  // ========= CHECKLIST BOCA =========
+  function renderMouthSection(w, mouthMap = {}){
+    let selected = [];
+    try { selected = JSON.parse(localStorage.getItem(mouthLSKey(w.id)) || "[]"); }
+    catch(e){ selected = []; }
+
+    const countsByTag = mouthMap[w.id] || {};
+    const totalMarks = Object.values(countsByTag).reduce((a,b)=>a+(b||0),0) || 1;
+
+    const pills = mouthTags.map((tag, idx)=>{
+      const count = countsByTag[idx] || 0;
+      const pct = Math.round((count / totalMarks) * 100);
+      const isOn = selected.includes(idx);
+
+      return `
+        <button class="${isOn ? "primary" : ""}" data-mouth-idx="${idx}">
+          ${tag}
+          <span class="small"> · ${pct}%</span>
+        </button>
+      `;
+    }).join("");
+
+    return `
+      <div class="section">
+        <h3>👄 Sensaciones en boca</h3>
+        <div id="mouthPills" class="nav" style="margin-top:8px">
+          ${pills}
+        </div>
+        <div class="small" style="margin-top:6px">
+          Marca todas las que te encajen. Se actualiza en vivo.
+        </div>
+      </div>
+    `;
+  }
+
+  function attachMouthHandlers(w){
+    const wrap = document.getElementById("mouthPills");
+    if(!wrap) return;
+
+    function getSelected(){
+      try { return JSON.parse(localStorage.getItem(mouthLSKey(w.id)) || "[]"); }
+      catch(e){ return []; }
+    }
+    function setSelected(arr){
+      localStorage.setItem(mouthLSKey(w.id), JSON.stringify(arr));
+    }
+
+    wrap.querySelectorAll("button[data-mouth-idx]").forEach(btn=>{
+      btn.onclick = () => {
+        const idx = Number(btn.getAttribute("data-mouth-idx"));
+        let selected = getSelected();
+
+        const isOn = selected.includes(idx);
+        if(isOn) selected = selected.filter(x=>x!==idx);
+        else selected.push(idx);
+        setSelected(selected);
+
+        const tagRef = ref(db, `mouth/${w.id}/${idx}`);
+        runTransaction(tagRef, (cur)=>{
+          const val = cur || 0;
+          const nextVal = isOn ? val - 1 : val + 1;
+          return Math.max(0, nextVal);
+        });
+
+        const actionRef = ref(db, `userActions/${w.id}/${deviceId}`);
+        update(actionRef, { name: guestName, mouthSelected: selected, ts: Date.now() });
+      };
+    });
+  }
 
   function renderPause(hostNote){
     wineCard.innerHTML = `
@@ -860,7 +984,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     `;
   }
 
-  function renderWine(activeId, hostNote, ratingsMap={}, quizMap={}, notesMap={}){
+  function renderWine(activeId, hostNote, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}){
     const w = wines.find(x=>x.id===activeId) || wines[0];
     wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
 
@@ -906,11 +1030,13 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       ${renderRatingSection(w, ratingsMap)}
       ${renderQuizSection(w, quizCounts, hostNote)}
       ${renderNotesSection(w, notesMap)}
+      ${renderMouthSection(w, mouthMap)}
     `;
 
     attachRatingHandlers(w);
     attachQuizHandlers(w);
     attachNotesHandlers(w);
+    attachMouthHandlers(w);
   }
 
   function chime(){
@@ -1016,6 +1142,22 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     }).join("");
   }
 
+  function topMouthHTML(mouthForWine = {}){
+    const pairs = Object.entries(mouthForWine)
+      .map(([k,v]) => ({ idx:Number(k), count: v||0 }))
+      .sort((a,b)=>b.count-a.count)
+      .slice(0,3);
+
+    if(!pairs.length || pairs[0].count===0) return `<div class="small">Sin datos aún</div>`;
+
+    const total = Object.values(mouthForWine).reduce((a,b)=>a+(b||0),0) || 1;
+
+    return pairs.map(p=>{
+      const pct = Math.round((p.count/total)*100);
+      return `<div class="note">• ${mouthTags[p.idx]} <span class="small">(${pct}%)</span></div>`;
+    }).join("");
+  }
+
   function quizSummaryHTML(w, quizForWine = {}){
     if(!w.quiz) return `<div class="small">Sin quiz</div>`;
     const counts = [
@@ -1049,33 +1191,82 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     return { correct, total, pct };
   }
 
+  // 👥 lista TV 12 usuarios, 2 columnas, con nariz+boca
   function userListHTML(wineId, actionsForWine = {}){
-    const entries = Object.values(actionsForWine || {})
-      .map(a => ({
-        name: a?.name || "Invitado",
-        rating: a?.rating || 0,
-        quizAnswer: (a?.quizAnswer ?? null),
-        ts: a?.ts || 0
-      }))
-      .sort((a,b)=>b.ts-a.ts);
+    const ww = wines.find(x=>x.id===wineId);
 
-    if(!entries.length) return `<div class="small">Aún no hay participaciones.</div>`;
+    function emojiOnly(tag){
+      if(!tag) return "";
+      const em = tag.match(/[\p{Extended_Pictographic}]/gu);
+      return em ? em.join("") : tag;
+    }
 
-    return entries.map(e=>{
-      const stars = e.rating ? `${"★".repeat(e.rating)}${"☆".repeat(5-e.rating)}` : "—";
-      return `
-        <div style="display:flex; justify-content:space-between; gap:8px; padding:6px 0; border-bottom:1px dashed #2b2f3d;">
-          <div style="font-weight:800">${e.name}</div>
-          <div class="small" style="white-space:nowrap">
-            ${stars}
-            ${e.quizAnswer !== null ? ` · Quiz: ${Number(e.quizAnswer)+1}` : ``}
+    const entriesAll = Object.values(actionsForWine || {})
+      .map(a => {
+        const rating = a?.rating || 0;
+
+        const qa = (a?.quizAnswer ?? null);
+        const isCorrect =
+          (ww && qa !== null && typeof ww.quiz?.correct === "number")
+            ? (Number(qa) === ww.quiz.correct)
+            : null;
+
+        const selNotes = Array.isArray(a?.notesSelected) ? a.notesSelected : [];
+        const top2Notes = selNotes.slice(0,2).map(i => emojiOnly(noteTags[i])).join(" ");
+
+        const selMouth = Array.isArray(a?.mouthSelected) ? a.mouthSelected : [];
+        const top2Mouth = selMouth.slice(0,2).map(i => emojiOnly(mouthTags[i])).join(" ");
+
+        return {
+          name: a?.name || "Invitado",
+          rating,
+          isCorrect,
+          top2Notes,
+          top2Mouth,
+          ts: a?.ts || 0
+        };
+      })
+      .sort((a,b)=>b.ts-a.ts)
+      .slice(0,12);
+
+    if(!entriesAll.length) return `<div class="small">Aún no hay participaciones.</div>`;
+
+    const left  = entriesAll.slice(0,6);
+    const right = entriesAll.slice(6,12);
+
+    function renderCol(list){
+      if(!list.length) return `<div class="small">—</div>`;
+      return list.map(e=>{
+        const stars = e.rating
+          ? `${"★".repeat(e.rating)}${"☆".repeat(5-e.rating)}`
+          : "—";
+
+        const quizMark =
+          e.isCorrect === null ? "—" : (e.isCorrect ? "✅" : "❌");
+
+        return `
+          <div class="userRow">
+            <div class="userName">${e.name}</div>
+            <div class="userRight">
+              ${stars} · ${quizMark}
+              ${e.top2Notes ? `· ${e.top2Notes}` : ""}
+              ${e.top2Mouth ? `· ${e.top2Mouth}` : ""}
+            </div>
           </div>
-        </div>
-      `;
-    }).join("");
+        `;
+      }).join("");
+    }
+
+    return `
+      <div class="userGrid">
+        <div class="userCol">${renderCol(left)}</div>
+        <div class="userCol">${renderCol(right)}</div>
+      </div>
+    `;
   }
 
-  function renderDashboard(ratingsMap={}, quizMap={}, notesMap={}, userActionsMap={}){
+  // ✅ Dashboard sólo vino activo + histórico (Opción B)
+  function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}){
     if(!dashGrid) return;
 
     let globalCorrect = 0;
@@ -1107,46 +1298,102 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       }
     }
 
-    dashGrid.innerHTML = wines.map(w=>{
-      const rForWine = ratingsMap[w.id] || {};
-      const stats = computeRatingStats(rForWine);
-      const qsLocal = quizCorrectStats(w, quizMap[w.id] || {});
-
-      return `
+    if(activeId === 0){
+      dashGrid.innerHTML = `
         <div class="card">
-          <div class="pill">Vino ${w.id}</div>
-          <div style="margin-top:6px; font-weight:900; font-size:1.05rem;">
-            ${w.name}
+          <div class="pill">Intermedio</div>
+          <div style="margin-top:8px; font-weight:900; font-size:2rem; font-family:'Playfair Display', serif;">
+            Pausa Mediterránea
           </div>
-          <div class="meta">${w.winery}</div>
-
-          <div class="section" style="margin-top:10px">
-            <h3>⭐ Valoración</h3>
-            <div class="note">Media: <b>${stats.avg ? stats.avg.toFixed(1) : "—"}</b> / 5 · votos: <b>${stats.total}</b></div>
-            ${ratingHistogramHTML(rForWine)}
-          </div>
-
-          <div class="section">
-            <h3>❓ Quiz</h3>
-            <div class="note" style="margin-bottom:6px">
-              Aciertos: <b>${qsLocal.correct}</b> / ${qsLocal.total}
-              <span class="small">(${qsLocal.pct}%)</span>
-            </div>
-            ${quizSummaryHTML(w, quizMap[w.id] || {})}
-          </div>
-
-          <div class="section">
-            <h3>👃 Notas percibidas (top 3)</h3>
-            ${topNotesHTML(notesMap[w.id] || {})}
-          </div>
-
-          <div class="section">
-            <h3>👥 Quién ha participado</h3>
-            ${userListHTML(w.id, userActionsMap[w.id] || {})}
+          <div class="note" style="margin-top:6px">
+            Ahora mismo no hay vino activo. En cuanto el host siga, saldrá aquí el siguiente resumen.
           </div>
         </div>
       `;
-    }).join("");
+      return;
+    }
+
+    const w = wines.find(x=>x.id===activeId) || wines[0];
+
+    const rForWine = ratingsMap[w.id] || {};
+    const stats = computeRatingStats(rForWine);
+    const qsLocal = quizCorrectStats(w, quizMap[w.id] || {});
+
+    const last1Id = (activeId - 1) < 1 ? wines.length : (activeId - 1);
+    const last2Id = (activeId - 2) < 1 ? wines.length + (activeId - 2) : (activeId - 2);
+
+    function wineSummaryHTML(id, label, isActive=false){
+      const ww = wines.find(x=>x.id===id);
+      if(!ww) return "";
+
+      const r = ratingsMap[id] || {};
+      const st = computeRatingStats(r);
+      const qst = quizCorrectStats(ww, quizMap[id] || {});
+      const avgTxt = st.avg ? st.avg.toFixed(1) : "—";
+      const votesTxt = st.total || 0;
+      const qPctTxt = qst.total ? `${qst.pct}%` : "—";
+
+      return `
+        <div class="historyItem ${isActive ? "active" : ""}">
+          <div class="historyLabel">${label}</div>
+          <div class="historyTitle">Vino ${id}: ${ww.name}</div>
+          <div class="historyMeta">${ww.winery} · ${ww.type}</div>
+          <div class="historyStats">
+            ⭐ Media: <b>${avgTxt}</b> (${votesTxt} votos)
+            <br/>
+            ❓ Quiz: <b>${qPctTxt}</b> acierto
+          </div>
+        </div>
+      `;
+    }
+
+    dashGrid.innerHTML = `
+      <div class="card">
+        <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
+        <div style="margin-top:6px; font-weight:900; font-size:2.2rem; font-family:'Playfair Display', serif;">
+          ${w.name}
+        </div>
+        <div class="meta" style="font-size:1.2rem">${w.winery} · ${w.type}</div>
+
+        <div class="section" style="margin-top:12px">
+          <h3>⭐ Valoración</h3>
+          <div class="note" style="font-size:1.25rem">
+            Media: <b>${stats.avg ? stats.avg.toFixed(1) : "—"}</b> / 5 · votos: <b>${stats.total}</b>
+          </div>
+          ${ratingHistogramHTML(rForWine)}
+        </div>
+
+        <div class="section">
+          <h3>❓ Quiz</h3>
+          <div class="note" style="margin-bottom:6px; font-size:1.2rem">
+            Aciertos: <b>${qsLocal.correct}</b> / ${qsLocal.total}
+            <span class="small">(${qsLocal.pct}%)</span>
+          </div>
+          ${quizSummaryHTML(w, quizMap[w.id] || {})}
+        </div>
+
+        <div class="section">
+          <h3>👃 Nariz (top 3)</h3>
+          ${topNotesHTML(notesMap[w.id] || {})}
+        </div>
+
+        <div class="section">
+          <h3>👄 Boca (top 3)</h3>
+          ${topMouthHTML(mouthMap[w.id] || {})}
+        </div>
+
+        <div class="section">
+          <h3>👥 Quién ha participado</h3>
+          ${userListHTML(w.id, userActionsMap[w.id] || {})}
+        </div>
+
+        <div class="historyBar" aria-label="Histórico de cata">
+          ${wineSummaryHTML(last2Id, "Hace 2 vinos")}
+          ${wineSummaryHTML(last1Id, "Anterior")}
+          ${wineSummaryHTML(activeId, "Actual", true)}
+        </div>
+      </div>
+    `;
   }
 
   function toggleDashboardUI(){
@@ -1161,7 +1408,6 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     document.body.classList.add("tv");
   }
 
-  // ===== Pantalla completa (Dashboard) =====
   function setupFullscreenBtn(){
     if(!isDashboard) return;
     const fsBtn = document.getElementById("fsBtn");
@@ -1208,9 +1454,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     updateLabel();
   }
   setupFullscreenBtn();
-  // =========================================
 
-  // ✅ Listener realtime de TODO
   const rootRef = ref(db, "/");
   let lastWine = null;
 
@@ -1221,10 +1465,11 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     const ratingsMap    = data.ratings || {};
     const quizMap       = data.quiz  || {};
     const notesMap      = data.notes || {};
+    const mouthMap      = data.mouth || {};
     const userActionsMap= data.userActions || {};
 
     if(isDashboard){
-      renderDashboard(ratingsMap, quizMap, notesMap, userActionsMap);
+      renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap);
       return;
     }
 
@@ -1236,7 +1481,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
       renderPause(hostNote);
     }else{
       statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
-      renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap);
+      renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
     }
 
     if(lastWine !== null && lastWine !== activeId){
@@ -1250,7 +1495,6 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     console.error(err);
   });
 
-  // Inicializa estado la 1ª vez (solo host)
   if(isHost){
     onValue(rootRef, (snap)=>{
       if(snap.val() == null){
@@ -1260,6 +1504,7 @@ apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
           ratings: {},
           quiz: {},
           notes: {},
+          mouth: {},
           userActions: {}
         });
       }
