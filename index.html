@@ -171,7 +171,7 @@
     }
     .small{font-size:.85rem; color:var(--muted)}
 
-    /* ⭐ Rating dorado */
+    /* ⭐ Rating dorado (invitado) */
     .star-btn{
       background: transparent !important;
       border: none !important;
@@ -265,7 +265,7 @@
        TV 32" FULLSCREEN DASHBOARD
        ======================= */
     body.tv{
-      font-size: 26px; /* más grande base */
+      font-size: 26px;
     }
     body.tv header{
       position: fixed; top:0; left:0; right:0;
@@ -295,7 +295,7 @@
 
     .tvLayout{
       display: grid;
-      grid-template-columns: 1.1fr 0.9fr; /* izquierda más ancha */
+      grid-template-columns: 1.1fr 0.9fr;
       gap: 16px;
       flex: 1;
       min-height: 0;
@@ -314,10 +314,10 @@
     }
 
     body.tv h3{
-      font-size: 1.7rem !important; /* títulos más grandes */
+      font-size: 1.7rem !important;
     }
     body.tv .note{
-      font-size: 1.35rem; /* texto más grande */
+      font-size: 1.35rem;
       line-height:1.55;
     }
     body.tv .pill{
@@ -329,7 +329,7 @@
       height: 14px !important;
     }
 
-    /* usuarios 1 columna + más grande */
+    /* usuarios 1 columna */
     body.tv .userGrid{
       grid-template-columns: 1fr !important;
       gap:14px;
@@ -338,15 +338,48 @@
       padding:14px 16px;
       border-radius:14px;
     }
+
+    /* ✅ AÚN MÁS GRANDE PARTICIPANTES EN DASHBOARD */
     body.tv .userRow{
-      padding:12px 0;
+      padding:14px 0 !important;
     }
     body.tv .userName{
-      font-size:1.55rem;
+      font-size: 2.05rem !important;
+      font-weight: 900;
+      letter-spacing: .3px;
     }
     body.tv .userRight{
-      font-size:1.4rem;
-      letter-spacing:.4px;
+      font-size: 1.75rem !important;
+      font-weight: 900;
+      letter-spacing: .5px;
+      white-space:nowrap;
+    }
+
+    /* ✅ Nariz y boca en la misma línea (2 columnas) */
+    body.tv .noseMouthRow{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:16px;
+      align-items:start;
+    }
+
+    /* ⭐ Estrellas doradas en el dashboard */
+    #dashboard .dashStar{
+      color:#3b3f52;
+      font-size:1.9rem;
+      letter-spacing:2px;
+      text-shadow:0 2px 6px rgba(0,0,0,.45);
+    }
+    #dashboard .dashStar.filled{
+      color:#f6c453;
+      text-shadow:
+        0 0 8px rgba(246,196,83,.6),
+        0 2px 10px rgba(0,0,0,.6);
+    }
+    #dashboard .dashStarsWrap{
+      display:inline-flex;
+      gap:2px;
+      transform: translateY(2px);
     }
   </style>
 </head>
@@ -1310,7 +1343,11 @@
 
     const rows = entries.map(e=>{
       const stars = e.rating
-        ? `${"★".repeat(e.rating)}${"☆".repeat(5-e.rating)}`
+        ? `<span class="dashStarsWrap">${
+            Array.from({length:5}, (_,i)=>
+              `<span class="dashStar ${i < e.rating ? "filled" : ""}">★</span>`
+            ).join("")
+          }</span>`
         : "—";
 
       const quizMark =
@@ -1413,7 +1450,7 @@
             </div>
           </div>
 
-          <!-- DERECHA: RATING + NARIZ + BOCA + QUIZ -->
+          <!-- DERECHA: RATING + NARIZ/BOCA EN 2 COLUMNAS + QUIZ -->
           <div class="tvCol">
 
             <div class="tvBlock">
@@ -1425,13 +1462,16 @@
             </div>
 
             <div class="tvBlock">
-              <h3>👃 Nariz (top 3)</h3>
-              ${topNotesHTML(notesMap[w.id] || {})}
-            </div>
-
-            <div class="tvBlock">
-              <h3>👄 Boca (top 3)</h3>
-              ${topMouthHTML(mouthMap[w.id] || {})}
+              <div class="noseMouthRow">
+                <div>
+                  <h3 style="margin-bottom:6px">👃 Nariz (top 3)</h3>
+                  ${topNotesHTML(notesMap[w.id] || {})}
+                </div>
+                <div>
+                  <h3 style="margin-bottom:6px">👄 Boca (top 3)</h3>
+                  ${topMouthHTML(mouthMap[w.id] || {})}
+                </div>
+              </div>
             </div>
 
             <div class="tvBlock">
