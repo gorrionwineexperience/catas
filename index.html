@@ -51,9 +51,52 @@
       width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
       background: linear-gradient(145deg, var(--accent), var(--accent2));
       color:#1a1a1a; font-weight:800; box-shadow: var(--shadow);
+      flex:0 0 auto;
     }
     h1{font-size:1.15rem; margin:0}
     .sub{color:var(--muted); font-size:.9rem; margin-top:2px}
+
+    /* Header layout base */
+    .headerRow{
+      display:flex; align-items:center; justify-content:space-between; gap:12px;
+      width:100%;
+    }
+    .headerLeft{
+      display:flex; align-items:center; gap:12px; min-width:0;
+    }
+    .headerTitle{min-width:0;}
+    .headerWineInfo{
+      display:none; /* se activa solo en dashboard */
+      font-weight:900;
+      white-space:nowrap;
+      color:var(--text);
+      background:#111218;
+      border:1px dashed #2b2f3d;
+      padding:6px 10px;
+      border-radius:999px;
+    }
+    .headerControls{
+      display:none; /* solo dashboard */
+      gap:8px; align-items:center;
+    }
+
+    /* Barra de progreso en el header (solo dashboard) */
+    .headerProgress{
+      display:none; /* solo dashboard */
+      height:8px;
+      margin:8px 16px 10px;
+      border-radius:999px;
+      background:#222634;
+      overflow:hidden;
+      border:1px solid #2d3142;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+    }
+    .headerProgress > div{
+      height:100%;
+      width:0%;
+      background: linear-gradient(90deg, var(--accent), var(--accent2));
+      transition: width .6s ease;
+    }
 
     main{padding:18px 0 28px}
     .grid{display:grid; grid-template-columns: 1.15fr .85fr; gap:16px;}
@@ -271,14 +314,34 @@
       position: fixed; top:0; left:0; right:0;
       z-index: 50;
     }
+    body.tv .wrap{max-width:none;}
+    body.tv .headerRow{
+      padding: 10px 14px;
+      gap:10px;
+    }
+    body.tv .headerWineInfo{
+      display:inline-flex;
+      font-size: clamp(.9rem, 1.2vw, 1.2rem);
+      padding: 6px 10px;
+    }
+    body.tv .headerControls{
+      display:flex;
+    }
+    body.tv .headerProgress{
+      display:block;
+      margin: 6px 14px 10px;
+      height: 8px;
+    }
+
+    /* ↓ aumentamos el padding-top porque el header es más alto con la barra */
     body.tv #dashboard.wrap{
       max-width: none; padding: 0; margin: 0;
-      padding-top: 78px; height: 100vh;
+      padding-top: 96px; height: 100vh;
     }
     body.tv #dashGrid{
       grid-template-columns: 1fr !important;
       gap: 0 !important; margin-top: 0 !important;
-      height: calc(100vh - 78px);
+      height: calc(100vh - 96px);
       padding: 10px 14px 12px;
     }
     body.tv #dashGrid .card{
@@ -327,10 +390,6 @@
       display:inline-flex; gap:2px;
       transform: translateY(2px);
     }
-
-    body.tv .tvHeader .meta{ margin-top: 4px; }
-    body.tv .tvHeader .progress{ margin-top: 8px; }
-    body.tv .tvHeader .steps{ margin-top: 6px; }
 
     /* =======================
        TV RESPONSIVE v2 (más pequeño)
@@ -386,28 +445,41 @@
       width: calc(100% / var(--tv-scale, .85));
       height: calc(100% / var(--tv-scale, .85));
     }
+
+    @media (max-width:520px){
+      .headerWineInfo{display:none !important;}
+    }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="wrap brand">
-    <div class="logo">GW</div>
-    <div>
-      <h1>La degustazione de Puglia</h1>
-      <div class="sub">Vino activo sincronizado en tiempo real</div>
+  <div class="wrap headerRow">
+    <div class="headerLeft">
+      <div class="logo">GW</div>
+      <div class="headerTitle">
+        <h1>La degustazione de Puglia</h1>
+        <div class="sub">Vino activo sincronizado en tiempo real</div>
+      </div>
     </div>
+
+    <!-- SOLO DASHBOARD: Vino activo + nombre -->
+    <div id="headerWineInfo" class="headerWineInfo"></div>
+
+    <!-- SOLO DASHBOARD: Fullscreen -->
+    <div class="headerControls">
+      <button id="fsBtn" class="primary" style="padding:8px 10px; border-radius:10px;">⛶ Fullscreen</button>
+    </div>
+  </div>
+
+  <!-- SOLO DASHBOARD: Barra de progreso -->
+  <div id="headerProgress" class="headerProgress">
+    <div id="headerProgressBar"></div>
   </div>
 </header>
 
 <!-- DASHBOARD (TV) -->
 <section id="dashboard" class="wrap" style="display:none; padding-top:14px;">
-  <div class="card">
-    <div class="pill">Dashboard en vivo</div>
-    <div class="row" style="margin-top:10px">
-      <button id="fsBtn" class="primary">⛶ Pantalla completa</button>
-    </div>
-  </div>
   <div id="dashGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin-top:12px;"></div>
 </section>
 
@@ -676,10 +748,9 @@
   // --- FireTV/Silk auto-scale + override manual ---
   if (isDashboard) {
     const ua = navigator.userAgent || "";
-    const isSilk = /Silk/i.test(ua) || /AFT/i.test(ua); // AFT = Amazon Fire TV
+    const isSilk = /Silk/i.test(ua) || /AFT/i.test(ua);
     if (isSilk) document.body.classList.add("silk");
 
-    // Ajuste manual: ?tvscale=0.75
     const tvScaleParam = parseFloat(qs.get("tvscale"));
     if (!isNaN(tvScaleParam) && tvScaleParam > 0.5 && tvScaleParam < 1.2) {
       document.documentElement.style.setProperty("--tv-scale", String(tvScaleParam));
@@ -754,7 +825,7 @@
   }
 
   function progressPercent(activeId){
-    if(activeId <= 0) return 0;
+    if(activeId <= 1) return 0;
     return (activeId-1)/(wines.length-1)*100;
   }
 
@@ -765,31 +836,17 @@
 
   // 👃 Checklist nariz
   const noteTags = [
-    "Cítrico 🍋",
-    "Floral 🌸",
-    "Fruta roja 🍒",
-    "Fruta negra 🍇",
-    "Herbáceo 🌿",
-    "Especias 🌶️",
-    "Madera / vainilla 🌳",
-    "Mineral / salino 🧂",
-    "Tostado / café 🍫☕",
-    "Terroso / cuero 🍄"
+    "Cítrico 🍋","Floral 🌸","Fruta roja 🍒","Fruta negra 🍇","Herbáceo 🌿",
+    "Especias 🌶️","Madera / vainilla 🌳","Mineral / salino 🧂",
+    "Tostado / café 🍫☕","Terroso / cuero 🍄"
   ];
   function notesLSKey(wineId){ return `gw_notes_${wineId}`; }
 
   // 👄 Checklist boca
   const mouthTags = [
-    "Seco / nada dulce 🧊",
-    "Goloso / frutal 🍬",
-    "Acidez alta 🍋",
-    "Acidez suave 🙂",
-    "Tanino suave 🤝",
-    "Tanino intenso 😬",
-    "Cuerpo ligero 💨",
-    "Cuerpo potente 🏋️",
-    "Cremoso / untuoso 🥛",
-    "Final largo ⏳"
+    "Seco / nada dulce 🧊","Goloso / frutal 🍬","Acidez alta 🍋","Acidez suave 🙂",
+    "Tanino suave 🤝","Tanino intenso 😬","Cuerpo ligero 💨","Cuerpo potente 🏋️",
+    "Cremoso / untuoso 🥛","Final largo ⏳"
   ];
   function mouthLSKey(wineId){ return `gw_mouth_${wineId}`; }
 
@@ -1074,6 +1131,28 @@
     `;
   }
 
+  // --- Header vino activo + barra progreso (solo dashboard) ---
+  const headerWineInfo = document.getElementById("headerWineInfo");
+  const headerProgress = document.getElementById("headerProgress");
+  const headerProgressBar = document.getElementById("headerProgressBar");
+
+  function updateHeaderWine(activeId){
+    if(!isDashboard) return;
+
+    if(headerProgress) headerProgress.style.display="block";
+
+    if(activeId === 0){
+      if(headerWineInfo) headerWineInfo.textContent = "⏸ Intermedio";
+      if(headerProgressBar) headerProgressBar.style.width = "0%";
+      return;
+    }
+    const w = wines.find(x=>x.id===activeId) || wines[0];
+    if(headerWineInfo) headerWineInfo.textContent = `🍷 Vino ${w.id}/${wines.length} · ${w.name}`;
+
+    const pct = progressPercent(w.id);
+    if(headerProgressBar) headerProgressBar.style.width = pct + "%";
+  }
+
   function renderWine(activeId, hostNote, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}){
     const w = wines.find(x=>x.id===activeId) || wines[0];
     wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
@@ -1251,7 +1330,6 @@
   }
 
   // ===== DASHBOARD MODE =====
-  const dashEl  = document.getElementById("dashboard");
   const dashGrid= document.getElementById("dashGrid");
 
   function ratingHistogramHTML(rForWine = {}){
@@ -1408,24 +1486,6 @@
     `;
   }
 
-  function dashboardProgressHTML(activeId){
-    if(activeId === 0){
-      return `
-        <div class="progress" style="margin-top:8px"><div style="width:0%"></div></div>
-        <div class="steps" style="margin-top:6px">
-          ${wines.map(()=>`<div class="dot"></div>`).join("")}
-        </div>
-      `;
-    }
-    const w = wines.find(x=>x.id===activeId) || wines[0];
-    return `
-      <div class="progress" style="margin-top:8px"><div style="width:${progressPercent(w.id)}%"></div></div>
-      <div class="steps" style="margin-top:6px">
-        ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
-      </div>
-    `;
-  }
-
   function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}, expectedCount=12){
     if(!dashGrid) return;
 
@@ -1436,9 +1496,8 @@
           <div style="margin-top:6px; font-weight:900; font-size:2.2rem; font-family:'Playfair Display', serif;">
             Pausa Mediterránea
           </div>
-          ${dashboardProgressHTML(0)}
           <div class="note" style="margin-top:8px">
-            Ahora mismo no hay vino activo. En cuanto el host siga, saldrá aquí el siguiente resumen.
+            Ahora mismo no hay vino activo.
           </div>
         </div>
       `;
@@ -1470,17 +1529,6 @@
           </div>
 
           <div class="tvCol">
-
-            <div class="tvBlock tvHeader">
-              <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
-              <div style="margin-top:4px; font-weight:900; font-size:2.1rem; font-family:'Playfair Display', serif;">
-                ${w.name}
-              </div>
-              <div class="meta" style="margin-bottom:2px;">
-                ${w.winery} · ${w.type}
-              </div>
-              ${dashboardProgressHTML(w.id)}
-            </div>
 
             <div class="tvBlock">
               <h3>⭐ Valoración</h3>
@@ -1531,14 +1579,13 @@
     if(!isDashboard) return;
     const mainWrap = document.querySelector("main.wrap");
     if(mainWrap) mainWrap.style.display = "none";
+    const dashEl = document.getElementById("dashboard");
     if(dashEl) dashEl.style.display = "block";
+    document.body.classList.add("tv");
   }
   toggleDashboardUI();
 
-  if(isDashboard){
-    document.body.classList.add("tv");
-  }
-
+  // Fullscreen desde el header (solo dashboard)
   function setupFullscreenBtn(){
     if(!isDashboard) return;
     const fsBtn = document.getElementById("fsBtn");
@@ -1577,7 +1624,7 @@
     };
 
     function updateLabel(){
-      fsBtn.textContent = isFs() ? "⛶ Salir pantalla completa" : "⛶ Pantalla completa";
+      fsBtn.textContent = isFs() ? "⛶ Salir" : "⛶ Fullscreen";
     }
 
     document.addEventListener("fullscreenchange", updateLabel);
@@ -1600,6 +1647,8 @@
     const notesMap      = data.notes || {};
     const mouthMap      = data.mouth || {};
     const userActionsMap= data.userActions || {};
+
+    updateHeaderWine(activeId);
 
     if(isDashboard){
       renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap, expectedUsers);
