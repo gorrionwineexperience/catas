@@ -373,6 +373,27 @@
       padding:12px 14px;
     }
 
+    /* ✅ Evita cortes de títulos en FireTV/Silk */
+    body.tv .tvBlock h3{
+      line-height: 1.25 !important;
+      margin: 0 0 10px !important;
+      padding-top: 2px;
+      padding-bottom: 2px;
+    }
+
+    /* ✅ Participantes: título visible + lista recortada sin scroll */
+    body.tv .participantsBlock{
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: visible;
+    }
+    body.tv .participantsBlock .participantsList{
+      flex: 1;
+      min-height: 0;
+      overflow: hidden;
+    }
+
     /* Nariz y boca en la misma línea (2 columnas) */
     body.tv .noseMouthRow{
       display:grid;
@@ -487,6 +508,7 @@
   </div>
 </header>
 
+<!-- DASHBOARD (TV) -->
 <section id="dashboard" class="wrap" style="display:none; padding-top:14px;">
   <div id="dashGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin-top:12px;"></div>
 </section>
@@ -496,6 +518,7 @@
     <section id="wineCard" class="card fade-in"></section>
 
     <aside class="card">
+      <!-- ✅ ESTADO (se oculta a invitados por JS) -->
       <div id="statusWrap">
         <div class="pill">Estado</div>
         <div id="status" class="note" style="margin-top:8px">Conectando…</div>
@@ -509,6 +532,7 @@
       <div id="hostPanel" class="hostBox" style="display:none">
         <div class="hostTitle">Modo Host</div>
 
+        <!-- 👥 Participantes esperados (global para toda la cata) -->
         <div class="section" style="margin-top:10px; padding-top:10px;">
           <h3 style="margin:0 0 6px; font-size:1rem;">👥 Participantes esperados</h3>
           <div class="row" style="align-items:center;">
@@ -529,6 +553,7 @@
         </div>
         <div id="hostButtons" class="nav"></div>
 
+        <!-- 🧨 RESET DB -->
         <div class="row" style="margin-top:10px">
           <button id="resetDbBtn" class="danger">🧨 Resetear DB (borrar votos)</button>
         </div>
@@ -545,6 +570,7 @@
         <div class="small" style="margin-top:6px">URL host: añade <b>?host=1</b></div>
       </div>
 
+      <!-- ✅ ORDEN DE SERVICIO (se oculta a invitados por JS) -->
       <div id="orderSection" class="section">
         <h3>Orden de servicio</h3>
         <ol class="note" id="orderList" style="margin-left:18px"></ol>
@@ -555,6 +581,7 @@
 
 <footer>🍷 Buona cata! · Gorrión Wine Experience · La degustazione de Puglia</footer>
 
+<!-- overlay show para cambio de vino -->
 <div id="overlay" class="overlay">
   <div class="ovCard">
     <div class="pill" style="justify-content:center">Ahora servimos</div>
@@ -564,6 +591,7 @@
   </div>
 </div>
 
+<!-- Name Gate obligatorio -->
 <div id="nameGate" class="overlay">
   <div class="ovCard" style="text-align:left">
     <div class="pill">Bienvenido/a</div>
@@ -589,6 +617,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
   import { getDatabase, ref, onValue, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
+  // 🔥 PEGA TU CONFIG REAL AQUÍ
   const firebaseConfig = {
   apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
   authDomain: "catas-9d780.firebaseapp.com",
@@ -746,6 +775,7 @@
   const isHost = qs.get("host") === "1";
   const isDashboard = qs.get("dashboard") === "1";
 
+  // FireTV/Silk auto-scale + override manual
   if (isDashboard) {
     const ua = navigator.userAgent || "";
     const isSilk = /Silk/i.test(ua) || /AFT/i.test(ua);
@@ -757,6 +787,7 @@
     }
   }
 
+  // Ocultar "Estado" y "Orden de servicio" a invitados
   if(!isHost && !isDashboard){
     const sw = document.getElementById("statusWrap");
     if(sw) sw.style.display = "none";
@@ -764,6 +795,7 @@
     if(os) os.style.display = "none";
   }
 
+  // ===== 👤 IDENTIFICACIÓN SIMPLE (OBLIGATORIA) =====
   let guestName = (localStorage.getItem("gw_name") || "").trim();
 
   function showNameGate(){
@@ -805,6 +837,7 @@
     return id;
   }
   const deviceId = getDeviceId();
+  // ===============================================
 
   function setTheme(id){
     const t = themes[id] || themes[1];
@@ -831,6 +864,7 @@
     return `img/maridaje-${n}.jpg`;
   }
 
+  // 👃 Checklist nariz
   const noteTags = [
     "Cítrico 🍋","Floral 🌸","Fruta roja 🍒","Fruta negra 🍇","Herbáceo 🌿",
     "Especias 🌶️","Madera / vainilla 🌳","Mineral / salino 🧂",
@@ -838,6 +872,7 @@
   ];
   function notesLSKey(wineId){ return `gw_notes_${wineId}`; }
 
+  // 👄 Checklist boca
   const mouthTags = [
     "Seco / nada dulce 🧊","Goloso / frutal 🍬","Acidez alta 🍋","Acidez suave 🙂",
     "Tanino suave 🤝","Tanino intenso 😬","Cuerpo ligero 💨","Cuerpo potente 🏋️",
@@ -845,6 +880,7 @@
   ];
   function mouthLSKey(wineId){ return `gw_mouth_${wineId}`; }
 
+  // ========= RATING =========
   function ratingLSKey(id){ return `gw_rating_${id}`; }
 
   function computeRatingStats(ratingsForWine = {}){
@@ -908,6 +944,7 @@
     });
   }
 
+  // ========= QUIZ =========
   function quizKey(id){ return `gw_quiz_${id}`; }
 
   function renderQuizSection(w, quizCounts=[0,0,0], hostNote=""){
@@ -969,6 +1006,7 @@
     }
   }
 
+  // ========= CHECKLIST NARIZ =========
   function renderNotesSection(w, notesMap = {}){
     let selected = [];
     try { selected = JSON.parse(localStorage.getItem(notesLSKey(w.id)) || "[]"); }
@@ -1038,6 +1076,7 @@
     });
   }
 
+  // ========= CHECKLIST BOCA =========
   function renderMouthSection(w, mouthMap = {}){
     let selected = [];
     try { selected = JSON.parse(localStorage.getItem(mouthLSKey(w.id)) || "[]"); }
@@ -1122,6 +1161,7 @@
     `;
   }
 
+  // --- Header vino activo + barra progreso (solo dashboard) ---
   const headerWineInfo = document.getElementById("headerWineInfo");
   const headerProgress = document.getElementById("headerProgress");
   const headerProgressBar = document.getElementById("headerProgressBar");
@@ -1522,10 +1562,12 @@
         <div class="tvLayout">
 
           <div class="tvCol">
-            <!-- ✅ participantsBlock + overflow hidden (0 scroll) -->
-            <div class="tvBlock participantsBlock" style="flex:1; overflow:hidden;">
+            <!-- ✅ título visible, lista recortada sin cortar el h3 -->
+            <div class="tvBlock participantsBlock" style="flex:1;">
               <h3>👥 Participantes (${participants}/${expectedCount})</h3>
-              ${userListHTML(w.id, actionsForWine)}
+              <div class="participantsList">
+                ${userListHTML(w.id, actionsForWine)}
+              </div>
             </div>
           </div>
 
@@ -1586,6 +1628,7 @@
   }
   toggleDashboardUI();
 
+  // Fullscreen desde el header (solo dashboard)
   function setupFullscreenBtn(){
     if(!isDashboard) return;
     const fsBtn = document.getElementById("fsBtn");
