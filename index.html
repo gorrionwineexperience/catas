@@ -329,24 +329,26 @@
       letter-spacing: .3px;
       border-width: 2px;
     }
-
-    body.tv .headerControls{
-      display:flex;
-    }
+    body.tv .headerControls{ display:flex; }
     body.tv .headerProgress{
       display:block;
       margin: 6px 14px 10px;
       height: 8px;
     }
 
+    /* ✅ Header height dinámico para que no tape el dashboard */
+    body.tv{
+      --header-h: 120px; /* fallback si JS no mide aún */
+    }
     body.tv #dashboard.wrap{
       max-width: none; padding: 0; margin: 0;
-      padding-top: 96px; height: 100vh;
+      padding-top: calc(var(--header-h) + 6px);
+      height: 100vh;
     }
     body.tv #dashGrid{
       grid-template-columns: 1fr !important;
       gap: 0 !important; margin-top: 0 !important;
-      height: calc(100vh - 96px);
+      height: calc(100vh - var(--header-h) - 6px);
       padding: 10px 14px 12px;
     }
     body.tv #dashGrid .card{
@@ -405,6 +407,7 @@
     #dashboard .dashStar{
       color:#3b3f52; letter-spacing:2px;
       text-shadow:0 2px 6px rgba(0,0,0,.45);
+      font-size: clamp(1.2rem, 1.8vw, 1.9rem);
     }
     #dashboard .dashStar.filled{
       color:#f6c453;
@@ -456,11 +459,6 @@
       white-space: nowrap;
     }
 
-    #dashboard .dashStar{
-      font-size: clamp(1.2rem, 1.8vw, 1.9rem);
-      letter-spacing: 2px;
-      text-shadow: 0 3px 8px rgba(0,0,0,.55);
-    }
     body.tv .tvBlock div[style*="height:8px"]{
       height: clamp(8px, .9vw, 12px) !important;
       border-radius: 999px;
@@ -1517,10 +1515,7 @@
   /* ✅ Auto-fit de participantes SIN SCROLL */
   function fitParticipants(expectedUsers){
     if(!isDashboard) return;
-
-    // 12 => factor ~0.83, 10 => 1.0, 8 => 1.1
     const factor = Math.max(0.78, Math.min(1.12, 10 / expectedUsers));
-
     document.body.style.setProperty("--p-name",  `clamp(${1.0*factor}rem, ${1.6*factor}vw, ${1.7*factor}rem)`);
     document.body.style.setProperty("--p-right", `clamp(${0.9*factor}rem, ${1.3*factor}vw, ${1.4*factor}rem)`);
     document.body.style.setProperty("--p-pad",   `clamp(${4*factor}px,  ${0.6*factor}vw, ${8*factor}px)`);
@@ -1545,7 +1540,6 @@
     }
 
     const w = wines.find(x=>x.id===activeId) || wines[0];
-
     const rForWine = ratingsMap[w.id] || {};
     const stats = computeRatingStats(rForWine);
     const qsLocal = quizCorrectStats(w, quizMap[w.id] || {});
@@ -1562,7 +1556,6 @@
         <div class="tvLayout">
 
           <div class="tvCol">
-            <!-- ✅ título visible, lista recortada sin cortar el h3 -->
             <div class="tvBlock participantsBlock" style="flex:1;">
               <h3>👥 Participantes (${participants}/${expectedCount})</h3>
               <div class="participantsList">
@@ -1627,6 +1620,17 @@
     document.body.classList.add("tv");
   }
   toggleDashboardUI();
+
+  // 🔧 Mide altura real del header para que no tape títulos en TV
+  function syncHeaderHeight(){
+    if(!isDashboard) return;
+    const headerEl = document.querySelector("header");
+    const h = headerEl ? headerEl.offsetHeight : 120;
+    document.body.style.setProperty("--header-h", h + "px");
+  }
+  window.addEventListener("load", syncHeaderHeight);
+  window.addEventListener("resize", syncHeaderHeight);
+  setTimeout(syncHeaderHeight, 250);
 
   // Fullscreen desde el header (solo dashboard)
   function setupFullscreenBtn(){
@@ -1694,7 +1698,8 @@
     updateHeaderWine(activeId);
 
     if(isDashboard){
-      fitParticipants(expectedUsers);   // ✅ AUTO-FIT sin scroll
+      syncHeaderHeight();          // ✅ re-mide por si cambió algo
+      fitParticipants(expectedUsers);
       renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap, expectedUsers);
       return;
     }
