@@ -17,8 +17,11 @@
       --accent:#ffb347; --accent2:#ff6f61; --ok:#9be7a1;
       --radius:18px; --shadow: 0 10px 30px rgba(0,0,0,.35);
 
-      /* escala TV (se puede sobreescribir con ?tvscale=0.75) */
+      /* escala TV dashboard (override con ?tvscale=0.75) */
       --tv-scale: .85;
+
+      /* altura header dinámica */
+      --header-h: 120px;
     }
     *{box-sizing:border-box}
     body{
@@ -336,20 +339,29 @@
       height: 8px;
     }
 
-    /* ✅ Header height dinámico para que no tape el dashboard */
-    body.tv{
-      --header-h: 120px; /* fallback si JS no mide aún */
-    }
-    body.tv #dashboard.wrap{
-      max-width: none; padding: 0; margin: 0;
-      padding-top: calc(var(--header-h) + 6px);
-      height: 100vh;
-    }
-    body.tv #dashGrid{
-      grid-template-columns: 1fr !important;
-      gap: 0 !important; margin-top: 0 !important;
-      height: calc(100vh - var(--header-h) - 6px);
+    /* ✅ Dashboard FIJO debajo del header (sin padding-top ni body-scale) */
+    body.tv #dashboard.tvDash{
+      position: fixed;
+      top: var(--header-h);
+      left: 0; right: 0; bottom: 0;
       padding: 10px 14px 12px;
+      max-width: none; margin: 0;
+      display: none;
+    }
+
+    /* ✅ Escala SOLO el contenido del dashboard */
+    body.tv #dashScale{
+      transform: scale(var(--tv-scale));
+      transform-origin: top left;
+      width: calc(100% / var(--tv-scale));
+      height: calc(100% / var(--tv-scale));
+    }
+
+    body.tv #dashGrid{
+      display: grid;
+      grid-template-columns: 1fr !important;
+      gap: 0 !important;
+      height: 100%;
     }
     body.tv #dashGrid .card{
       height: 100%;
@@ -421,13 +433,10 @@
     }
 
     /* =======================
-       TV RESPONSIVE v2 (más pequeño)
-       Pensado para 32" 720p + Firestick
+       TV RESPONSIVE v2
        ======================= */
     body.tv{
       font-size: clamp(14px, 1.6vw, 22px);
-
-      /* ✅ VARIABLES para auto-ajuste participantes (sin scroll) */
       --p-name: clamp(1.0rem, 1.6vw, 1.7rem);
       --p-right: clamp(.9rem, 1.3vw, 1.4rem);
       --p-pad: clamp(4px, .6vw, 8px);
@@ -445,37 +454,16 @@
       padding: 5px 8px;
     }
 
-    /* ✅ Aplicación de variables a la lista participantes */
-    body.tv .participantsBlock .userRow{
-      padding: var(--p-pad) 0 !important;
-    }
-    body.tv .participantsBlock .userName{
-      font-size: var(--p-name) !important;
-      font-weight: 900;
-    }
-    body.tv .participantsBlock .userRight{
-      font-size: var(--p-right) !important;
-      font-weight: 900;
-      white-space: nowrap;
-    }
+    body.tv .participantsBlock .userRow{ padding: var(--p-pad) 0 !important; }
+    body.tv .participantsBlock .userName{ font-size: var(--p-name) !important; font-weight: 900; }
+    body.tv .participantsBlock .userRight{ font-size: var(--p-right) !important; font-weight: 900; white-space: nowrap; }
 
     body.tv .tvBlock div[style*="height:8px"]{
       height: clamp(8px, .9vw, 12px) !important;
       border-radius: 999px;
     }
-    body.tv .tvBlock .small{
-      font-size: clamp(.75rem, .9vw, 1.0rem);
-    }
-    body.tv .card .meta{
-      font-size: clamp(.95rem, 1.1vw, 1.25rem) !important;
-    }
-
-    body.tv.silk{
-      transform: scale(var(--tv-scale, .85));
-      transform-origin: top left;
-      width: calc(100% / var(--tv-scale, .85));
-      height: calc(100% / var(--tv-scale, .85));
-    }
+    body.tv .tvBlock .small{ font-size: clamp(.75rem, .9vw, 1.0rem); }
+    body.tv .card .meta{ font-size: clamp(.95rem, 1.1vw, 1.25rem) !important; }
 
     @media (max-width:520px){
       .headerWineInfo{display:none !important;}
@@ -507,8 +495,10 @@
 </header>
 
 <!-- DASHBOARD (TV) -->
-<section id="dashboard" class="wrap" style="display:none; padding-top:14px;">
-  <div id="dashGrid" style="display:grid; grid-template-columns:repeat(auto-fit,minmax(250px,1fr)); gap:12px; margin-top:12px;"></div>
+<section id="dashboard" class="wrap tvDash">
+  <div id="dashScale">
+    <div id="dashGrid"></div>
+  </div>
 </section>
 
 <main class="wrap">
@@ -516,7 +506,6 @@
     <section id="wineCard" class="card fade-in"></section>
 
     <aside class="card">
-      <!-- ✅ ESTADO (se oculta a invitados por JS) -->
       <div id="statusWrap">
         <div class="pill">Estado</div>
         <div id="status" class="note" style="margin-top:8px">Conectando…</div>
@@ -530,7 +519,6 @@
       <div id="hostPanel" class="hostBox" style="display:none">
         <div class="hostTitle">Modo Host</div>
 
-        <!-- 👥 Participantes esperados (global para toda la cata) -->
         <div class="section" style="margin-top:10px; padding-top:10px;">
           <h3 style="margin:0 0 6px; font-size:1rem;">👥 Participantes esperados</h3>
           <div class="row" style="align-items:center;">
@@ -551,7 +539,6 @@
         </div>
         <div id="hostButtons" class="nav"></div>
 
-        <!-- 🧨 RESET DB -->
         <div class="row" style="margin-top:10px">
           <button id="resetDbBtn" class="danger">🧨 Resetear DB (borrar votos)</button>
         </div>
@@ -568,7 +555,6 @@
         <div class="small" style="margin-top:6px">URL host: añade <b>?host=1</b></div>
       </div>
 
-      <!-- ✅ ORDEN DE SERVICIO (se oculta a invitados por JS) -->
       <div id="orderSection" class="section">
         <h3>Orden de servicio</h3>
         <ol class="note" id="orderList" style="margin-left:18px"></ol>
@@ -579,7 +565,6 @@
 
 <footer>🍷 Buona cata! · Gorrión Wine Experience · La degustazione de Puglia</footer>
 
-<!-- overlay show para cambio de vino -->
 <div id="overlay" class="overlay">
   <div class="ovCard">
     <div class="pill" style="justify-content:center">Ahora servimos</div>
@@ -589,7 +574,6 @@
   </div>
 </div>
 
-<!-- Name Gate obligatorio -->
 <div id="nameGate" class="overlay">
   <div class="ovCard" style="text-align:left">
     <div class="pill">Bienvenido/a</div>
@@ -773,19 +757,14 @@
   const isHost = qs.get("host") === "1";
   const isDashboard = qs.get("dashboard") === "1";
 
-  // FireTV/Silk auto-scale + override manual
+  // FireTV/Silk escala SOLO dashboard
   if (isDashboard) {
-    const ua = navigator.userAgent || "";
-    const isSilk = /Silk/i.test(ua) || /AFT/i.test(ua);
-    if (isSilk) document.body.classList.add("silk");
-
     const tvScaleParam = parseFloat(qs.get("tvscale"));
     if (!isNaN(tvScaleParam) && tvScaleParam > 0.5 && tvScaleParam < 1.2) {
       document.documentElement.style.setProperty("--tv-scale", String(tvScaleParam));
     }
   }
 
-  // Ocultar "Estado" y "Orden de servicio" a invitados
   if(!isHost && !isDashboard){
     const sw = document.getElementById("statusWrap");
     if(sw) sw.style.display = "none";
@@ -862,7 +841,6 @@
     return `img/maridaje-${n}.jpg`;
   }
 
-  // 👃 Checklist nariz
   const noteTags = [
     "Cítrico 🍋","Floral 🌸","Fruta roja 🍒","Fruta negra 🍇","Herbáceo 🌿",
     "Especias 🌶️","Madera / vainilla 🌳","Mineral / salino 🧂",
@@ -870,7 +848,6 @@
   ];
   function notesLSKey(wineId){ return `gw_notes_${wineId}`; }
 
-  // 👄 Checklist boca
   const mouthTags = [
     "Seco / nada dulce 🧊","Goloso / frutal 🍬","Acidez alta 🍋","Acidez suave 🙂",
     "Tanino suave 🤝","Tanino intenso 😬","Cuerpo ligero 💨","Cuerpo potente 🏋️",
@@ -878,7 +855,6 @@
   ];
   function mouthLSKey(wineId){ return `gw_mouth_${wineId}`; }
 
-  // ========= RATING =========
   function ratingLSKey(id){ return `gw_rating_${id}`; }
 
   function computeRatingStats(ratingsForWine = {}){
@@ -942,7 +918,6 @@
     });
   }
 
-  // ========= QUIZ =========
   function quizKey(id){ return `gw_quiz_${id}`; }
 
   function renderQuizSection(w, quizCounts=[0,0,0], hostNote=""){
@@ -1004,7 +979,6 @@
     }
   }
 
-  // ========= CHECKLIST NARIZ =========
   function renderNotesSection(w, notesMap = {}){
     let selected = [];
     try { selected = JSON.parse(localStorage.getItem(notesLSKey(w.id)) || "[]"); }
@@ -1074,7 +1048,6 @@
     });
   }
 
-  // ========= CHECKLIST BOCA =========
   function renderMouthSection(w, mouthMap = {}){
     let selected = [];
     try { selected = JSON.parse(localStorage.getItem(mouthLSKey(w.id)) || "[]"); }
@@ -1159,15 +1132,11 @@
     `;
   }
 
-  // --- Header vino activo + barra progreso (solo dashboard) ---
   const headerWineInfo = document.getElementById("headerWineInfo");
-  const headerProgress = document.getElementById("headerProgress");
   const headerProgressBar = document.getElementById("headerProgressBar");
 
   function updateHeaderWine(activeId){
     if(!isDashboard) return;
-
-    if(headerProgress) headerProgress.style.display="block";
 
     if(activeId === 0){
       if(headerWineInfo) headerWineInfo.textContent = "⏸ Intermedio";
@@ -1452,7 +1421,6 @@
     const entries = Object.values(actionsForWine || {})
       .map(a => {
         const rating = a?.rating || 0;
-
         const qa = (a?.quizAnswer ?? null);
         const isCorrect =
           (ww && qa !== null && typeof ww.quiz?.correct === "number")
@@ -1512,7 +1480,6 @@
     `;
   }
 
-  /* ✅ Auto-fit de participantes SIN SCROLL */
   function fitParticipants(expectedUsers){
     if(!isDashboard) return;
     const factor = Math.max(0.78, Math.min(1.12, 10 / expectedUsers));
@@ -1621,18 +1588,17 @@
   }
   toggleDashboardUI();
 
-  // 🔧 Mide altura real del header para que no tape títulos en TV
+  // ✅ mide header real y fija dashboard debajo SIEMPRE
   function syncHeaderHeight(){
     if(!isDashboard) return;
     const headerEl = document.querySelector("header");
     const h = headerEl ? headerEl.offsetHeight : 120;
-    document.body.style.setProperty("--header-h", h + "px");
+    document.documentElement.style.setProperty("--header-h", h + "px");
   }
   window.addEventListener("load", syncHeaderHeight);
   window.addEventListener("resize", syncHeaderHeight);
   setTimeout(syncHeaderHeight, 250);
 
-  // Fullscreen desde el header (solo dashboard)
   function setupFullscreenBtn(){
     if(!isDashboard) return;
     const fsBtn = document.getElementById("fsBtn");
@@ -1661,7 +1627,7 @@
         if(document.exitFullscreen) await document.exitFullscreen();
         else if(document.webkitExitFullscreen) await document.webkitExitFullscreen();
         else if(document.mozCancelFullScreen) await document.mozCancelFullScreen();
-        else if(document.msExitFullscreen) await document.msExitFullscreen();
+        else if(document.msExitFullscreen) await document.msRequestFullscreen();
       }catch(e){}
     }
 
@@ -1698,7 +1664,7 @@
     updateHeaderWine(activeId);
 
     if(isDashboard){
-      syncHeaderHeight();          // ✅ re-mide por si cambió algo
+      syncHeaderHeight();
       fitParticipants(expectedUsers);
       renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap, expectedUsers);
       return;
