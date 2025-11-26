@@ -239,6 +239,12 @@
       border:1px solid #2a2d3a; border-radius:10px; padding:10px 12px;
       font-size:1rem; outline:none;
     }
+
+    /* 🔤 Nombre en mayúsculas visualmente */
+    #nameInput{
+      text-transform: uppercase;
+    }
+
     .row{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
 
     .toggle{
@@ -687,6 +693,15 @@
 
 <div id="nameGate" class="overlay">
   <div class="ovCard" style="text-align:left">
+    <div class="welcomeLogoWrap" style="justify-content:flex-start; margin-top:0; margin-bottom:10px;">
+      <img
+        src="img/logoredondo.png"
+        alt="Gorrión Wine Experience"
+        class="welcomeLogo"
+        style="width:80px; max-width:30vw;"
+      />
+    </div>
+
     <div class="pill">Bienvenido/a</div>
     <div class="ovBig" style="font-size:1.8rem; margin-top:.4rem;">Antes de entrar…</div>
     <div class="note" style="margin-top:6px">
@@ -694,7 +709,7 @@
     </div>
 
     <input id="nameInput" class="input" maxlength="30"
-           placeholder="Tu nombre / apodo" style="margin-top:10px"/>
+           placeholder="TU NOMBRE / APODO" style="margin-top:10px"/>
 
     <div class="row" style="margin-top:10px">
       <button id="enterBtn" class="primary" disabled>Entrar a la cata</button>
@@ -907,6 +922,10 @@
 
   // ===== 👤 IDENTIFICACIÓN SIMPLE (OBLIGATORIA) =====
   let guestName = (localStorage.getItem("gw_name") || "").trim();
+  if(guestName){
+    guestName = guestName.toUpperCase();
+    localStorage.setItem("gw_name", guestName);
+  }
 
   function showNameGate(){
     const gate = document.getElementById("nameGate");
@@ -924,7 +943,8 @@
     btn.onclick = () => {
       const n = input.value.trim();
       if(!n) return;
-      guestName = n.slice(0, 30);
+      const upper = n.toUpperCase();
+      guestName = upper.slice(0, 30);
       localStorage.setItem("gw_name", guestName);
       gate.classList.remove("show");
       document.body.style.overflow = "";
@@ -1158,7 +1178,7 @@
       localStorage.setItem(notesLSKey(w.id), JSON.stringify(arr));
     }
 
-    wrap.querySelectorAll("button[data-note-idx]").forEach(btn=>{
+    wrap.querySelectorAll("button[data-note-idx"]).forEach(btn=>{
       btn.onclick = () => {
         const idx = Number(btn.getAttribute("data-note-idx"));
         let selected = getSelected();
@@ -1227,7 +1247,7 @@
       localStorage.setItem(mouthLSKey(w.id), JSON.stringify(arr));
     }
 
-    wrap.querySelectorAll("button[data-mouth-idx]").forEach(btn=>{
+    wrap.querySelectorAll("button[data-mouth-idx"]).forEach(btn=>{
       btn.onclick = () => {
         const idx = Number(btn.getAttribute("data-mouth-idx"));
         let selected = getSelected();
