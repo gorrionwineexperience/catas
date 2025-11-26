@@ -283,7 +283,7 @@
         rgba(10,10,12,.92);
       backdrop-filter: blur(6px);
     }
-    .overlay.show{display:grid; animation:ov .45s.ease;}
+    .overlay.show{display:grid; animation:ov .45s ease;}
     @keyframes ov{from{opacity:0; transform:scale(.98)} to{opacity:1; transform:scale(1)}}
     .ovCard{
       padding:26px 20px; border-radius:22px; border:1px solid #2a2d3a;
@@ -298,7 +298,7 @@
     .ovWine{font-size:1.12rem; color:var(--text); font-weight:800}
     .ovSub{color:var(--muted); margin-top:6px}
 
-    .fade-in{animation:fade .25s.ease;}
+    .fade-in{animation:fade .25s ease;}
     @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
 
     footer{color:var(--muted); font-size:.9rem; text-align:center; padding:18px}
@@ -1304,16 +1304,22 @@
     });
   }
 
-  // 🌟 Bienvenida sincronizada (con contador en invitado)
+  // 🌟 Bienvenida sincronizada (contador en la misma línea que la pill, solo invitado)
   function renderWelcome(hostNote, joinedCount = 0, expectedUsers = 12){
+    const isGuest = !isHost && !isDashboard;
+
     wineCard.innerHTML = `
-      <div class="pill">Bienvenida</div>
+      <div class="welcomeTopRow" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
+        ${isGuest ? `
+          <div class="small" style="color:var(--muted);">
+            Conectados: <b>${joinedCount}/${expectedUsers}</b>
+          </div>
+        ` : `<div></div>`}
+        <div class="pill">Bienvenida</div>
+      </div>
 
       <div class="title" style="margin-top:14px;">
         <div>
-          <div class="small" style="color:var(--muted); margin-bottom:4px;">
-            Conectados: <b>${joinedCount}/${expectedUsers}</b>
-          </div>
           <h2>La degustazione de Puglia</h2>
           <div class="meta">5 vinos · 5 bocados · 1 viaje por el tacón de Italia</div>
         </div>
