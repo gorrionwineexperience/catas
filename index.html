@@ -358,7 +358,7 @@
 
     body.tv .headerWineInfo{
       display:inline-flex;
-      font-size: clamp(1.2rem, 2.2vw, 2.0rem);
+      font-size: clamp(1.0rem, 2.0vw, 1.9rem);
       padding: 8px 14px;
       font-weight: 900;
       letter-spacing: .3px;
@@ -568,7 +568,7 @@
       height:100%;
       width:0%;
       background:linear-gradient(90deg,var(--accent),var(--accent2));
-      transition:width .4s ease;
+      transition:width .4s.ease;
     }
   </style>
 </head>
@@ -648,7 +648,7 @@
           <button id="resetDbBtn" class="danger">🧨 Resetear DB (borrar votos)</button>
         </div>
         <div class="small" style="margin-top:6px; opacity:.9">
-          Esto borra ratings, quiz, nariz, boca y acciones. No borra tus vinos.
+          Esto borra ratings, quiz, nariz, boca, acciones y conectados. No borra tus vinos.
         </div>
 
         <div style="margin-top:10px; font-weight:800;">Nota del host (sale en todos)</div>
@@ -934,11 +934,30 @@
     if(os) os.style.display = "none";
   }
 
+  function getDeviceId(){
+    let id = localStorage.getItem("gw_device");
+    if(!id){
+      if(window.crypto && crypto.randomUUID) id = crypto.randomUUID();
+      else id = "dev_" + Math.random().toString(36).slice(2) + Date.now();
+      localStorage.setItem("gw_device", id);
+    }
+    return id;
+  }
+  const deviceId = getDeviceId();
+
   // ===== 👤 IDENTIFICACIÓN SIMPLE (OBLIGATORIA) =====
   let guestName = (localStorage.getItem("gw_name") || "").trim();
   if(guestName){
     guestName = guestName.toUpperCase().slice(0,8);
     localStorage.setItem("gw_name", guestName);
+  }
+
+  // 🔢 marcar usuario conectado en bienvenida
+  function markJoined(){
+    if(isHost || isDashboard) return;
+    const nameToUse = guestName || "INVITADO";
+    const jRef = ref(db, `joinedUsers/${deviceId}`);
+    update(jRef, { name: nameToUse, ts: Date.now() });
   }
 
   function showNameGate(){
@@ -962,26 +981,16 @@
       localStorage.setItem("gw_name", guestName);
       gate.classList.remove("show");
       document.body.style.overflow = "";
+      markJoined(); // cuenta como conectado
     };
   }
 
   if(!isHost && !isDashboard){
     if(!guestName) showNameGate();
+    else markJoined(); // ya tenía nombre guardado, cuenta como conectado
   }else{
     guestName = isHost ? "HOST" : "DASHBOARD";
   }
-
-  function getDeviceId(){
-    let id = localStorage.getItem("gw_device");
-    if(!id){
-      if(window.crypto && crypto.randomUUID) id = crypto.randomUUID();
-      else id = "dev_" + Math.random().toString(36).slice(2) + Date.now();
-      localStorage.setItem("gw_device", id);
-    }
-    return id;
-  }
-  const deviceId = getDeviceId();
-  // ===============================================
 
   function setTheme(id){
     const t = themes[id] || themes[1];
@@ -1025,7 +1034,6 @@
   // 🔹 helper para quedarnos sólo con los emojis
   function emojiOnly(tag){
     if(!tag) return "";
-    // rango amplio de emojis (básico) sin usar \p{...}
     const em = tag.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}]/gu);
     return em ? em.join("") : tag;
   }
@@ -1111,7 +1119,7 @@
       `;
     }).join("");
 
-    // 🐦 Mensajes del pájaro
+    // 🐦 Mensajes
     let feedbackText = "Selecciona la respuesta correcta";
     if (answeredOption !== null) {
       if (Number(answeredOption) === w.quiz.correct) {
@@ -1372,11 +1380,13 @@
   const headerWineInfo = document.getElementById("headerWineInfo");
   const headerProgressBar = document.getElementById("headerProgressBar");
 
-  function updateHeaderWine(activeId){
+  function updateHeaderWine(activeId, joinedCount=0, expectedUsers=12){
     if(!isDashboard) return;
 
+    const label = expectedUsers ? `${joinedCount}/${expectedUsers}` : `${joinedCount}`;
+
     if(activeId === -1){
-      if(headerWineInfo) headerWineInfo.textContent = "🎬 Bienvenida";
+      if(headerWineInfo) headerWineInfo.textContent = `🎬 Bienvenida · ${label}`;
       if(headerProgressBar) headerProgressBar.style.width = "0%";
       return;
     }
@@ -1552,7 +1562,7 @@
     if(resetDbBtn){
       resetDbBtn.onclick = async () => {
         const ok = confirm(
-          "⚠️ Vas a borrar TODAS las puntuaciones y respuestas.\n\n" +
+          "⚠️ Vas a borrar TODAS las puntuaciones, respuestas y conectados.\n\n" +
           "Esto no se puede deshacer.\n\n" +
           "¿Seguro que quieres resetear la base de datos?"
         );
@@ -1568,7 +1578,8 @@
           quiz: {},
           notes: {},
           mouth: {},
-          userActions: {}
+          userActions: {},
+          joinedUsers: {}
         });
 
         alert("✅ DB reseteada. Todo vuelve a 0.");
@@ -1739,7 +1750,7 @@
     document.body.style.setProperty("--p-pad",   `clamp(${4*factor}px,  ${0.6*factor}vw, ${8*factor}px)`);
   }
 
-  function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}, expectedCount=12){
+  function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}, expectedCount=12, joinedCount=0){
     if(!dashGrid) return;
 
     if(activeId === -1){
@@ -1759,7 +1770,7 @@
           </div>
 
           <div class="note" style="margin-top:12px">
-            El host aún no ha activado el primer vino. Acomódate, sirve agua y revisa tu ficha de cata.
+            Conectados: <b>${joinedCount}/${expectedCount}</b>. El host aún no ha activado el primer vino.
           </div>
 
           <div class="section" style="margin-top:14px; padding-top:12px; border-top:1px dashed #2b2f3d;">
@@ -1877,7 +1888,6 @@
     document.documentElement.style.setProperty("--header-h", h + "px");
   }
   window.addEventListener("load", syncHeaderHeight);
-  window.addListener?.("resize", syncHeaderHeight);
   window.addEventListener("resize", syncHeaderHeight);
   setTimeout(syncHeaderHeight, 250);
 
@@ -1961,13 +1971,15 @@
     const notesMap      = data.notes || {};
     const mouthMap      = data.mouth || {};
     const userActionsMap= data.userActions || {};
+    const joinedUsers   = data.joinedUsers || {};
+    const joinedCount   = Object.keys(joinedUsers).length;
 
-    updateHeaderWine(activeId);
+    updateHeaderWine(activeId, joinedCount, expectedUsers);
 
     if(isDashboard){
       syncHeaderHeight();
       fitParticipants(expectedUsers);
-      renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap, expectedUsers);
+      renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap, expectedUsers, joinedCount);
       return;
     }
 
@@ -2011,7 +2023,8 @@
           quiz: {},
           notes: {},
           mouth: {},
-          userActions: {}
+          userActions: {},
+          joinedUsers: {}
         });
       }
     }, { onlyOnce:true });
