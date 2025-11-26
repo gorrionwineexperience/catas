@@ -51,10 +51,20 @@
     .wrap{max-width:980px; margin:0 auto; padding:14px 16px;}
     .brand{display:flex; align-items:center; gap:12px;}
     .logo{
-      width:42px; height:42px; border-radius:12px; display:grid; place-items:center;
-      background: linear-gradient(145deg, var(--accent), var(--accent2));
-      color:#1a1a1a; font-weight:800; box-shadow: var(--shadow);
+      width:42px;
+      height:42px;
+      border-radius:12px;
       flex:0 0 auto;
+      overflow:hidden;
+      box-shadow: var(--shadow);
+      background:#0f0f12;
+      display:block;
+    }
+    .logo img{
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
     }
     h1{font-size:1.15rem; margin:0}
     .sub{color:var(--muted); font-size:.9rem; margin-top:2px}
@@ -567,7 +577,9 @@
 <header>
   <div class="wrap headerRow">
     <div class="headerLeft">
-      <div class="logo">GW</div>
+      <div class="logo">
+        <img src="img/logoredondo.png" alt="Gorrión Wine Experience" />
+      </div>
       <div class="headerTitle">
         <h1>La degustazione de Puglia</h1>
         <div class="sub">Vino activo sincronizado en tiempo real</div>
@@ -1550,7 +1562,7 @@
 
     return pairs.map(p=>{
       const pct = Math.round((p.count/total)*100);
-      return `<div class="note">• ${mouthTags ? noteTags[p.idx] : ""} <span class="small">(${pct}%)</span></div>`;
+      return `<div class="note">• ${noteTags[p.idx]} <span class="small">(${pct}%)</span></div>`;
     }).join("");
   }
 
