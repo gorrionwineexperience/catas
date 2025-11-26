@@ -513,9 +513,15 @@
         border-radius:22px;
         padding-bottom:90px;
       }
+
+      /* ✅ Versión invitado móvil: no recorta la imagen, la muestra completa */
       body.guest .heroImg{
-        height:240px;
+        width:100%;
+        height:auto;           /* sin altura fija */
+        max-height:60vh;       /* que no ocupe toda la pantalla */
         border-radius:20px;
+        object-fit:contain;    /* muestra la imagen completa */
+        background:#111218;    /* marco neutro alrededor si sobra espacio */
       }
     }
 
@@ -581,8 +587,8 @@
         <img src="img/logoredondo.png" alt="Gorrión Wine Experience" />
       </div>
       <div class="headerTitle">
-        <h1>LA DEGUSTAZIONE DI PUGLIA</h1>
-        <div class="sub">Gorrion Wine Experience</div>
+        <h1>La degustazione de Puglia</h1>
+        <div class="sub">Vino activo sincronizado en tiempo real</div>
       </div>
     </div>
 
@@ -1979,5 +1985,3 @@
 
 </body>
 </html>
-
-
