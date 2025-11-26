@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Aroma Tetris · Falanghina Edition</title>
+  <title>Aroma Tetris · Falanghina Edition (Mobile)</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
   <style>
@@ -32,6 +32,7 @@
       align-items:center;
       justify-content:center;
       padding:16px;
+      -webkit-tap-highlight-color: transparent;
     }
     .shell{
       width:100%;
@@ -133,6 +134,7 @@
         linear-gradient(180deg, rgba(255,255,255,.04), transparent 18%),
         radial-gradient(circle at 50% 0%, rgba(255,255,255,.05), transparent 55%),
         #05050b;
+      touch-action:manipulation;
     }
 
     .column-labels{
@@ -158,11 +160,11 @@
       position:absolute;
       left:50%;
       transform:translate(-50%, -40px);
-      padding:6px 8px;
-      min-width:68px;
-      max-width:90px;
+      padding:8px 10px;
+      min-width:80px;
+      max-width:110px;
       border-radius:12px;
-      font-size:.78rem;
+      font-size:.8rem;
       text-align:center;
       background:linear-gradient(145deg,#1f2130,#131422);
       border:1px solid #323548;
@@ -171,7 +173,7 @@
       cursor:pointer;
       user-select:none;
       -webkit-user-select:none;
-      touch-action:manipulation;
+      touch-action:none;
       z-index:2;
     }
     .block.correct-hint{
@@ -360,7 +362,7 @@
         <div class="column-labels">
           <div>🍋 cítrico</div>
           <div>🌸 floral</div>
-          <div>🍒 fruta roja</div>
+          <div>🧂 salino</div>
           <div>☕ tostado / otros</div>
         </div>
         <div class="grid-overlay">
@@ -412,8 +414,8 @@
 
   const NUM_COLS = 4;
   const GAME_DURATION_MS = 30000;
-  const SPAWN_INTERVAL_SEC = 0.9; // nuevo bloque cada ~0.9 s
-  const SPEED_PX_PER_SEC = 120; // velocidad de caída
+  const SPAWN_INTERVAL_SEC = 1.0;   // un poco más lento
+  const SPEED_PX_PER_SEC = 95;      // caída más suave para móvil
 
   const aromas = [
     { label:"Cítrico 🍋", correct:true },
@@ -442,7 +444,6 @@
 
   let rafId = null;
 
-  // Utilidades
   function formatTime(ms){
     const t = Math.max(0, Math.floor(ms / 1000));
     const s = t % 60;
@@ -478,9 +479,13 @@
       removed: false
     };
 
-    blockEl.addEventListener("click", (ev)=>{
-      ev.stopPropagation();
-      handleBlockTap(block);
+    // Mejoramos interacción móvil: touchstart + mousedown
+    ["touchstart","mousedown"].forEach(evtName=>{
+      blockEl.addEventListener(evtName, (ev)=>{
+        ev.preventDefault();
+        ev.stopPropagation();
+        handleBlockTap(block);
+      }, { passive:false });
     });
 
     playfield.appendChild(blockEl);
@@ -489,7 +494,7 @@
 
   function handleBlockTap(block){
     if(!gameRunning || block.removed) return;
-    if(block.hit) return;
+    if(block.hit) return; // por si llega doble evento (touch + mouse)
 
     block.hit = true;
 
@@ -506,7 +511,7 @@
       mistakesEl.textContent = mistakes;
       block.el.classList.add("hit-wrong");
       setTimeout(()=> removeBlock(block), 220);
-      statusText.textContent = "Ese aroma no pega mucho… 😅 prueba a cazar los cítricos / florales / salinos.";
+      statusText.textContent = "Ese aroma no pega mucho… 😅 caza mejor los cítricos / florales / salinos.";
     }
   }
 
