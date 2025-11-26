@@ -523,11 +523,11 @@
       /* ✅ Versión invitado móvil: no recorta la imagen, la muestra completa */
       body.guest .heroImg{
         width:100%;
-        height:auto;           /* sin altura fija */
-        max-height:60vh;       /* que no ocupe toda la pantalla */
+        height:auto;
+        max-height:60vh;
         border-radius:20px;
-        object-fit:contain;    /* muestra la imagen completa */
-        background:#111218;    /* marco neutro alrededor si sobra espacio */
+        object-fit:contain;
+        background:#111218;
       }
     }
 
@@ -693,7 +693,7 @@
 
 <div id="nameGate" class="overlay">
   <div class="ovCard" style="text-align:left">
-    <div class="welcomeLogoWrap" style="justify-content:flex-start; margin-top:0; margin-bottom:10px;">
+    <div class="welcomeLogoWrap" style="margin-top:0; margin-bottom:10px;">
       <img
         src="img/logoredondo.png"
         alt="Gorrión Wine Experience"
@@ -1359,6 +1359,7 @@
       if(headerProgressBar) headerProgressBar.style.width = "0%";
       return;
     }
+
     const w = wines.find(x=>x.id===activeId) || wines[0];
     if(headerWineInfo) headerWineInfo.textContent = `🍷 Vino ${w.id}/${wines.length} · ${w.name}`;
 
