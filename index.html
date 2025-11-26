@@ -356,7 +356,6 @@
       gap:10px;
     }
 
-    /* 🔥 Header vino más grande */
     body.tv .headerWineInfo{
       display:inline-flex;
       font-size: clamp(1.2rem, 2.2vw, 2.0rem);
@@ -372,7 +371,6 @@
       height: 8px;
     }
 
-    /* ✅ Dashboard FIJO debajo del header (sin padding-top ni body-scale) */
     body.tv #dashboard.tvDash{
       position: fixed;
       top: var(--header-h);
@@ -382,7 +380,6 @@
       display: none;
     }
 
-    /* ✅ Escala SOLO el contenido del dashboard */
     body.tv #dashScale{
       transform: scale(var(--tv-scale));
       transform-origin: top left;
@@ -420,7 +417,6 @@
       padding:12px 14px;
     }
 
-    /* ✅ Evita cortes de títulos en FireTV/Silk */
     body.tv .tvBlock h3{
       line-height: 1.25 !important;
       margin: 0 0 10px !important;
@@ -428,7 +424,6 @@
       padding-bottom: 2px;
     }
 
-    /* ✅ Participantes: título visible + lista recortada sin scroll */
     body.tv .participantsBlock{
       display: flex;
       flex-direction: column;
@@ -441,14 +436,12 @@
       overflow: hidden;
     }
 
-    /* Nariz y boca en la misma línea (2 columnas) */
     body.tv .noseMouthRow{
       display:grid;
       grid-template-columns: 1fr 1fr;
       gap:16px; align-items:start;
     }
 
-    /* ⭐ Estrellas doradas en el dashboard */
     #dashboard .dashStar{
       color:#3b3f52; letter-spacing:2px;
       text-shadow:0 2px 6px rgba(0,0,0,.45);
@@ -465,9 +458,6 @@
       transform: translateY(2px);
     }
 
-    /* =======================
-       TV RESPONSIVE v2
-       ======================= */
     body.tv{
       font-size: clamp(14px, 1.6vw, 22px);
       --p-name: clamp(1.0rem, 1.6vw, 1.7rem);
@@ -506,21 +496,19 @@
        MODO INVITADO "PREMIUM" MÓVIL
        ======================= */
     body.guest main{
-      padding-bottom:80px; /* espacio para la barra móvil */
+      padding-bottom:80px;
     }
     @media (max-width: 860px){
       body.guest .grid{
         grid-template-columns:1fr;
       }
       body.guest aside.card{
-        display:none; /* fuera la columna derecha en móvil invitado */
+        display:none;
       }
       body.guest #wineCard{
         border-radius:22px;
         padding-bottom:90px;
       }
-
-      /* ✅ Versión invitado móvil: no recorta la imagen, la muestra completa */
       body.guest .heroImg{
         width:100%;
         height:auto;
@@ -949,7 +937,7 @@
   // ===== 👤 IDENTIFICACIÓN SIMPLE (OBLIGATORIA) =====
   let guestName = (localStorage.getItem("gw_name") || "").trim();
   if(guestName){
-    guestName = guestName.toUpperCase().slice(0,8);   // 🔢 aseguramos máximo 8 chars
+    guestName = guestName.toUpperCase().slice(0,8);
     localStorage.setItem("gw_name", guestName);
   }
 
@@ -970,7 +958,7 @@
       const n = input.value.trim();
       if(!n) return;
       const upper = n.toUpperCase();
-      guestName = upper.slice(0, 8);                 // 🔢 guardamos máximo 8 chars
+      guestName = upper.slice(0, 8);
       localStorage.setItem("gw_name", guestName);
       gate.classList.remove("show");
       document.body.style.overflow = "";
@@ -1037,7 +1025,8 @@
   // 🔹 helper para quedarnos sólo con los emojis
   function emojiOnly(tag){
     if(!tag) return "";
-    const em = tag.match(/[\p{Extended_Pictographic}]/gu);
+    // rango amplio de emojis (básico) sin usar \p{...}
+    const em = tag.match(/[\u{1F300}-\u{1FAFF}\u{2600}-\u{26FF}]/gu);
     return em ? em.join("") : tag;
   }
 
@@ -1445,7 +1434,7 @@
       ${renderQuizSection(w, hostNote)}
       ${renderNotesSection(w, notesMap)}
       ${renderMouthSection(w, mouthMap)}
-    ";
+    `;
 
     attachRatingHandlers(w);
     attachQuizHandlers(w);
@@ -1499,7 +1488,6 @@
       hostButtons.appendChild(b);
     });
 
-    // 🎬 Botón Bienvenida (-1)
     if(welcomeBtn){
       welcomeBtn.onclick = () => set(ref(db, "activeWine"), -1);
     }
@@ -1620,7 +1608,7 @@
 
     return pairs.map(p=>{
       const pct = Math.round((p.count/total)*100);
-      const label = noteTags[p.idx] || ""; // TEXTO COMPLETO + emoji
+      const label = noteTags[p.idx] || "";
       return `<div class="note">• ${label} <span class="small">(${pct}%)</span></div>`;
     }).join("");
   }
@@ -1637,7 +1625,7 @@
 
     return pairs.map(p=>{
       const pct = Math.round((p.count/total)*100);
-      const label = mouthTags[p.idx] || ""; // TEXTO COMPLETO + emoji
+      const label = mouthTags[p.idx] || "";
       return `<div class="note">• ${label} <span class="small">(${pct}%)</span></div>`;
     }).join("");
   }
@@ -1687,13 +1675,13 @@
         const selNotes = Array.isArray(a?.notesSelected) ? a.notesSelected : [];
         const top2Notes = selNotes
           .slice(0,2)
-          .map(i => emojiOnly(noteTags[i] || ""))  // 👃 solo emojis
+          .map(i => emojiOnly(noteTags[i] || ""))
           .join(" ");
 
         const selMouth = Array.isArray(a?.mouthSelected) ? a.mouthSelected : [];
         const top2Mouth = selMouth
           .slice(0,2)
-          .map(i => emojiOnly(mouthTags[i] || "")) // 👄 solo emojis
+          .map(i => emojiOnly(mouthTags[i] || ""))
           .join(" ");
 
         return {
@@ -1882,7 +1870,6 @@
   }
   toggleDashboardUI();
 
-  // ✅ mide header real y fija dashboard debajo SIEMPRE
   function syncHeaderHeight(){
     if(!isDashboard) return;
     const headerEl = document.querySelector("header");
@@ -1890,6 +1877,7 @@
     document.documentElement.style.setProperty("--header-h", h + "px");
   }
   window.addEventListener("load", syncHeaderHeight);
+  window.addListener?.("resize", syncHeaderHeight);
   window.addEventListener("resize", syncHeaderHeight);
   setTimeout(syncHeaderHeight, 250);
 
@@ -1985,7 +1973,6 @@
 
     window.__activeWine = activeId;
 
-    // Bienvenida / intermedio usan el tema 0, los vinos su propio tema
     const themeId = activeId <= 0 ? 0 : activeId;
     setTheme(themeId);
 
