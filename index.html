@@ -662,14 +662,23 @@
         <!-- Controles Pantalla 2 (infoScreen) -->
         <div class="section" style="margin-top:14px; padding-top:12px;">
           <h3>Pantalla 2 (Story / Mapas)</h3>
+
           <div class="row">
             <button id="infoNoneBtn">🙈 Ocultar pantalla 2</button>
-            <button id="infoMapPugliaBtn" class="primary">🗺️ Mapa general Puglia</button>
+          </div>
+
+          <div class="row">
+            <button id="infoScene1Btn" class="primary">🖼️ Escena 1</button>
+            <button id="infoScene2Btn">🖼️ Escena 2</button>
           </div>
           <div class="row">
-            <button id="infoFalanghinaBtn">🍋 Zona Falanghina</button>
-            <button id="infoPrimitivoBtn">🍷 Zona Primitivo</button>
+            <button id="infoScene3Btn">🖼️ Escena 3</button>
+            <button id="infoScene4Btn">🖼️ Escena 4</button>
           </div>
+          <div class="row">
+            <button id="infoScene5Btn">🖼️ Escena 5</button>
+          </div>
+
           <div class="small" style="margin-top:6px">
             Estos botones solo afectan a la pantalla 2 (informativa). El dashboard de valoraciones sigue igual.
           </div>
@@ -1003,7 +1012,7 @@
 
   if(!isHost && !isDashboard){
     if(!guestName) showNameGate();
-    else markJoined(); // ya tenía nombre guardado, cuenta como conectado
+    else markJoined(); // ya tenía nombre, cuenta como conectado
   }else{
     guestName = isHost ? "HOST" : "DASHBOARD";
   }
@@ -1408,10 +1417,8 @@
   function updateHeaderWine(activeId, joinedCount=0, expectedUsers=12){
     if(!isDashboard) return;
 
-    const label = expectedUsers ? `${joinedCount}/${expectedUsers}` : `${joinedCount}`;
-
     if(activeId === -1){
-      if(headerWineInfo) headerWineInfo.textContent = `🎬 Bienvenida · ${label}`;
+      if(headerWineInfo) headerWineInfo.textContent = `🎬 Bienvenida · ${joinedCount}/${expectedUsers}`;
       if(headerProgressBar) headerProgressBar.style.width = "0%";
       return;
     }
@@ -1563,26 +1570,36 @@
     }
 
     // 🔹 Controles de Pantalla 2 (infoScreen)
-    const infoNoneBtn       = document.getElementById("infoNoneBtn");
-    const infoMapPugliaBtn  = document.getElementById("infoMapPugliaBtn");
-    const infoFalanghinaBtn = document.getElementById("infoFalanghinaBtn");
-    const infoPrimitivoBtn  = document.getElementById("infoPrimitivoBtn");
+    const infoNoneBtn  = document.getElementById("infoNoneBtn");
+    const infoScene1Btn = document.getElementById("infoScene1Btn");
+    const infoScene2Btn = document.getElementById("infoScene2Btn");
+    const infoScene3Btn = document.getElementById("infoScene3Btn");
+    const infoScene4Btn = document.getElementById("infoScene4Btn");
+    const infoScene5Btn = document.getElementById("infoScene5Btn");
 
     if(infoNoneBtn){
       infoNoneBtn.onclick = () =>
         update(ref(db, "/"), { infoScreen: "none" });
     }
-    if(infoMapPugliaBtn){
-      infoMapPugliaBtn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "map_puglia" });
+    if(infoScene1Btn){
+      infoScene1Btn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "scene1" });
     }
-    if(infoFalanghinaBtn){
-      infoFalanghinaBtn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "zone_falanghina" });
+    if(infoScene2Btn){
+      infoScene2Btn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "scene2" });
     }
-    if(infoPrimitivoBtn){
-      infoPrimitivoBtn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "zone_primitivo" });
+    if(infoScene3Btn){
+      infoScene3Btn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "scene3" });
+    }
+    if(infoScene4Btn){
+      infoScene4Btn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "scene4" });
+    }
+    if(infoScene5Btn){
+      infoScene5Btn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "scene5" });
     }
 
     const expectedInput = document.getElementById("expectedInput");
