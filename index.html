@@ -485,6 +485,81 @@
     @media (max-width:520px){
       .headerWineInfo{display:none !important;}
     }
+
+    /* =======================
+       MODO INVITADO "PREMIUM" MÓVIL
+       ======================= */
+    body.guest main{
+      padding-bottom:80px; /* espacio para la barra móvil */
+    }
+    @media (max-width: 860px){
+      body.guest .grid{
+        grid-template-columns:1fr;
+      }
+      body.guest aside.card{
+        display:none; /* fuera la columna derecha en móvil invitado */
+      }
+      body.guest #wineCard{
+        border-radius:22px;
+        padding-bottom:90px;
+      }
+      body.guest .heroImg{
+        height:240px;
+        border-radius:20px;
+      }
+    }
+
+    .mobileBar{
+      position:fixed; left:0; right:0; bottom:0;
+      z-index:40;
+      padding:10px 16px;
+      background:rgba(10,10,14,.94);
+      backdrop-filter:blur(14px);
+      border-top:1px solid #262838;
+      display:none;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+    }
+    body.guest .mobileBar{ display:flex; }
+    @media (min-width:860px){
+      .mobileBar{ display:none !important; }
+    }
+
+    .mobileBarMain{
+      display:flex;
+      flex-direction:column;
+      gap:2px;
+      min-width:0;
+    }
+    .mobileBarTitle{
+      font-size:.95rem;
+      font-weight:700;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .mobileBarSub{
+      font-size:.8rem;
+      color:var(--muted);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+    .mobileBarProgressWrap{
+      flex:0 0 120px;
+      height:6px;
+      border-radius:999px;
+      background:#222634;
+      border:1px solid #2d3142;
+      overflow:hidden;
+    }
+    .mobileBarProgress{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,var(--accent),var(--accent2));
+      transition:width .4s ease;
+    }
   </style>
 </head>
 <body>
@@ -610,6 +685,17 @@
     <div class="small" style="margin-top:8px">
       (No pedimos email ni datos personales.)
     </div>
+  </div>
+</div>
+
+<!-- Barra móvil premium invitado -->
+<div id="mobileBar" class="mobileBar">
+  <div class="mobileBarMain">
+    <div id="mobileBarTitle" class="mobileBarTitle">La degustazione de Puglia</div>
+    <div id="mobileBarSub" class="mobileBarSub">Tu mando de la cata</div>
+  </div>
+  <div class="mobileBarProgressWrap">
+    <div id="mobileBarProgress" class="mobileBarProgress"></div>
   </div>
 </div>
 
@@ -766,6 +852,11 @@
   const ovWine      = document.getElementById("ovWine");
   const ovSub       = document.getElementById("ovSub");
 
+  const mobileBar          = document.getElementById("mobileBar");
+  const mobileBarTitle     = document.getElementById("mobileBarTitle");
+  const mobileBarSub       = document.getElementById("mobileBarSub");
+  const mobileBarProgress  = document.getElementById("mobileBarProgress");
+
   const soundToggle = document.getElementById("soundToggle");
   if(soundToggle){
     soundToggle.checked = localStorage.getItem("gw_sound") === "1";
@@ -782,6 +873,11 @@
     if (!isNaN(tvScaleParam) && tvScaleParam > 0.5 && tvScaleParam < 1.2) {
       document.documentElement.style.setProperty("--tv-scale", String(tvScaleParam));
     }
+  }
+
+  // Marca cuerpo como invitado (no host, no dashboard)
+  if(!isHost && !isDashboard){
+    document.body.classList.add("guest");
   }
 
   if(!isHost && !isDashboard){
@@ -1454,7 +1550,7 @@
 
     return pairs.map(p=>{
       const pct = Math.round((p.count/total)*100);
-      return `<div class="note">• ${noteTags[p.idx]} <span class="small">(${pct}%)</span></div>`;
+      return `<div class="note">• ${mouthTags ? noteTags[p.idx] : ""} <span class="small">(${pct}%)</span></div>`;
     }).join("");
   }
 
@@ -1775,6 +1871,25 @@
   }
   setupFullscreenBtn();
 
+  function updateMobileBar(activeId){
+    if(!mobileBar || !document.body.classList.contains("guest")) return;
+
+    if(activeId === -1){
+      mobileBarTitle.textContent = "Esperando al inicio";
+      mobileBarSub.textContent = "El host activará el primer vino en breve";
+      mobileBarProgress.style.width = "0%";
+    }else if(activeId === 0){
+      mobileBarTitle.textContent = "Intermedio activo";
+      mobileBarSub.textContent = "Agua · pan · charla";
+      mobileBarProgress.style.width = "0%";
+    }else{
+      const w = wines.find(x=>x.id===activeId) || wines[0];
+      mobileBarTitle.textContent = `Vino ${w.id} de ${wines.length}`;
+      mobileBarSub.textContent = w.name;
+      mobileBarProgress.style.width = progressPercent(w.id) + "%";
+    }
+  }
+
   const rootRef = ref(db, "/");
   let lastWine = null;
 
@@ -1815,6 +1930,8 @@
       if(statusEl) statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
       renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
     }
+
+    updateMobileBar(activeId);
 
     if(lastWine !== null && lastWine !== activeId){
       showOverlayFor(activeId);
