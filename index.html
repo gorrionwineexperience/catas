@@ -708,7 +708,8 @@
       Escribe tu nombre o apodo para identificar tus votos.
     </div>
 
-    <input id="nameInput" class="input" maxlength="30"
+    <!-- 🔢 límite a 8 caracteres -->
+    <input id="nameInput" class="input" maxlength="8"
            placeholder="TU NOMBRE / APODO" style="margin-top:10px"/>
 
     <div class="row" style="margin-top:10px">
@@ -736,7 +737,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
   import { getDatabase, ref, onValue, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
 
-  // 🔥 CONFIG REAL (igual que antes)
+  // 🔥 CONFIG REAL
   const firebaseConfig = {
     apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
     authDomain: "catas-9d780.firebaseapp.com",
@@ -769,7 +770,12 @@
       serve: "8–10 ºC · copa blanca",
       quiz: {
         q: "La Falanghina suele destacar sobre todo por…",
-        options: ["Notas ahumadas", "Perfil cítrico y floral", "Tanino potente"],
+        options: [
+          "Notas ahumadas",
+          "Perfil cítrico y floral",
+          "Tanino potente",
+          "Notas de chocolate"
+        ],
         correct: 1
       }
     },
@@ -790,7 +796,12 @@
       serve: "16–18 ºC · copa balón",
       quiz: {
         q: "¿Con qué va mejor este Riserva?",
-        options: ["Bocado graso y picante suave", "Postre de chocolate", "Ensalada cítrica"],
+        options: [
+          "Bocado graso y picante suave",
+          "Postre de chocolate",
+          "Ensalada cítrica",
+          "Pescado blanco a la plancha"
+        ],
         correct: 0
       }
     },
@@ -811,7 +822,12 @@
       serve: "15–17 ºC",
       quiz: {
         q: "Este vino es más bien…",
-        options: ["Joven y frutal", "Muy tánico y duro", "Oxidativo"],
+        options: [
+          "Joven y frutal",
+          "Muy tánico y duro",
+          "Oxidativo",
+          "Extremadamente dulce"
+        ],
         correct: 0
       }
     },
@@ -832,7 +848,12 @@
       serve: "16–18 ºC",
       quiz: {
         q: "¿Qué pide este vino?",
-        options: ["Plato con salsa/umami", "Solo frutos secos", "Nada de comida"],
+        options: [
+          "Plato con salsa/umami",
+          "Solo frutos secos",
+          "Nada de comida",
+          "Postre helado suave"
+        ],
         correct: 0
       }
     },
@@ -853,7 +874,12 @@
       serve: "17–18 ºC",
       quiz: {
         q: "¿Qué sensación es típica del Primitivo?",
-        options: ["Frescura ligera", "Calidez y fruta madura", "Acidez punzante extrema"],
+        options: [
+          "Frescura ligera",
+          "Calidez y fruta madura",
+          "Acidez punzante extrema",
+          "Muy ligero y acuoso"
+        ],
         correct: 1
       }
     }
@@ -923,7 +949,7 @@
   // ===== 👤 IDENTIFICACIÓN SIMPLE (OBLIGATORIA) =====
   let guestName = (localStorage.getItem("gw_name") || "").trim();
   if(guestName){
-    guestName = guestName.toUpperCase();
+    guestName = guestName.toUpperCase().slice(0,8);   // 🔢 aseguramos máximo 8 chars
     localStorage.setItem("gw_name", guestName);
   }
 
@@ -944,7 +970,7 @@
       const n = input.value.trim();
       if(!n) return;
       const upper = n.toUpperCase();
-      guestName = upper.slice(0, 30);
+      guestName = upper.slice(0, 8);                 // 🔢 guardamos máximo 8 chars
       localStorage.setItem("gw_name", guestName);
       gate.classList.remove("show");
       document.body.style.overflow = "";
@@ -1007,6 +1033,13 @@
     "Cremoso / untuoso 🥛","Final largo ⏳"
   ];
   function mouthLSKey(wineId){ return `gw_mouth_${wineId}`; }
+
+  // 🔹 helper para quedarnos sólo con los emojis
+  function emojiOnly(tag){
+    if(!tag) return "";
+    const em = tag.match(/[\p{Extended_Pictographic}]/gu);
+    return em ? em.join("") : tag;
+  }
 
   function ratingLSKey(id){ return `gw_rating_${id}`; }
 
@@ -1073,22 +1106,31 @@
 
   function quizKey(id){ return `gw_quiz_${id}`; }
 
-  function renderQuizSection(w, quizCounts=[0,0,0], hostNote=""){
+  // ⬇️ Mini-quiz invitado (sin % en botones)
+  function renderQuizSection(w, hostNote=""){
     const answeredOption = localStorage.getItem(quizKey(w.id));
-    const totalAnswers = quizCounts.reduce((a,b)=>a+b,0) || 1;
 
     const quizButtons = w.quiz.options.map((opt, i)=>{
       const isAnswered = answeredOption !== null;
       const isThis = answeredOption == i;
-      const pct = Math.round((quizCounts[i]/totalAnswers)*100);
 
       return `
         <button data-quiz="${i}" class="${isThis ? "primary" : ""}"
           ${isAnswered ? "disabled style='opacity:.7; cursor:default'" : ""}>
-          ${opt} ${isAnswered ? ` · ${pct}%` : ""}
+          ${opt}
         </button>
       `;
     }).join("");
+
+    // 🐦 Mensajes del pájaro
+    let feedbackText = "Selecciona la respuesta correcta";
+    if (answeredOption !== null) {
+      if (Number(answeredOption) === w.quiz.correct) {
+        feedbackText = "🐦 Gorrión/a, has acertado. 😄";
+      } else {
+        feedbackText = "🐦 Gorrión/a, has fallado. 😔";
+      }
+    }
 
     return `
       <div class="section">
@@ -1099,12 +1141,7 @@
             ${quizButtons}
           </div>
           <div class="small" style="margin-top:6px">
-            ${answeredOption !== null
-              ? (Number(answeredOption) === w.quiz.correct
-                  ? "✅ Correcto. ¡Buena nariz!"
-                  : `👀 Interesante… la respuesta más típica es: “${w.quiz.options[w.quiz.correct]}”.`)
-              : "Elige una opción para ver resultados en vivo."
-            }
+            ${feedbackText}
           </div>
         </div>
 
@@ -1371,12 +1408,6 @@
     const w = wines.find(x=>x.id===activeId) || wines[0];
     wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
 
-    const quizCounts = [
-      (quizMap[w.id]?.[0] || 0),
-      (quizMap[w.id]?.[1] || 0),
-      (quizMap[w.id]?.[2] || 0)
-    ];
-
     wineCard.innerHTML = `
       <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
 
@@ -1411,10 +1442,10 @@
       </div>
 
       ${renderRatingSection(w, ratingsMap)}
-      ${renderQuizSection(w, quizCounts, hostNote)}
+      ${renderQuizSection(w, hostNote)}
       ${renderNotesSection(w, notesMap)}
       ${renderMouthSection(w, mouthMap)}
-    `;
+    ";
 
     attachRatingHandlers(w);
     attachQuizHandlers(w);
@@ -1589,7 +1620,8 @@
 
     return pairs.map(p=>{
       const pct = Math.round((p.count/total)*100);
-      return `<div class="note">• ${noteTags[p.idx]} <span class="small">(${pct}%)</span></div>`;
+      const label = noteTags[p.idx] || ""; // TEXTO COMPLETO + emoji
+      return `<div class="note">• ${label} <span class="small">(${pct}%)</span></div>`;
     }).join("");
   }
 
@@ -1605,25 +1637,25 @@
 
     return pairs.map(p=>{
       const pct = Math.round((p.count/total)*100);
-      return `<div class="note">• ${mouthTags[p.idx]} <span class="small">(${pct}%)</span></div>`;
+      const label = mouthTags[p.idx] || ""; // TEXTO COMPLETO + emoji
+      return `<div class="note">• ${label} <span class="small">(${pct}%)</span></div>`;
     }).join("");
   }
 
   function quizSummaryHTML(w, quizForWine = {}){
     if(!w.quiz) return `<div class="small">Sin quiz</div>`;
-    const counts = [
-      quizForWine[0]||0,
-      quizForWine[1]||0,
-      quizForWine[2]||0
-    ];
-    const total = counts.reduce((a,b)=>a+b,0) || 1;
 
-    return w.quiz.options.map((opt,i)=>{
-      const pct = Math.round((counts[i]/total)*100);
-      const isCorrect = i===w.quiz.correct;
+    const countsByIndex = w.quiz.options.map((_, i) => quizForWine[i] || 0);
+    const total = countsByIndex.reduce((a,b)=>a+b,0) || 1;
+
+    return w.quiz.options.map((opt, i)=>{
+      const count = countsByIndex[i];
+      const pct = Math.round((count / total) * 100);
+      const isCorrect = i === w.quiz.correct;
+
       return `
-        <div class="note" style="${isCorrect?'font-weight:900;color:var(--ok)':''}">
-          • ${opt} <span class="small">(${pct}%)</span> ${isCorrect?'✓':''}
+        <div class="note" style="${isCorrect ? 'font-weight:900;color:var(--ok)' : ''}">
+          • ${opt} <span class="small">(${pct}%)</span> ${isCorrect ? '✓' : ''}
         </div>
       `;
     }).join("");
@@ -1631,14 +1663,12 @@
 
   function quizCorrectStats(w, quizForWine = {}){
     if(!w.quiz) return { correct: 0, total: 0, pct: 0 };
-    const counts = [
-      quizForWine[0]||0,
-      quizForWine[1]||0,
-      quizForWine[2]||0
-    ];
-    const total = counts.reduce((a,b)=>a+b,0) || 0;
-    const correct = counts[w.quiz.correct] || 0;
-    const pct = total ? Math.round((correct/total)*100) : 0;
+
+    const countsByIndex = w.quiz.options.map((_, i) => quizForWine[i] || 0);
+    const total = countsByIndex.reduce((a,b)=>a+b,0) || 0;
+    const correct = countsByIndex[w.quiz.correct] || 0;
+    const pct = total ? Math.round((correct / total) * 100) : 0;
+
     return { correct, total, pct };
   }
 
@@ -1655,10 +1685,16 @@
             : null;
 
         const selNotes = Array.isArray(a?.notesSelected) ? a.notesSelected : [];
-        const top2Notes = selNotes.slice(0,2).map(i => noteTags[i] || "").join(" / ");
+        const top2Notes = selNotes
+          .slice(0,2)
+          .map(i => emojiOnly(noteTags[i] || ""))  // 👃 solo emojis
+          .join(" ");
 
         const selMouth = Array.isArray(a?.mouthSelected) ? a.mouthSelected : [];
-        const top2Mouth = selMouth.slice(0,2).map(i => mouthTags[i] || "").join(" / ");
+        const top2Mouth = selMouth
+          .slice(0,2)
+          .map(i => emojiOnly(mouthTags[i] || "")) // 👄 solo emojis
+          .join(" ");
 
         return {
           name: a?.name || "INVITADO",
