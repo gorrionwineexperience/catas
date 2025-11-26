@@ -658,6 +658,22 @@
           <button id="clearNote">Borrar nota</button>
         </div>
         <div class="small" style="margin-top:6px">URL host: añade <b>?host=1</b></div>
+
+        <!-- Controles Pantalla 2 (infoScreen) -->
+        <div class="section" style="margin-top:14px; padding-top:12px;">
+          <h3>Pantalla 2 (Story / Mapas)</h3>
+          <div class="row">
+            <button id="infoNoneBtn">🙈 Ocultar pantalla 2</button>
+            <button id="infoMapPugliaBtn" class="primary">🗺️ Mapa general Puglia</button>
+          </div>
+          <div class="row">
+            <button id="infoFalanghinaBtn">🍋 Zona Falanghina</button>
+            <button id="infoPrimitivoBtn">🍷 Zona Primitivo</button>
+          </div>
+          <div class="small" style="margin-top:6px">
+            Estos botones solo afectan a la pantalla 2 (informativa). El dashboard de valoraciones sigue igual.
+          </div>
+        </div>
       </div>
 
       <div id="orderSection" class="section">
@@ -1546,6 +1562,29 @@
       };
     }
 
+    // 🔹 Controles de Pantalla 2 (infoScreen)
+    const infoNoneBtn       = document.getElementById("infoNoneBtn");
+    const infoMapPugliaBtn  = document.getElementById("infoMapPugliaBtn");
+    const infoFalanghinaBtn = document.getElementById("infoFalanghinaBtn");
+    const infoPrimitivoBtn  = document.getElementById("infoPrimitivoBtn");
+
+    if(infoNoneBtn){
+      infoNoneBtn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "none" });
+    }
+    if(infoMapPugliaBtn){
+      infoMapPugliaBtn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "map_puglia" });
+    }
+    if(infoFalanghinaBtn){
+      infoFalanghinaBtn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "zone_falanghina" });
+    }
+    if(infoPrimitivoBtn){
+      infoPrimitivoBtn.onclick = () =>
+        update(ref(db, "/"), { infoScreen: "zone_primitivo" });
+    }
+
     const expectedInput = document.getElementById("expectedInput");
     const setExpectedBtn = document.getElementById("setExpectedBtn");
     const expectedHint = document.getElementById("expectedHint");
@@ -1588,7 +1627,8 @@
           notes: {},
           mouth: {},
           userActions: {},
-          joinedUsers: {}
+          joinedUsers: {},
+          infoScreen: "none"
         });
 
         alert("✅ DB reseteada. Todo vuelve a 0.");
@@ -2033,7 +2073,8 @@
           notes: {},
           mouth: {},
           userActions: {},
-          joinedUsers: {}
+          joinedUsers: {},
+          infoScreen: "none"
         });
       }
     }, { onlyOnce:true });
