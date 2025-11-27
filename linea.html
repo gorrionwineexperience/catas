@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Test línea recta 2D · Modo imposible</title>
+  <title>Test línea recta 2D · Carretera hardcore</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
   <style>
@@ -127,40 +127,76 @@
       margin-bottom:8px;
       text-align:center;
     }
+
+    /* 🚗 Carretera vertical */
     .field{
       position:relative;
-      width:220px;
-      height:220px;
-      border-radius:32px;
-      background:radial-gradient(circle at 20% 0%, rgba(255,255,255,.06), transparent 60%),
-                 radial-gradient(circle at 80% 100%, rgba(255,255,255,.03), transparent 60%),
-                 #080a16;
-      box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
+      width:140px;
+      height:260px;
+      border-radius:40px;
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255,255,255,.05), transparent 60%),
+        radial-gradient(circle at 80% 100%, rgba(255,255,255,.03), transparent 60%),
+        #111317;
+      box-shadow:
+        inset 0 0 0 1px rgba(255,255,255,.06),
+        0 12px 22px rgba(0,0,0,.8);
       overflow:hidden;
     }
+    /* bordes de la carretera */
     .field::before{
       content:"";
       position:absolute;
       inset:0;
       background:
-        linear-gradient(transparent 49%, rgba(255,255,255,.06) 50%, transparent 51%),
-        linear-gradient(90deg, transparent 49%, rgba(255,255,255,.06) 50%, transparent 51%);
-      background-size:100% 100%;
-      opacity:.3;
+        linear-gradient(90deg,
+          rgba(240,240,240,.2) 0px,
+          rgba(240,240,240,.2) 4px,
+          transparent 4px,
+          transparent calc(100% - 4px),
+          rgba(240,240,240,.2) calc(100% - 4px),
+          rgba(240,240,240,.2) 100%);
+      pointer-events:none;
+      mix-blend-mode:screen;
+      opacity:.6;
+    }
+    /* línea discontinua central */
+    .field::after{
+      content:"";
+      position:absolute;
+      top:0;
+      bottom:0;
+      left:50%;
+      width:4px;
+      transform:translateX(-50%);
+      background:
+        repeating-linear-gradient(
+          180deg,
+          rgba(255,255,255,.8) 0,
+          rgba(255,255,255,.8) 14px,
+          transparent 14px,
+          transparent 26px
+        );
+      opacity:.9;
+      box-shadow:0 0 4px rgba(255,255,255,.9);
       pointer-events:none;
     }
-    /* zona segura MUY pequeña */
+
+    /* 🟩 Zona segura MUY MUY pequeña */
     .safe-zone{
       position:absolute;
-      width:25%;
-      height:25%;
-      left:37.5%;
-      top:37.5%;
-      border-radius:18px;
-      background:radial-gradient(circle at 50% 50%, rgba(155,231,161,.2), transparent 70%);
-      border:1px dashed rgba(155,231,161,.5);
+      width:18%;
+      height:14%;
+      left:41%;
+      top:43%;
+      border-radius:12px;
+      background:
+        radial-gradient(circle at 50% 50%, rgba(155,231,161,.3), transparent 80%);
+      border:1px solid rgba(155,231,161,.75);
+      box-shadow:0 0 12px rgba(155,231,161,.7);
       pointer-events:none;
     }
+
     .dot{
       position:absolute;
       width:22px;
@@ -309,7 +345,7 @@
     <div class="header">
       <div>
         <div class="title">Test línea recta 2D</div>
-        <div class="subtitle">Modo imposible · arriba, abajo, izquierda y derecha</div>
+        <div class="subtitle">Carretera vertical · modo imposible</div>
       </div>
       <div class="pill">
         🚫🚗 <span><b>Solo es un juego</b><br>no sirve para conducir</span>
@@ -326,14 +362,14 @@
     <div class="instructions">
       <b>Cómo se juega:</b><br>
       Sujeta el móvil frente a ti.<br>
-      Inclínalo arriba/abajo/izquierda/derecha para mantener el punto
-      dentro del recuadro verde minúsculo durante 15 segundos.<br>
-      Está hecho para que sea <b>muy muy difícil</b> mantenerte dentro 😈
+      Inclínalo suave arriba/abajo/izquierda/derecha para mantener el punto
+      dentro del <b>micro-recuadro verde</b> en mitad de la carretera durante 15 segundos.<br>
+      Es casi imposible a propósito 😈
     </div>
 
     <div class="field-wrap">
       <div class="field-label">
-        Mantén el punto dentro del recuadro verde central.
+        Mantén el punto dentro del tramo verde central de la carretera.
       </div>
       <div class="field" id="field">
         <div class="safe-zone"></div>
@@ -347,7 +383,7 @@
     </div>
 
     <div class="status" id="statusText">
-      Pulsa <b>“Activar sensores y empezar”</b>, sujeta el móvil cómodo, deja que calibre tu centro y luego mueve suavemente en todas direcciones.
+      Pulsa <b>“Activar sensores y empezar”</b>, sujeta el móvil cómodo, deja que calibre el centro y luego mueve lo mínimo posible en todas las direcciones.
     </div>
   </div>
 </div>
@@ -357,7 +393,7 @@
 <div class="overlay" id="endOverlay">
   <div class="overlay-card">
     <div class="overlay-title">Fin del test</div>
-    <div class="overlay-sub">Resumen de tu puntería imposible 🍷</div>
+    <div class="overlay-sub">Resumen de tu puntería en carretera 🍷</div>
     <div class="overlay-stats" id="finalStats"></div>
     <div class="overlay-buttons">
       <button id="closeOverlayBtn">Cerrar</button>
@@ -381,8 +417,8 @@
   const restartOverlayBtn = document.getElementById("restartOverlayBtn");
 
   const GAME_DURATION_MS = 15000;
-  const MAX_TILT = 8;   // grados máximos que mapeamos (muy sensible)
-  const SAFE_TILT = 2.0; // zona segura MUY pequeña (±2° en X e Y)
+  const MAX_TILT = 8;    // rango máximo que mapeamos
+  const SAFE_TILT = 2.0; // zona segura muy pequeña en X e Y
 
   let gameRunning = false;
   let sensorActive = false;
@@ -415,9 +451,8 @@
 
   function handleOrientation(ev){
     if(ev.gamma == null || ev.beta == null) return;
-    latestGamma = ev.gamma; // izquierda/derecha
+    latestGamma = ev.gamma; // izq/der
     latestBeta  = ev.beta;  // adelante/atrás
-
     if(baselineGamma === null) baselineGamma = latestGamma;
     if(baselineBeta === null)  baselineBeta  = latestBeta;
   }
@@ -467,8 +502,8 @@
   }
 
   function updateDotAndStats(dt){
-    let tiltX = 0; // gamma: izquierda/derecha
-    let tiltY = 0; // beta: adelante/atrás
+    let tiltX = 0; // gamma
+    let tiltY = 0; // beta
 
     if(baselineGamma !== null){
       tiltX = latestGamma - baselineGamma;
@@ -477,19 +512,18 @@
       tiltY = latestBeta - baselineBeta;
     }
 
-    // Limitar a rango [-MAX_TILT, MAX_TILT]
+    // limitar
     tiltX = Math.max(-MAX_TILT, Math.min(MAX_TILT, tiltX));
     tiltY = Math.max(-MAX_TILT, Math.min(MAX_TILT, tiltY));
 
-    // Mapear tiltX (izq/der) a posición horizontal 5..95
-    const ratioX = tiltX / MAX_TILT;   // -1..1
-    let posX = 50 + ratioX * 40;       // 10..90 teórico
+    // mapear a % campo (5..95)
+    const ratioX = tiltX / MAX_TILT;
+    let posX = 50 + ratioX * 40;
     if(posX < 5) posX = 5;
     if(posX > 95) posX = 95;
 
-    // Mapear tiltY (adelante/atrás) a posición vertical 5..95
-    const ratioY = tiltY / MAX_TILT;   // -1..1
-    let posY = 50 + ratioY * 40;       // 10..90 teórico
+    const ratioY = tiltY / MAX_TILT;
+    let posY = 50 + ratioY * 40;
     if(posY < 5) posY = 5;
     if(posY > 95) posY = 95;
 
@@ -508,9 +542,9 @@
     insidePercentEl.textContent = p + "%";
 
     if(inside){
-      statusText.textContent = "Dentro del recuadro verde ✅ · No te muevas ni un milímetro…";
+      statusText.textContent = "En el tramo verde ✅ · No respires fuerte…";
     }else{
-      statusText.textContent = "Fuera del recuadro 😅 · Cualquier mínimo movimiento te saca.";
+      statusText.textContent = "Fuera del tramo 😅 · Cualquier mínimo temblor te saca de la carretera.";
     }
   }
 
@@ -526,25 +560,25 @@
     const percent = Math.max(0, Math.min(100, Math.round(insideMs / GAME_DURATION_MS * 100)));
     let nivel;
     if(percent >= 50){
-      nivel = "Pulso sobrenatural en modo imposible 🧠🍷";
+      nivel = "Pulso sobrenatural en carretera hardcore 🧠🍷";
     }else if(percent >= 20){
-      nivel = "Muy buen control para lo loco que está esto 😏";
+      nivel = "Muy buen control para lo pequeño del tramo 😏";
     }else if(percent >= 5){
-      nivel = "Has sobrevivido unos segundos en el infierno 2D 😄";
+      nivel = "Has tocado el tramo verde, que ya es mucho 😄";
     }else{
-      nivel = "Modo lavadora · el punto no ha visto el recuadro casi nunca 🤣";
+      nivel = "Modo lavadora · la carretera iba por un lado y tú por otro 🤣";
     }
 
     finalStatsEl.innerHTML = `
       ⏱️ Tiempo total: <b>${(GAME_DURATION_MS/1000).toFixed(0)} s</b><br>
-      ✅ Tiempo dentro del recuadro: <b>${Math.round(insideMs/1000)} s</b><br>
-      📊 Porcentaje en el recuadro: <b>${percent}%</b><br><br>
+      ✅ Tiempo dentro del tramo verde: <b>${Math.round(insideMs/1000)} s</b><br>
+      📊 Porcentaje en el tramo: <b>${percent}%</b><br><br>
       Diagnóstico de la casa:<br>
       <b>${nivel}</b>
     `;
 
     endOverlay.classList.add("show");
-    statusText.textContent = "Prueba terminada. Mira tu resumen y vuelve a intentarlo si te va el masoquismo lúdico.";
+    statusText.textContent = "Prueba terminada. Mira tu resumen y repite si quieres humillar al resto de la mesa.";
   }
 
   function loop(timestamp){
@@ -589,15 +623,15 @@
 
     gameRunning = true;
     endOverlay.classList.remove("show");
-    statusText.textContent = "Mantén el punto en el recuadro verde moviendo el móvil arriba/abajo/izquierda/derecha. ¡Suerte!";
-    showToast("Test iniciado · 15 s de puntería 2D imposible");
+    statusText.textContent = "Mantén el punto en el micro-tramo verde inclinando el móvil lo mínimo posible. Suerte… la vas a necesitar 😈";
+    showToast("Test iniciado · 15 s de carretera 2D imposible");
     rafId = requestAnimationFrame(loop);
   }
 
   function recalibrate(){
     baselineGamma = latestGamma;
     baselineBeta  = latestBeta;
-    showToast("Centro recalibrado. Esta orientación es tu nuevo “recto” 2D.");
+    showToast("Centro recalibrado. Esta orientación es tu nuevo “recto” en carretera.");
   }
 
   startBtn.addEventListener("click", startGame);
@@ -612,7 +646,7 @@
     startGame();
   });
 
-  statusText.textContent = "Pulsa “Activar sensores y empezar”, sujeta el móvil cómodo, deja que calibre y luego mueve muy poquito en todas direcciones.";
+  statusText.textContent = "Pulsa “Activar sensores y empezar”, sujeta el móvil cómodo, deja que calibre y luego muévete lo mínimo posible.";
 })();
 </script>
 
