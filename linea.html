@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Test línea recta · Demo móvil</title>
+  <title>Test línea recta · Vertical hardcore</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
   <style>
@@ -114,33 +114,38 @@
       border-radius:16px;
       border:1px solid #343a56;
       background:#050814;
-      padding:14px 10px;
+      padding:12px 20px;
       position:relative;
+      display:flex;
+      flex-direction:column;
+      align-items:center;
+      justify-content:center;
     }
     .road-label{
       font-size:.8rem;
       color:var(--muted);
-      margin-bottom:6px;
+      margin-bottom:8px;
       text-align:center;
     }
     .road{
       position:relative;
-      height:64px;
+      width:70px;
+      height:260px;
       border-radius:999px;
-      background:linear-gradient(180deg,#101320,#080a14);
+      background:linear-gradient(90deg,#101320,#080a14);
       box-shadow:inset 0 0 0 1px rgba(255,255,255,.03);
       overflow:hidden;
     }
     .road::before{
       content:"";
       position:absolute;
-      left:0;
-      right:0;
-      top:50%;
-      height:2px;
-      transform:translateY(-50%);
+      top:0;
+      bottom:0;
+      left:50%;
+      width:2px;
+      transform:translateX(-50%);
       background:repeating-linear-gradient(
-        90deg,
+        180deg,
         rgba(255,255,255,.13) 0,
         rgba(255,255,255,.13) 10px,
         transparent 10px,
@@ -148,23 +153,25 @@
       );
       pointer-events:none;
     }
+    /* zona segura en el centro, estrecha (hardcore) */
     .safe-zone{
       position:absolute;
-      top:10px;
-      bottom:10px;
-      width:40%;
-      left:30%;
-      border-radius:999px;
+      left:10px;
+      right:10px;
+      height:60px;
+      top:50%;
+      transform:translateY(-50%);
+      border-radius:14px;
       background:radial-gradient(circle at 50% 50%, rgba(155,231,161,.2), transparent 70%);
       border:1px dashed rgba(155,231,161,.4);
       pointer-events:none;
     }
     .car{
       position:absolute;
-      top:50%;
       left:50%;
-      width:26px;
-      height:26px;
+      top:50%;
+      width:24px;
+      height:24px;
       border-radius:999px;
       transform:translate(-50%,-50%);
       background:radial-gradient(circle at 30% 30%, #ffffff, #ffb347);
@@ -307,7 +314,7 @@
     <div class="header">
       <div>
         <div class="title">Test línea recta</div>
-        <div class="subtitle">Modo juego · “conduce” la copa recta</div>
+        <div class="subtitle">Carretera vertical · modo casi imposible</div>
       </div>
       <div class="pill">
         🚫🚗 <span><b>Solo es un juego</b><br>no sirve para conducir</span>
@@ -324,14 +331,14 @@
     <div class="instructions">
       <b>Cómo se juega:</b><br>
       Sujeta el móvil como si fuera un volante.<br>
-      Inclina a izquierda / derecha para mantener el punto dentro de la franja verde
-      durante 15 segundos.<br>
-      Cuanto más tiempo estés dentro del carril, mejor tu “línea recta”.
+      Inclina ligeramente hacia delante / atrás para mantener el punto dentro de la
+      franja verde vertical durante 15 segundos.<br>
+      Está puesto difícil a propósito: casi imposible ir perfecto 😈
     </div>
 
     <div class="road-wrap">
       <div class="road-label">
-        Mantén el punto dentro de la zona verde.
+        Mantén el punto dentro del tramo verde.
       </div>
       <div class="road" id="road">
         <div class="safe-zone"></div>
@@ -345,8 +352,8 @@
     </div>
 
     <div class="status" id="statusText">
-      Pulsa <b>“Activar sensores y empezar”</b>, sujeta el móvil más o menos horizontal y
-      deja que el juego calibre tu “recto”.
+      Pulsa <b>“Activar sensores y empezar”</b>, sujeta el móvil cómodo y deja que el juego
+      calibre tu “recto”. Luego inclinación suave hacia delante/atrás.
     </div>
   </div>
 </div>
@@ -380,13 +387,13 @@
   const restartOverlayBtn = document.getElementById("restartOverlayBtn");
 
   const GAME_DURATION_MS = 15000;
-  const MAX_TILT = 25;      // grados máximo que contamos
-  const SAFE_TILT = 8;      // dentro de este valor = “carril”
+  const MAX_TILT = 10;   // más pequeño = más sensible
+  const SAFE_TILT = 3;   // zona segura ultra estrecha
 
   let gameRunning = false;
   let sensorActive = false;
-  let baselineGamma = null;   // centro calibrado
-  let latestGamma = 0;
+  let baselineBeta = null; // centro calibrado (inclinación adelante/atrás)
+  let latestBeta = 0;
 
   let lastFrameTime = null;
   let elapsedMs = 0;
@@ -410,15 +417,14 @@
   }
 
   function handleOrientation(ev){
-    if(ev.gamma == null) return;
-    latestGamma = ev.gamma;
-    if(baselineGamma === null){
-      baselineGamma = latestGamma;
+    if(ev.beta == null) return;
+    latestBeta = ev.beta;
+    if(baselineBeta === null){
+      baselineBeta = latestBeta;
     }
   }
 
   async function requestSensorPermission(){
-    // iOS 13+ style
     try{
       if (typeof DeviceOrientationEvent !== "undefined" &&
           typeof DeviceOrientationEvent.requestPermission === "function"){
@@ -428,7 +434,6 @@
     }catch(e){
       console.warn("Error pidiendo permiso DeviceOrientation:", e);
     }
-    // Otros navegadores no necesitan permiso manual
     return true;
   }
 
@@ -436,7 +441,7 @@
     if(sensorActive) return;
     if(typeof window.DeviceOrientationEvent === "undefined"){
       showToast("Tu móvil no soporta sensor de orientación.");
-      statusText.textContent = "Parece que este dispositivo no permite leer la orientación. El juego solo se puede ver, no jugar aquí.";
+      statusText.textContent = "Este dispositivo no permite leer la orientación. Solo puedes ver la demo.";
       return;
     }
     window.addEventListener("deviceorientation", handleOrientation, true);
@@ -450,34 +455,33 @@
   }
 
   function resetState(){
-    detachSensor(); // por si acaso
-    carEl.style.left = "50%";
+    detachSensor();
+    carEl.style.top = "50%";
     carEl.classList.remove("out");
     elapsedMs = 0;
     insideMs = 0;
     lastFrameTime = null;
-    baselineGamma = null;
+    baselineBeta = null;
     timerEl.textContent = formatTime(GAME_DURATION_MS);
     insidePercentEl.textContent = "0%";
   }
 
   function updateCarAndStats(dt){
-    // Calcular tilt relativo (gamma - baseline)
     let tilt = 0;
-    if(baselineGamma !== null){
-      tilt = latestGamma - baselineGamma;
+    if(baselineBeta !== null){
+      tilt = latestBeta - baselineBeta; // positivo = inclinado hacia delante / atrás
     }
 
-    // Limitar tilt a rango [-MAX_TILT, MAX_TILT]
+    // Limitar tilt a [-MAX_TILT, MAX_TILT]
     tilt = Math.max(-MAX_TILT, Math.min(MAX_TILT, tilt));
 
-    // Mapear tilt a posición horizontal (5%..95%)
+    // Mapear tilt a posición vertical (5%..95%)
     const ratio = tilt / MAX_TILT; // -1..1
     let pos = 50 + ratio * 40;     // 10..90 teórico
     if(pos < 5) pos = 5;
     if(pos > 95) pos = 95;
 
-    carEl.style.left = pos + "%";
+    carEl.style.top = pos + "%";
 
     const inside = Math.abs(tilt) <= SAFE_TILT;
     if(inside){
@@ -491,9 +495,9 @@
     insidePercentEl.textContent = p + "%";
 
     if(inside){
-      statusText.textContent = "Dentro del carril ✅ · Sigue manteniendo el móvil recto.";
+      statusText.textContent = "Dentro del tramo verde ✅ · Inclinación casi perfecta.";
     }else{
-      statusText.textContent = "Fuera de carril 😅 · Ajusta un poco la inclinación.";
+      statusText.textContent = "Fuera del tramo 😅 · Mínimo movimiento te saca del carril.";
     }
   }
 
@@ -508,24 +512,24 @@
 
     const percent = Math.max(0, Math.min(100, Math.round(insideMs / GAME_DURATION_MS * 100)));
     let nivel;
-    if(percent >= 80){
-      nivel = "Recta de manual 🍷🛣️";
-    }else if(percent >= 50){
-      nivel = "Bastante recto, con algún zig-zag 🙂";
+    if(percent >= 60){
+      nivel = "Línea recta imposible casi perfecta 🧠🍷";
+    }else if(percent >= 30){
+      nivel = "Buen intento en modo hardcore 😏";
     }else{
-      nivel = "Modo rotonda infinita 😄";
+      nivel = "Caos controlado… o no tanto 😄";
     }
 
     finalStatsEl.innerHTML = `
       ⏱️ Tiempo total: <b>${(GAME_DURATION_MS/1000).toFixed(0)} s</b><br>
-      ✅ Tiempo dentro del carril: <b>${Math.round(insideMs/1000)} s</b><br>
+      ✅ Tiempo dentro del tramo verde: <b>${Math.round(insideMs/1000)} s</b><br>
       📊 Porcentaje de línea recta: <b>${percent}%</b><br><br>
       Diagnóstico de la casa:<br>
       <b>${nivel}</b>
     `;
 
     endOverlay.classList.add("show");
-    statusText.textContent = "Prueba terminada. Mira tu resumen y vuelve a intentarlo cuando quieras.";
+    statusText.textContent = "Prueba terminada. Mira tu resumen y vuelve a intentarlo en modo leyenda.";
   }
 
   function loop(timestamp){
@@ -570,14 +574,14 @@
 
     gameRunning = true;
     endOverlay.classList.remove("show");
-    statusText.textContent = "Mantén el punto dentro de la zona verde inclinando el móvil. ¡Empieza el test!";
-    showToast("Test iniciado · 15 segundos de línea recta");
+    statusText.textContent = "Mantén el punto en el tramo verde inclinando apenas el móvil. Suerte… la vas a necesitar 😈";
+    showToast("Test iniciado · 15 s de línea recta vertical hardcore");
     rafId = requestAnimationFrame(loop);
   }
 
   function recalibrate(){
-    baselineGamma = latestGamma;
-    showToast("Centro recalibrado. Este ángulo es tu “recto”.");
+    baselineBeta = latestBeta;
+    showToast("Centro recalibrado. Esta inclinación es tu nuevo “recto”.");
   }
 
   startBtn.addEventListener("click", startGame);
@@ -592,7 +596,7 @@
     startGame();
   });
 
-  statusText.textContent = "Pulsa “Activar sensores y empezar”, sujeta el móvil recto y deja que calibre tu línea recta.";
+  statusText.textContent = "Pulsa “Activar sensores y empezar”, sujeta el móvil cómodo, deja que calibre y luego inclina muy poquito hacia delante/atrás.";
 })();
 </script>
 
