@@ -1116,7 +1116,7 @@
     return { total, avg };
   }
 
-  // 🔹 NUEVO: bloque “Datos rápidos + curiosidad”
+  // 🔹 bloque “Datos rápidos + curiosidad”
   function renderQuickInfoSection(w){
     if(!w.quickInfo) return "";
     const qi = w.quickInfo;
@@ -1494,9 +1494,17 @@
     if(headerProgressBar) headerProgressBar.style.width = pct + "%";
   }
 
+  // 👉 Render vino: sin barra intermedia y sin puntos en invitado
   function renderWine(activeId, hostNote, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}){
     const w = wines.find(x=>x.id===activeId) || wines[0];
     wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
+
+    const showSteps = isHost || isDashboard;
+    const stepsHtml = showSteps ? `
+      <div class="steps">
+        ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
+      </div>
+    ` : "";
 
     wineCard.innerHTML = `
       <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
@@ -1515,10 +1523,7 @@
 
       ${renderQuickInfoSection(w)}
 
-      <div class="progress"><div style="width:${progressPercent(w.id)}%"></div></div>
-      <div class="steps">
-        ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
-      </div>
+      ${stepsHtml}
 
       <div class="section">
         <h3>Notas rápidas</h3>
