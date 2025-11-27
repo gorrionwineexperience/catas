@@ -27,7 +27,7 @@
     }
     h1 {
       font-size: 1.8rem;
-      margin-bottom: 0.8rem;
+      margin-bottom: 0.2rem;
     }
     h2 {
       font-size: 1.4rem;
@@ -77,11 +77,34 @@
     .highlight {
       background: #fff7dd;
     }
+    .top-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      margin-bottom: 0.5rem;
+    }
+    .fs-btn {
+      font-size: 0.85rem;
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      border: none;
+      cursor: pointer;
+      background: #7b4c24;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .fs-btn:hover {
+      opacity: 0.9;
+    }
   </style>
 </head>
 <body>
 <main>
-  <h1>Chuleta Cata – Italia &amp; Puglia</h1>
+  <div class="top-bar">
+    <h1>Chuleta Cata – Italia &amp; Puglia</h1>
+    <button class="fs-btn" onclick="toggleFullscreen()">⛶ Pantalla completa</button>
+  </div>
   <p class="small">Texto pensado para leer o inspirarte durante la cata. Adáptalo y recorta lo que quieras.</p>
 
   <!-- 1. INTRO GENERAL CATA -->
@@ -364,5 +387,28 @@
   </p>
 
 </main>
+
+<script>
+  function toggleFullscreen() {
+    const btn = document.querySelector('.fs-btn');
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen().catch(err => console.warn(err));
+      if (btn) btn.textContent = '✕ Salir pantalla completa';
+    } else {
+      document.exitFullscreen();
+      if (btn) btn.textContent = '⛶ Pantalla completa';
+    }
+  }
+
+  document.addEventListener('fullscreenchange', () => {
+    const btn = document.querySelector('.fs-btn');
+    if (!btn) return;
+    if (document.fullscreenElement) {
+      btn.textContent = '✕ Salir pantalla completa';
+    } else {
+      btn.textContent = '⛶ Pantalla completa';
+    }
+  });
+</script>
 </body>
 </html>
