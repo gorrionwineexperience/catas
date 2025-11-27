@@ -790,7 +790,15 @@
           "Notas de chocolate"
         ],
         correct: 1
-      }
+      },
+      quickInfo: {
+        winery: "Cantine Teanum",
+        region: "Puglia IGT (Apulia, sur de Italia)",
+        grapes: "Aprox. 60% Bombino, 40% Falanghina",
+        vintage: "2024",
+        alcohol: "12% vol"
+      },
+      funFact: "La Falanghina es una uva muy antigua: su nombre viene de “falangae”, los postes de madera que usaban los romanos para sujetar las viñas, y se cree que pudo formar parte del famoso vino Falerno de la Antigua Roma."
     },
     {
       id: 2,
@@ -816,7 +824,15 @@
           "Pescado blanco a la plancha"
         ],
         correct: 0
-      }
+      },
+      quickInfo: {
+        winery: "Botter S.p.A.",
+        region: "Abruzzo, Montepulciano d’Abruzzo DOC (Riserva)",
+        grapes: "100% Montepulciano",
+        vintage: "2021",
+        alcohol: "13,5% vol"
+      },
+      funFact: "La uva Montepulciano es la segunda uva tinta más plantada de Italia (solo por detrás de Sangiovese), así que este vino es casi como beberse un “estándar nacional” de los tintos italianos."
     },
     {
       id: 3,
@@ -842,7 +858,15 @@
           "Extremadamente dulce"
         ],
         correct: 0
-      }
+      },
+      quickInfo: {
+        winery: "Botter S.p.A.",
+        region: "Puglia IGT (Apulia, “Vinos de Apulia”)",
+        grapes: "Malvasia Nera, Negroamaro y Nero di Troia",
+        vintage: "2023",
+        alcohol: "14,5% vol"
+      },
+      funFact: "El nombre “Triplico / Multiplo” hace guiño al trío de uvas locales que lo forman: tres variedades muy típicas del sur de Italia que se combinan para dar fruta negra, especias y mucha intensidad en copa."
     },
     {
       id: 4,
@@ -868,7 +892,15 @@
           "Postre helado suave"
         ],
         correct: 0
-      }
+      },
+      quickInfo: {
+        winery: "Lupo Meraviglia (Botter)",
+        region: "Puglia IGT, uvas de la zona de Salento",
+        grapes: "Aprox. 40% Negroamaro, 40% Aglianico, 20% Primitivo",
+        vintage: "2023",
+        alcohol: "14,5% vol"
+      },
+      funFact: "En la etiqueta aparece “Tecnica del Salasso”: se “sangra” parte del mosto al inicio de la maceración para concentrar color y cuerpo, de ahí que el vino sea tan oscuro y potente."
     },
     {
       id: 5,
@@ -894,7 +926,15 @@
           "Muy ligero y acuoso"
         ],
         correct: 1
-      }
+      },
+      quickInfo: {
+        winery: "Masseria Tagaro",
+        region: "Puglia IGT, zona Salento / Valle d’Itria",
+        grapes: "100% Primitivo",
+        vintage: "2023",
+        alcohol: "15% vol"
+      },
+      funFact: "Antes de fermentar, el mosto hace una maceración en frío a 4–5 °C durante 48 horas y luego pasa unos 6 meses en contacto con madera; esa combinación de técnica + madera le ha valido 96 puntos Luca Maroni y una medalla de oro en el Berliner Wine Trophy. Además, la uva Primitivo es genéticamente la misma variedad que la Zinfandel de California (y la Tribidrag croata), así que estáis probando la versión pugliesa de una uva muy famosa al otro lado del Atlántico."
     }
   ];
 
@@ -1074,6 +1114,25 @@
     }
     const avg = total ? (sum/total) : 0;
     return { total, avg };
+  }
+
+  // 🔹 NUEVO: bloque “Datos rápidos + curiosidad”
+  function renderQuickInfoSection(w){
+    if(!w.quickInfo) return "";
+    const qi = w.quickInfo;
+    return `
+      <div class="section">
+        <h3>Datos rápidos</h3>
+        <div class="note">
+          <div><strong>Bodega:</strong> ${qi.winery}</div>
+          <div><strong>Región / DO:</strong> ${qi.region}</div>
+          <div><strong>Uvas:</strong> ${qi.grapes}</div>
+          <div><strong>Añada:</strong> ${qi.vintage}</div>
+          <div><strong>Alcohol:</strong> ${qi.alcohol}</div>
+        </div>
+        ${w.funFact ? `<div class="small" style="margin-top:6px;"><strong>Curiosidad:</strong> ${w.funFact}</div>` : ``}
+      </div>
+    `;
   }
 
   function renderRatingSection(w, ratingsMap = {}){
@@ -1453,6 +1512,8 @@
       <img class="heroImg" src="${imageForMaridaje(w.id)}" alt="Maridaje ${w.id}" />
 
       ${w.story ? `<div class="story">🍇 ${w.story}</div>` : ``}
+
+      ${renderQuickInfoSection(w)}
 
       <div class="progress"><div style="width:${progressPercent(w.id)}%"></div></div>
       <div class="steps">
