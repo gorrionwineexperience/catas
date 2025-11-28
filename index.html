@@ -20,7 +20,7 @@
       /* escala TV dashboard (override con ?tvscale=0.75) */
       --tv-scale: .85;
 
-      /* altura header dinámica */
+      /* altura header dinámica (la rellenamos por JS) */
       --header-h: 120px;
     }
     *{box-sizing:border-box}
@@ -519,12 +519,6 @@
       }
     }
 
-    /* Invitado: ocultar barra de progreso y puntos de pasos (ya hay barra en el footer móvil) */
-    body.guest .progress,
-    body.guest .steps{
-      display:none;
-    }
-
     .mobileBar{
       position:fixed; left:0; right:0; bottom:0;
       z-index:40;
@@ -577,73 +571,74 @@
       transition:width .4s ease;
     }
 
-    /* Escena de imagen a pantalla completa (solo invitado) */
-    body.guest.imageScene{
-      background:black;
+    /* Ocultar barra progreso + puntos en invitado (ya la tienes en footer móvil) */
+    body.guest .progress,
+    body.guest .steps{
+      display:none;
     }
-    body.guest.imageScene header,
-    body.guest.imageScene footer,
-    body.guest.imageScene aside.card,
-    body.guest.imageScene #statusWrap,
-    body.guest.imageScene #orderSection,
-    body.guest.imageScene .mobileBar{
-      display:none !important;
-    }
-    body.guest.imageScene main.wrap{
+
+    /* =======================
+       ESCENAS DE IMAGEN (invited)
+       ======================= */
+    body.imageScene main.wrap{
       padding:0;
     }
-    body.guest.imageScene .grid{
+    body.imageScene .grid{
       grid-template-columns:1fr;
     }
-    body.guest.imageScene #wineCard{
-      border-radius:0;
-      border:none;
+    body.imageScene aside.card{
+      display:none;
+    }
+    body.imageScene #wineCard{
       padding:0;
+      border:none;
+      border-radius:0;
       box-shadow:none;
+      background:#050509;
     }
-    .fullImageScreen{
-      position:relative;
-      width:100%;
-      height:100vh;
-      overflow:hidden;
+    body.imageScene .mobileBar{
+      display:none !important;
     }
-    .fullImageScreen img{
-      width:100%;
-      height:100%;
-      object-fit:cover;
+
+    .imageSceneFull{
+      position:fixed;
+      top:var(--header-h);
+      left:0; right:0; bottom:0;
+      padding:10px 10px 0;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:#050509;
+    }
+    .imageSceneImg{
+      max-width:100%;
+      max-height:100%;
+      object-fit:contain;
       display:block;
     }
-    .fullImageOverlay{
+    .imageSceneCaption{
       position:absolute;
-      left:0;
-      right:0;
-      bottom:0;
-      padding:18px 16px 26px;
-      background:linear-gradient(to top, rgba(0,0,0,.85), rgba(0,0,0,.0));
+      left:0; right:0;
+      bottom:18px;
+      text-align:center;
+      padding:0 16px;
+      text-shadow:0 4px 16px rgba(0,0,0,.85);
     }
-    .fullImageTitle{
-      margin:10px 0 2px;
-      font-size:1.4rem;
+    .imageSceneTitle{
+      margin-top:8px;
       font-family:"Playfair Display", serif;
       font-weight:900;
+      font-size:1.3rem;
     }
-    .fullImageSub{
-      margin:0;
+    .imageSceneSub{
+      margin-top:4px;
       font-size:.95rem;
       color:var(--muted);
     }
-    body.guest.imageScene .pill{
-      background:rgba(15,15,18,.9);
-      border-color:rgba(156,163,175,.7);
-    }
-    @media (min-width:860px){
-      .fullImageScreen{
-        height:calc(100vh - 40px);
-        margin:20px auto 0;
-        max-width:980px;
-        border-radius:24px;
-        overflow:hidden;
-      }
+    .imageSceneNote{
+      margin-top:6px;
+      font-size:.9rem;
+      color:var(--muted);
     }
   </style>
 </head>
@@ -755,7 +750,7 @@
           </div>
 
           <div class="small" style="margin-top:6px">
-            Estos botones solo afectan a la pantalla 2 (informativa) y a los móviles invitados en modo imagen. El dashboard de valoraciones sigue igual.
+            Estos botones afectan a la pantalla 2 y ahora también a los invitados (imagen a pantalla completa).
           </div>
         </div>
       </div>
@@ -973,50 +968,6 @@
     }
   ];
 
-  /* Escenas de imagen sincronizadas (mismo naming que dashboard-info) */
-  const imageScreens = [
-    {
-      id: "scene1",
-      label: "🖼️ Escena 1",
-      title: "Escena 1",
-      sub: "Imagen de apoyo 1 para la degustazione.",
-      text: "",
-      img: "img/info-scene-1.jpg"
-    },
-    {
-      id: "scene2",
-      label: "🖼️ Escena 2",
-      title: "Escena 2",
-      sub: "Imagen de apoyo 2 para la degustazione.",
-      text: "",
-      img: "img/info-scene-2.jpg"
-    },
-    {
-      id: "scene3",
-      label: "🖼️ Escena 3",
-      title: "Escena 3",
-      sub: "Imagen de apoyo 3 para la degustazione.",
-      text: "",
-      img: "img/info-scene-3.jpg"
-    },
-    {
-      id: "scene4",
-      label: "🖼️ Escena 4",
-      title: "Escena 4",
-      sub: "Imagen de apoyo 4 para la degustazione.",
-      text: "",
-      img: "img/info-scene-4.jpg"
-    },
-    {
-      id: "scene5",
-      label: "🖼️ Escena 5",
-      title: "Escena 5",
-      sub: "Imagen de apoyo 5 para la degustazione.",
-      text: "",
-      img: "img/info-scene-5.jpg"
-    }
-  ];
-
   const themes = {
     0:{accent:"#b7bbc7", accent2:"#6b7280", bg:"#0c0d10", bg2:"#14161b"},
     1:{accent:"#ffd166", accent2:"#6ee7ff", bg:"#0d0f12", bg2:"#14202a"},
@@ -1024,6 +975,40 @@
     3:{accent:"#b8f2a5", accent2:"#9bb7ff", bg:"#0d1110", bg2:"#18221e"},
     4:{accent:"#fbbf24", accent2:"#fb7185", bg:"#0f0d10", bg2:"#231a1d"},
     5:{accent:"#ff6f61", accent2:"#c084fc", bg:"#0f0a0a", bg2:"#1f1216"},
+  };
+
+  // Escenas de imagen compartidas con dashboard-info (mismo naming)
+  const imageScenes = {
+    "scene1": {
+      label: "🖼️ Escena 1",
+      title: "Escena 1",
+      sub: "Imagen de apoyo 1 para la degustazione.",
+      img: "img/info-scene-1.jpg"
+    },
+    "scene2": {
+      label: "🖼️ Escena 2",
+      title: "Escena 2",
+      sub: "Imagen de apoyo 2 para la degustazione.",
+      img: "img/info-scene-2.jpg"
+    },
+    "scene3": {
+      label: "🖼️ Escena 3",
+      title: "Escena 3",
+      sub: "Imagen de apoyo 3 para la degustazione.",
+      img: "img/info-scene-3.jpg"
+    },
+    "scene4": {
+      label: "🖼️ Escena 4",
+      title: "Escena 4",
+      sub: "Imagen de apoyo 4 para la degustazione.",
+      img: "img/info-scene-4.jpg"
+    },
+    "scene5": {
+      label: "🖼️ Escena 5",
+      title: "Escena 5",
+      sub: "Imagen de apoyo 5 para la degustazione.",
+      img: "img/info-scene-5.jpg"
+    }
   };
 
   const wineCard    = document.getElementById("wineCard");
@@ -1159,10 +1144,6 @@
   function imageForMaridaje(id){
     const n = String(id).padStart(2, "0");
     return `img/maridaje-${n}.jpg`;
-  }
-
-  function getImageScreen(sceneId){
-    return imageScreens.find(s => s.id === sceneId) || null;
   }
 
   const noteTags = [
@@ -1452,11 +1433,11 @@
     });
   }
 
-  // 🌟 Bienvenida sincronizada
+  // 🌟 Bienvenida sincronizada (contador en la misma línea que la pill, solo invitado)
   function renderWelcome(hostNote, joinedCount = 0, expectedUsers = 12){
-    const isGuest = !isHost && !isDashboard;
-
     document.body.classList.remove("imageScene");
+
+    const isGuest = !isHost && !isDashboard;
 
     wineCard.innerHTML = `
       <div class="welcomeTopRow" style="display:flex; align-items:center; justify-content:space-between; gap:10px;">
@@ -1538,41 +1519,6 @@
     `;
   }
 
-  function renderImageScene(sceneId, hostNote=""){
-    const s = getImageScreen(sceneId);
-    document.body.classList.add("imageScene");
-
-    wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
-
-    if(!s){
-      wineCard.innerHTML = `
-        <div class="fullImageScreen">
-          <div class="fullImageOverlay">
-            <div class="pill">Pantalla visual</div>
-            <h2 class="fullImageTitle">Escena no disponible</h2>
-            <p class="note" style="margin-top:6px">
-              El host ha activado una escena que aún no tiene imagen asignada.
-            </p>
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    wineCard.innerHTML = `
-      <div class="fullImageScreen">
-        <img src="${s.img}" alt="${s.title}">
-        <div class="fullImageOverlay">
-          <div class="pill">${s.label}</div>
-          <h2 class="fullImageTitle">${s.title}</h2>
-          <p class="fullImageSub">${s.sub}</p>
-          ${s.text ? `<p class="note" style="margin-top:6px">${s.text}</p>` : ""}
-          ${hostNote ? `<p class="note" style="margin-top:6px"><strong>Nota del host:</strong> ${hostNote}</p>` : ""}
-        </div>
-      </div>
-    `;
-  }
-
   const headerWineInfo = document.getElementById("headerWineInfo");
   const headerProgressBar = document.getElementById("headerProgressBar");
 
@@ -1640,12 +1586,35 @@
       ${renderQuizSection(w, hostNote)}
       ${renderNotesSection(w, notesMap)}
       ${renderMouthSection(w, mouthMap)}
-    ";
+    `;
 
     attachRatingHandlers(w);
     attachQuizHandlers(w);
     attachNotesHandlers(w);
     attachMouthHandlers(w);
+  }
+
+  function renderImageScene(sceneId, hostNote=""){
+    const scene = imageScenes[sceneId];
+    if(!scene){
+      document.body.classList.remove("imageScene");
+      return;
+    }
+    document.body.classList.add("imageScene");
+
+    wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
+
+    wineCard.innerHTML = `
+      <div id="imageSceneFull" class="imageSceneFull">
+        <img src="${scene.img}" alt="${scene.title}" class="imageSceneImg" />
+        <div class="imageSceneCaption">
+          <div class="pill">${scene.label}</div>
+          <div class="imageSceneTitle">${scene.title}</div>
+          <div class="imageSceneSub">${scene.sub}</div>
+          ${hostNote ? `<div class="imageSceneNote">🗣️ ${hostNote}</div>` : ``}
+        </div>
+      </div>
+    `;
   }
 
   function chime(){
@@ -2112,7 +2081,6 @@
   toggleDashboardUI();
 
   function syncHeaderHeight(){
-    if(!isDashboard) return;
     const headerEl = document.querySelector("header");
     const h = headerEl ? headerEl.offsetHeight : 120;
     document.documentElement.style.setProperty("--header-h", h + "px");
@@ -2195,6 +2163,7 @@
     const activeId      = data.activeWine ?? -1;
     const hostNote      = data.hostNote || "";
     const expectedUsers = data.expectedUsers ?? 12;
+    const infoScreen    = data.infoScreen || "none";
 
     const ratingsMap    = data.ratings || {};
     const quizMap       = data.quiz  || {};
@@ -2203,7 +2172,6 @@
     const userActionsMap= data.userActions || {};
     const joinedUsers   = data.joinedUsers || {};
     const joinedCount   = Object.keys(joinedUsers).length;
-    const infoScreen    = data.infoScreen || "none";
 
     updateHeaderWine(activeId, joinedCount, expectedUsers);
 
@@ -2216,35 +2184,30 @@
 
     window.__activeWine = activeId;
 
-    // 🎨 Tema por vino (o neutro si bienvenida/intermedio)
     const themeId = activeId <= 0 ? 0 : activeId;
     setTheme(themeId);
 
-    // 📸 MODO IMAGEN A PANTALLA COMPLETA (solo invitado)
-    if(!isHost && infoScreen !== "none"){
-      if(statusEl) statusEl.textContent = "Escena visual activa. El host está mostrando una imagen.";
+    // Si hay escena de info activa y NO somos host, mostramos la imagen a pantalla completa
+    if(infoScreen !== "none" && !isHost){
+      if(statusEl) statusEl.textContent = `Mostrando imagen de apoyo.`;
       renderImageScene(infoScreen, hostNote);
-      // La barra móvil no se ve en este modo (CSS), así que no hace falta tocarla.
-      lastWine = activeId;
-      return;
     } else {
-      document.body.classList.remove("imageScene");
-    }
-
-    if(activeId === -1){
-      if(statusEl) statusEl.textContent = `Pantalla de bienvenida activa.`;
-      renderWelcome(hostNote, joinedCount, expectedUsers);
-    }else if(activeId === 0){
-      if(statusEl) statusEl.textContent = `Intermedio activo.`;
-      renderPause(hostNote);
-    }else{
-      if(statusEl) statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
-      renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
+      if(activeId === -1){
+        if(statusEl) statusEl.textContent = `Pantalla de bienvenida activa.`;
+        renderWelcome(hostNote, joinedCount, expectedUsers);
+      }else if(activeId === 0){
+        if(statusEl) statusEl.textContent = `Intermedio activo.`;
+        renderPause(hostNote);
+      }else{
+        if(statusEl) statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
+        renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
+      }
     }
 
     updateMobileBar(activeId);
 
     if(lastWine !== null && lastWine !== activeId){
+      // Solo hacemos overlay/chime cuando cambia el vino, no cuando cambian escenas de imagen
       showOverlayFor(activeId);
       chime();
     }
