@@ -202,6 +202,13 @@
       box-shadow: 0 0 12px color-mix(in oklab, var(--accent2) 40%, transparent);
     }
 
+    /* Ocultar barra de progreso y pasos solo en invitado
+       (host y dashboard siguen viéndolos) */
+    body.guest .progress,
+    body.guest .steps{
+      display:none;
+    }
+
     .nav{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
     button{
       appearance:none; border:none; cursor:pointer; color:var(--text);
@@ -570,6 +577,75 @@
       background:linear-gradient(90deg,var(--accent),var(--accent2));
       transition:width .4s ease;
     }
+
+    /* ===== Escenas de imagen sincronizadas ===== */
+    .imageSceneWrap{
+      position:relative;
+      border-radius:16px;
+      overflow:hidden;
+      border:1px solid #2a2d3a;
+      background:#000;
+      min-height:260px;
+    }
+    .imageSceneImg{
+      width:100%;
+      height:100%;
+      max-height:70vh;
+      display:block;
+      object-fit:cover;
+    }
+    .imageSceneOverlay{
+      position:absolute;
+      inset:auto 0 0 0;
+      padding:14px 14px 18px;
+      background:linear-gradient(180deg, rgba(0,0,0,0.05), rgba(0,0,0,0.85));
+    }
+    .imageSceneOverlay h2{
+      margin:6px 0 2px;
+      font-family:"Playfair Display", serif;
+      font-size:1.4rem;
+    }
+    .imageSceneOverlay .meta{
+      font-size:.9rem;
+    }
+    .imageSceneOverlay .note{
+      margin-top:8px;
+    }
+
+    /* 📱 MODO INVITADO: imagen a pantalla completa */
+    @media (max-width: 860px){
+      body.guest.imageScene header,
+      body.guest.imageScene footer,
+      body.guest.imageScene .mobileBar{
+        display:none !important;
+      }
+      body.guest.imageScene main.wrap{
+        padding:0;
+        max-width:none;
+      }
+      body.guest.imageScene .grid{
+        grid-template-columns:1fr;
+      }
+      body.guest.imageScene aside.card{
+        display:none !important;
+      }
+      body.guest.imageScene #wineCard{
+        padding:0;
+        border-radius:0;
+        border:none;
+        box-shadow:none;
+      }
+      body.guest.imageScene .imageSceneWrap{
+        border-radius:0;
+        border:none;
+        width:100vw;
+        height:100vh;
+      }
+      body.guest.imageScene .imageSceneImg{
+        max-height:none;
+        height:100%;
+      }
+    }
   </style>
 </head>
 <body>
@@ -664,23 +740,23 @@
           <h3>Pantalla 2 (Story / Mapas)</h3>
 
           <div class="row">
-            <button id="infoNoneBtn">🙈 Ocultar pantalla 2</button>
+            <button id="infoNoneBtn">🙈 Ocultar imágenes</button>
           </div>
 
           <div class="row">
-            <button id="infoScene1Btn" class="primary">🖼️ Escena 1</button>
-            <button id="infoScene2Btn">🖼️ Escena 2</button>
+            <button id="infoScene1Btn" class="primary">🖼️ Imagen 1</button>
+            <button id="infoScene2Btn">🖼️ Imagen 2</button>
           </div>
           <div class="row">
-            <button id="infoScene3Btn">🖼️ Escena 3</button>
-            <button id="infoScene4Btn">🖼️ Escena 4</button>
+            <button id="infoScene3Btn">🖼️ Imagen 3</button>
+            <button id="infoScene4Btn">🖼️ Imagen 4</button>
           </div>
           <div class="row">
-            <button id="infoScene5Btn">🖼️ Escena 5</button>
+            <button id="infoScene5Btn">🖼️ Imagen 5</button>
           </div>
 
           <div class="small" style="margin-top:6px">
-            Estos botones solo afectan a la pantalla 2 (informativa). El dashboard de valoraciones sigue igual.
+            Estas escenas muestran imágenes a pantalla completa en los móviles de los invitados.
           </div>
         </div>
       </div>
@@ -790,15 +866,7 @@
           "Notas de chocolate"
         ],
         correct: 1
-      },
-      quickInfo: {
-        winery: "Cantine Teanum",
-        region: "Puglia IGT (Apulia, sur de Italia)",
-        grapes: "Aprox. 60% Bombino, 40% Falanghina",
-        vintage: "2024",
-        alcohol: "12% vol"
-      },
-      funFact: "La Falanghina es una uva muy antigua: su nombre viene de “falangae”, los postes de madera que usaban los romanos para sujetar las viñas, y se cree que pudo formar parte del famoso vino Falerno de la Antigua Roma."
+      }
     },
     {
       id: 2,
@@ -824,15 +892,7 @@
           "Pescado blanco a la plancha"
         ],
         correct: 0
-      },
-      quickInfo: {
-        winery: "Botter S.p.A.",
-        region: "Abruzzo, Montepulciano d’Abruzzo DOC (Riserva)",
-        grapes: "100% Montepulciano",
-        vintage: "2021",
-        alcohol: "13,5% vol"
-      },
-      funFact: "La uva Montepulciano es la segunda uva tinta más plantada de Italia (solo por detrás de Sangiovese), así que este vino es casi como beberse un “estándar nacional” de los tintos italianos."
+      }
     },
     {
       id: 3,
@@ -858,15 +918,7 @@
           "Extremadamente dulce"
         ],
         correct: 0
-      },
-      quickInfo: {
-        winery: "Botter S.p.A.",
-        region: "Puglia IGT (Apulia, “Vinos de Apulia”)",
-        grapes: "Malvasia Nera, Negroamaro y Nero di Troia",
-        vintage: "2023",
-        alcohol: "14,5% vol"
-      },
-      funFact: "El nombre “Triplico / Multiplo” hace guiño al trío de uvas locales que lo forman: tres variedades muy típicas del sur de Italia que se combinan para dar fruta negra, especias y mucha intensidad en copa."
+      }
     },
     {
       id: 4,
@@ -892,15 +944,7 @@
           "Postre helado suave"
         ],
         correct: 0
-      },
-      quickInfo: {
-        winery: "Lupo Meraviglia (Botter)",
-        region: "Puglia IGT, uvas de la zona de Salento",
-        grapes: "Aprox. 40% Negroamaro, 40% Aglianico, 20% Primitivo",
-        vintage: "2023",
-        alcohol: "14,5% vol"
-      },
-      funFact: "En la etiqueta aparece “Tecnica del Salasso”: se “sangra” parte del mosto al inicio de la maceración para concentrar color y cuerpo, de ahí que el vino sea tan oscuro y potente."
+      }
     },
     {
       id: 5,
@@ -926,17 +970,51 @@
           "Muy ligero y acuoso"
         ],
         correct: 1
-      },
-      quickInfo: {
-        winery: "Masseria Tagaro",
-        region: "Puglia IGT, zona Salento / Valle d’Itria",
-        grapes: "100% Primitivo",
-        vintage: "2023",
-        alcohol: "15% vol"
-      },
-      funFact: "Antes de fermentar, el mosto hace una maceración en frío a 4–5 °C durante 48 horas y luego pasa unos 6 meses en contacto con madera; esa combinación de técnica + madera le ha valido 96 puntos Luca Maroni y una medalla de oro en el Berliner Wine Trophy. Además, la uva Primitivo es genéticamente la misma variedad que la Zinfandel de California (y la Tribidrag croata), así que estáis probando la versión pugliesa de una uva muy famosa al otro lado del Atlántico."
+      }
     }
   ];
+
+  /* Escenas de imagen sincronizadas para invitados */
+  const imageScreens = [
+    {
+      id: "scene1",
+      title: "Puglia en el mapa",
+      subtitle: "El tacón de la bota italiana",
+      img: "img/scene1.jpg",
+      text: "Vista general para situarnos antes de empezar la cata."
+    },
+    {
+      id: "scene2",
+      title: "Viñedos junto al mar",
+      subtitle: "Brisa salina y suelos pobres",
+      img: "img/scene2.jpg",
+      text: "Una imagen para entender por qué muchos vinos de Puglia tienen ese toque mediterráneo."
+    },
+    {
+      id: "scene3",
+      title: "Uvas de la cata",
+      subtitle: "Falanghina, Montepulciano, Primitivo…",
+      img: "img/scene3.jpg",
+      text: "Repaso visual de algunas de las protagonistas de la noche."
+    },
+    {
+      id: "scene4",
+      title: "Pueblo blanco de Puglia",
+      subtitle: "Calles estrechas y piedra clara",
+      img: "img/scene4.jpg",
+      text: "Escena para viajar un momento al sur de Italia entre vino y vino."
+    },
+    {
+      id: "scene5",
+      title: "Mesa de maridajes",
+      subtitle: "Los cinco bocados de la degustazione",
+      img: "img/scene5.jpg",
+      text: "Vista del recorrido completo de vinos y bocados."
+    }
+  ];
+  function getImageScreen(id){
+    return imageScreens.find(s => s.id === id) || imageScreens[0];
+  }
 
   const themes = {
     0:{accent:"#b7bbc7", accent2:"#6b7280", bg:"#0c0d10", bg2:"#14161b"},
@@ -1114,25 +1192,6 @@
     }
     const avg = total ? (sum/total) : 0;
     return { total, avg };
-  }
-
-  // 🔹 bloque “Datos rápidos + curiosidad”
-  function renderQuickInfoSection(w){
-    if(!w.quickInfo) return "";
-    const qi = w.quickInfo;
-    return `
-      <div class="section">
-        <h3>Datos rápidos</h3>
-        <div class="note">
-          <div><strong>Bodega:</strong> ${qi.winery}</div>
-          <div><strong>Región / DO:</strong> ${qi.region}</div>
-          <div><strong>Uvas:</strong> ${qi.grapes}</div>
-          <div><strong>Añada:</strong> ${qi.vintage}</div>
-          <div><strong>Alcohol:</strong> ${qi.alcohol}</div>
-        </div>
-        ${w.funFact ? `<div class="small" style="margin-top:6px;"><strong>Curiosidad:</strong> ${w.funFact}</div>` : ``}
-      </div>
-    `;
   }
 
   function renderRatingSection(w, ratingsMap = {}){
@@ -1470,6 +1529,25 @@
     `;
   }
 
+  function renderImageScreen(screen){
+    if(!screen) return;
+    wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
+
+    wineCard.innerHTML = `
+      <div class="imageSceneWrap">
+        <img class="imageSceneImg" src="${screen.img}" alt="${screen.title}" />
+        <div class="imageSceneOverlay">
+          <div class="pill">Escena visual sincronizada</div>
+          <h2>${screen.title}</h2>
+          <div class="meta">${screen.subtitle || ""}</div>
+          <div class="note">
+            📸 ${screen.text}
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   const headerWineInfo = document.getElementById("headerWineInfo");
   const headerProgressBar = document.getElementById("headerProgressBar");
 
@@ -1494,17 +1572,9 @@
     if(headerProgressBar) headerProgressBar.style.width = pct + "%";
   }
 
-  // 👉 Render vino: sin barra intermedia y sin puntos en invitado
   function renderWine(activeId, hostNote, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}){
     const w = wines.find(x=>x.id===activeId) || wines[0];
     wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
-
-    const showSteps = isHost || isDashboard;
-    const stepsHtml = showSteps ? `
-      <div class="steps">
-        ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
-      </div>
-    ` : "";
 
     wineCard.innerHTML = `
       <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
@@ -1521,9 +1591,10 @@
 
       ${w.story ? `<div class="story">🍇 ${w.story}</div>` : ``}
 
-      ${renderQuickInfoSection(w)}
-
-      ${stepsHtml}
+      <div class="progress"><div style="width:${progressPercent(w.id)}%"></div></div>
+      <div class="steps">
+        ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
+      </div>
 
       <div class="section">
         <h3>Notas rápidas</h3>
@@ -1635,8 +1706,8 @@
       };
     }
 
-    // 🔹 Controles de Pantalla 2 (infoScreen)
-    const infoNoneBtn  = document.getElementById("infoNoneBtn");
+    // 🔹 Controles de Pantalla 2 (infoScreen) para imágenes
+    const infoNoneBtn   = document.getElementById("infoNoneBtn");
     const infoScene1Btn = document.getElementById("infoScene1Btn");
     const infoScene2Btn = document.getElementById("infoScene2Btn");
     const infoScene3Btn = document.getElementById("infoScene3Btn");
@@ -2105,6 +2176,7 @@
     const userActionsMap= data.userActions || {};
     const joinedUsers   = data.joinedUsers || {};
     const joinedCount   = Object.keys(joinedUsers).length;
+    const activeImage   = data.infoScreen || "none";
 
     updateHeaderWine(activeId, joinedCount, expectedUsers);
 
@@ -2120,15 +2192,28 @@
     const themeId = activeId <= 0 ? 0 : activeId;
     setTheme(themeId);
 
-    if(activeId === -1){
-      if(statusEl) statusEl.textContent = `Pantalla de bienvenida activa.`;
-      renderWelcome(hostNote, joinedCount, expectedUsers);
-    }else if(activeId === 0){
-      if(statusEl) statusEl.textContent = `Intermedio activo.`;
-      renderPause(hostNote);
+    // Escena de imagen sincronizada: prioritaria para invitados
+    if(activeImage && activeImage !== "none"){
+      if(!isHost && !isDashboard){
+        document.body.classList.add("imageScene");
+      }
+      if(statusEl) statusEl.textContent = `Mostrando escena de imagen sincronizada.`;
+      const screen = getImageScreen(activeImage);
+      renderImageScreen(screen);
     }else{
-      if(statusEl) statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
-      renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
+      // salimos del modo imagen a pantalla completa
+      document.body.classList.remove("imageScene");
+
+      if(activeId === -1){
+        if(statusEl) statusEl.textContent = `Pantalla de bienvenida activa.`;
+        renderWelcome(hostNote, joinedCount, expectedUsers);
+      }else if(activeId === 0){
+        if(statusEl) statusEl.textContent = `Intermedio activo.`;
+        renderPause(hostNote);
+      }else{
+        if(statusEl) statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
+        renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
+      }
     }
 
     updateMobileBar(activeId);
