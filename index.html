@@ -202,12 +202,6 @@
       box-shadow: 0 0 12px color-mix(in oklab, var(--accent2) 40%, transparent);
     }
 
-    /* Ocultar barra y puntos extra en modo invitado (ya hay barra en footer) */
-    body.guest .progress,
-    body.guest .steps{
-      display:none;
-    }
-
     .nav{display:flex; gap:8px; flex-wrap:wrap; margin-top:10px;}
     button{
       appearance:none; border:none; cursor:pointer; color:var(--text);
@@ -279,7 +273,7 @@
         0 2px 10px rgba(0,0,0,.55);
     }
 
-    /* OVERLAY genérico (vino + name gate) */
+    /* OVERLAY show (usado por overlay vino + name gate) */
     .overlay{
       position:fixed; inset:0; z-index:999;
       display:none; place-items:center; text-align:center;
@@ -303,30 +297,6 @@
     }
     .ovWine{font-size:1.12rem; color:var(--text); font-weight:800}
     .ovSub{color:var(--muted); margin-top:6px}
-
-    /* 🔳 Overlay de escenas de imagen para invitado (a pantalla completa, sin textos) */
-    #infoSceneOverlay{
-      position:fixed;
-      inset:0;
-      z-index:800;
-      display:none;
-      justify-content:center;
-      align-items:center;
-      background:#000;
-    }
-    #infoSceneOverlay .infoSceneInner{
-      max-width:100vw;
-      max-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    #infoSceneImage{
-      max-width:100%;
-      max-height:100%;
-      object-fit:contain;
-      display:block;
-    }
 
     .fade-in{animation:fade .25s ease;}
     @keyframes fade{from{opacity:0; transform:translateY(6px)} to{opacity:1; transform:none}}
@@ -600,6 +570,57 @@
       background:linear-gradient(90deg,var(--accent),var(--accent2));
       transition:width .4s ease;
     }
+
+    /* Ocultar barra de progreso central + puntos en invitado,
+       ya que tiene barra fija inferior */
+    body.guest .progress,
+    body.guest .steps{
+      display:none;
+    }
+
+    /* Bloque de imágenes info para invitado (sin escena 1/2/3) */
+    .infoSceneCard{
+      margin-top:10px;
+      border-radius:18px;
+      border:1px solid #262838;
+      background:#050509;
+      padding:10px;
+    }
+    .infoSceneInner{
+      position:relative;
+      border-radius:16px;
+      overflow:hidden;
+      background:#050509;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .infoSceneImg{
+      width:100%;
+      height:auto;
+      max-height:70vh;
+      object-fit:contain;
+      display:block;
+      background:#050509;
+    }
+    .infoSceneHeader{
+      position:absolute;
+      top:12px;
+      left:12px;
+      right:12px;
+      text-shadow:0 4px 16px rgba(0,0,0,.85);
+    }
+    .infoSceneTitle{
+      margin:0;
+      font-family:"Playfair Display", serif;
+      font-weight:900;
+      font-size:1.4rem;
+    }
+    .infoSceneSub{
+      margin:2px 0 0;
+      font-size:.9rem;
+      color:var(--muted);
+    }
   </style>
 </head>
 <body>
@@ -710,7 +731,7 @@
           </div>
 
           <div class="small" style="margin-top:6px">
-            Estos botones solo afectan a la pantalla 2 (informativa) y a la imagen a pantalla completa en los móviles invitados. El dashboard de valoraciones sigue igual.
+            Estos botones solo afectan a la pantalla 2 (informativa) y a la imagen en el móvil invitado. El dashboard de valoraciones sigue igual.
           </div>
         </div>
       </div>
@@ -734,7 +755,6 @@
   </div>
 </div>
 
-<!-- Overlay de nombre invitado -->
 <div id="nameGate" class="overlay">
   <div class="ovCard" style="text-align:left">
     <div class="welcomeLogoWrap" style="margin-top:0; margin-bottom:10px;">
@@ -763,13 +783,6 @@
     <div class="small" style="margin-top:8px">
       (No pedimos email ni datos personales.)
     </div>
-  </div>
-</div>
-
-<!-- Overlay de escenas para invitados (imagen a pantalla completa, sin textos) -->
-<div id="infoSceneOverlay">
-  <div class="infoSceneInner">
-    <img id="infoSceneImage" src="" alt="Imagen de apoyo" />
   </div>
 </div>
 
@@ -936,6 +949,65 @@
     }
   ];
 
+  // 🧾 Datos rápidos + curiosidad por vino
+  const wineQuick = {
+    1: {
+      bodega: "Cantine Teanum",
+      region: "Puglia IGT (Apulia, sur de Italia)",
+      grapes: "Aprox. 60% Bombino · 40% Falanghina",
+      vintage: "2024",
+      alcohol: "12% vol",
+      curiosity:
+        "La Falanghina es una uva muy antigua: su nombre viene de los ‘falangae’, los postes de madera que usaban los romanos para sujetar las viñas, y se cree que pudo formar parte del famoso vino Falerno de la Antigua Roma."
+    },
+    2: {
+      bodega: "Botter S.p.A. (línea Terre della Brunda)",
+      region: "Montepulciano d’Abruzzo DOC (Abruzzo, centro de Italia)",
+      grapes: "100% Montepulciano",
+      vintage: "2021 (referencia de estilo)",
+      alcohol: "13,5% vol",
+      curiosity:
+        "La uva Montepulciano es la segunda tinta más plantada de Italia (solo por detrás de la Sangiovese), así que este vino es casi como beberse un ‘estándar nacional’ de los tintos italianos."
+    },
+    3: {
+      bodega: "Botter S.p.A.",
+      region: "Puglia IGT (sur de Italia)",
+      grapes: "Malvasia Nera · Negroamaro · Nero di Troia",
+      vintage: "2023",
+      alcohol: "14,5% vol",
+      curiosity:
+        "El nombre ‘Triplico / Multiplo’ hace guiño al trío de uvas locales que lo forman: tres variedades muy típicas del sur de Italia que se combinan para dar fruta negra, especias y mucha intensidad en copa."
+    },
+    4: {
+      bodega: "Lupo Meraviglia (Botter)",
+      region: "Puglia IGT, uvas de la zona de Salento",
+      grapes: "Aprox. 40% Negroamaro · 40% Aglianico · 20% Primitivo",
+      vintage: "2023",
+      alcohol: "14,5% vol",
+      curiosity:
+        "En la etiqueta aparece ‘Tecnica del Salasso’: se ‘sangra’ parte del mosto al inicio de la maceración para concentrar color y cuerpo, de ahí que el vino sea tan oscuro y potente."
+    },
+    5: {
+      bodega: "Masseria Tagaro",
+      region: "Puglia IGT (zona Salento)",
+      grapes: "100% Primitivo",
+      vintage: "2023",
+      alcohol: "15% vol",
+      curiosity:
+        "El Primitivo es una de las uvas icónicas de Puglia y, genéticamente, es la misma variedad que la Zinfandel de California. En este vino se trabaja con maceraciones y madera para potenciar la fruta golosa y el volumen en boca, lo que le ha valido altas puntuaciones en guías y concursos."
+    }
+  };
+
+  // Escenas de imágenes compartidas con dashboard-info
+  const infoScenes = {
+    scene1: { img: "img/info-scene-1.jpg" },
+    scene2: { img: "img/info-scene-2.jpg" },
+    scene3: { img: "img/info-scene-3.jpg" },
+    scene4: { img: "img/info-scene-4.jpg" },
+    scene5: { img: "img/info-scene-5.jpg" }
+  };
+  let currentInfoScreen = "none";
+
   const themes = {
     0:{accent:"#b7bbc7", accent2:"#6b7280", bg:"#0c0d10", bg2:"#14161b"},
     1:{accent:"#ffd166", accent2:"#6ee7ff", bg:"#0d0f12", bg2:"#14202a"},
@@ -961,9 +1033,6 @@
   const ovBig       = document.getElementById("ovBig");
   const ovWine      = document.getElementById("ovWine");
   const ovSub       = document.getElementById("ovSub");
-
-  const infoSceneOverlay = document.getElementById("infoSceneOverlay");
-  const infoSceneImage   = document.getElementById("infoSceneImage");
 
   const mobileBar          = document.getElementById("mobileBar");
   const mobileBarTitle     = document.getElementById("mobileBarTitle");
@@ -1129,7 +1198,7 @@
 
     return `
       <div class="section">
-        <h3>¿Cuánto te gusta este vino?</h3>
+        <h3>⭐ Valoración</h3>
         <div id="starsWrap" class="nav" style="gap:6px; margin-top:8px">
           ${stars}
         </div>
@@ -1347,7 +1416,7 @@
       localStorage.setItem(mouthLSKey(w.id), JSON.stringify(arr));
     }
 
-    wrap.querySelectorAll("button[data-mouth-idx]").forEach(btn=>{
+    wrap.querySelectorAll("button[data-mouth-idx"]).forEach(btn=>{
       btn.onclick = () => {
         const idx = Number(btn.getAttribute("data-mouth-idx"));
         let selected = getSelected();
@@ -1370,7 +1439,28 @@
     });
   }
 
-  // 🌟 Bienvenida sincronizada
+  // Bloque de imágenes extra (solo invitado) sincronizado con infoScreen
+  function renderInfoSceneBlock(){
+    if(isHost || isDashboard) return "";
+    const scene = infoScenes[currentInfoScreen];
+    if(!scene) return "";
+
+    return `
+      <div class="section">
+        <div class="infoSceneCard">
+          <div class="infoSceneInner">
+            <img src="${scene.img}" alt="La degustazione di Puglia" class="infoSceneImg" />
+            <div class="infoSceneHeader">
+              <div class="infoSceneTitle">La degustazione di Puglia</div>
+              <div class="infoSceneSub">Gorrion Wine Experience</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  // 🌟 Bienvenida sincronizada (contador + posible imagen)
   function renderWelcome(hostNote, joinedCount = 0, expectedUsers = 12){
     const isGuest = !isHost && !isDashboard;
 
@@ -1434,6 +1524,8 @@
           <div class="note">🗣️ ${hostNote}</div>
         </div>
       ` : ``}
+
+      ${renderInfoSceneBlock()}
     `;
   }
 
@@ -1443,739 +1535,4 @@
       <div class="pauseBox" style="margin-top:12px">
         <h2 class="pauseTitle">Pausa Mediterránea</h2>
         <div class="pauseSub">Agua · pan · charla · prepárate para el siguiente vino</div>
-        ${hostNote ? `<div class="story" style="margin-top:14px">🗣️ ${hostNote}</div>` : ``}
-      </div>
-      <div class="section">
-        <h3>Orden de servicio</h3>
-        <div class="note">Seguimos en breve con el siguiente capítulo de Puglia.</div>
-      </div>
-    `;
-  }
-
-  const headerWineInfo = document.getElementById("headerWineInfo");
-  const headerProgressBar = document.getElementById("headerProgressBar");
-
-  function updateHeaderWine(activeId, joinedCount=0, expectedUsers=12){
-    if(!isDashboard) return;
-
-    if(activeId === -1){
-      if(headerWineInfo) headerWineInfo.textContent = `🎬 Bienvenida · ${joinedCount}/${expectedUsers}`;
-      if(headerProgressBar) headerProgressBar.style.width = "0%";
-      return;
-    }
-    if(activeId === 0){
-      if(headerWineInfo) headerWineInfo.textContent = "⏸ Intermedio";
-      if(headerProgressBar) headerProgressBar.style.width = "0%";
-      return;
-    }
-
-    const w = wines.find(x=>x.id===activeId) || wines[0];
-    if(headerWineInfo) headerWineInfo.textContent = `🍷 Vino ${w.id}/${wines.length} · ${w.name}`;
-
-    const pct = progressPercent(w.id);
-    if(headerProgressBar) headerProgressBar.style.width = pct + "%";
-  }
-
-  function renderWine(activeId, hostNote, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}){
-    const w = wines.find(x=>x.id===activeId) || wines[0];
-    wineCard.classList.remove("fade-in"); void wineCard.offsetWidth; wineCard.classList.add("fade-in");
-
-    wineCard.innerHTML = `
-      <div class="pill">Vino activo ${w.id} / ${wines.length}</div>
-
-      <div class="title">
-        <div>
-          <h2>${w.name}</h2>
-          <div class="meta">${w.winery} · ${w.type}</div>
-        </div>
-        <div class="badge">${w.serve}</div>
-      </div>
-
-      <img class="heroImg" src="${imageForMaridaje(w.id)}" alt="Maridaje ${w.id}" />
-
-      ${w.story ? `<div class="story">🍇 ${w.story}</div>` : ``}
-
-      <div class="progress"><div style="width:${progressPercent(w.id)}%"></div></div>
-      <div class="steps">
-        ${wines.map(v=>`<div class="dot ${v.id===w.id?'active':''}"></div>`).join("")}
-      </div>
-
-      <div class="section">
-        <h3>Notas rápidas</h3>
-        <ul>${w.notes.map(n=>`<li>${n}</li>`).join("")}</ul>
-      </div>
-
-      <div class="section">
-        <h3>Maridaje</h3>
-        <div class="pairing">
-          <strong>🍽️ ${w.pairing.name}</strong>
-          <div class="note" style="margin-top:6px">${w.pairing.desc}</div>
-        </div>
-      </div>
-
-      ${renderRatingSection(w, ratingsMap)}
-      ${renderQuizSection(w, hostNote)}
-      ${renderNotesSection(w, notesMap)}
-      ${renderMouthSection(w, mouthMap)}
-    `;
-
-    attachRatingHandlers(w);
-    attachQuizHandlers(w);
-    attachNotesHandlers(w);
-    attachMouthHandlers(w);
-  }
-
-  function chime(){
-    if(localStorage.getItem("gw_sound")!=="1") return;
-    try{
-      const ctx = new (window.AudioContext || window.webkitAudioContext)();
-      const o = ctx.createOscillator();
-      const g = ctx.createGain();
-      o.connect(g); g.connect(ctx.destination);
-      o.type="sine"; o.frequency.value=880;
-      g.gain.setValueAtTime(0.0001, ctx.currentTime);
-      g.gain.exponentialRampToValueAtTime(0.08, ctx.currentTime+0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime+0.35);
-      o.start(); o.stop(ctx.currentTime+0.4);
-    }catch(e){}
-  }
-
-  function showOverlayFor(activeId){
-    if(activeId === -1){
-      ovBig.textContent = `Bienvenida`;
-      ovWine.textContent = `La degustazione de Puglia`;
-      ovSub.textContent = `Prepara la copa, servimos enseguida…`;
-    }else if(activeId === 0){
-      ovBig.textContent = `Intermedio`;
-      ovWine.textContent = `Pausa Mediterránea`;
-      ovSub.textContent = `Agua · pan · charla`;
-    }else{
-      const w = wines.find(x=>x.id===activeId) || wines[0];
-      ovBig.textContent = `Vino ${w.id}`;
-      ovWine.textContent = w.name;
-      ovSub.textContent = w.pairing.name;
-    }
-    overlay.classList.add("show");
-    setTimeout(()=>overlay.classList.remove("show"), 2200);
-  }
-
-  // 🔳 Actualizar overlay de escena en invitado
-  function updateInfoSceneOverlay(screenId){
-    if(!infoSceneOverlay || !infoSceneImage) return;
-
-    // Nunca mostrar overlay de escena en host ni dashboard
-    if(isHost || isDashboard){
-      infoSceneOverlay.style.display = "none";
-      infoSceneImage.src = "";
-      return;
-    }
-
-    const map = {
-      scene1: "img/info-scene-1.jpg",
-      scene2: "img/info-scene-2.jpg",
-      scene3: "img/info-scene-3.jpg",
-      scene4: "img/info-scene-4.jpg",
-      scene5: "img/info-scene-5.jpg"
-    };
-
-    const src = map[screenId];
-
-    if(!src){
-      infoSceneOverlay.style.display = "none";
-      infoSceneImage.src = "";
-      return;
-    }
-
-    infoSceneImage.src = src;
-    infoSceneOverlay.style.display = "flex";
-  }
-
-  function setupHostUI(){
-    if(!isHost) return;
-    hostPanel.style.display = "block";
-    hostButtons.innerHTML = "";
-
-    wines.forEach(w=>{
-      const b = document.createElement("button");
-      b.textContent = `${w.id}. ${w.name.split(" ")[0]}`;
-      b.onclick = () => set(ref(db, "activeWine"), w.id);
-      hostButtons.appendChild(b);
-    });
-
-    if(welcomeBtn){
-      welcomeBtn.onclick = () => set(ref(db, "activeWine"), -1);
-    }
-
-    // Secuencia circular: -1 → 1 → 2 → 3 → 4 → 5 → 0 → -1 …
-    prevBtn.onclick = () => {
-      const cur = window.__activeWine ?? -1;
-      let next;
-      if(cur === -1)        next = 0;
-      else if(cur === 0)    next = wines.length;
-      else if(cur === 1)    next = -1;
-      else                  next = cur - 1;
-      set(ref(db,"activeWine"), next);
-    };
-    nextBtn.onclick = () => {
-      const cur = window.__activeWine ?? -1;
-      let next;
-      if(cur === -1)                next = 1;
-      else if(cur === wines.length) next = 0;
-      else if(cur === 0)            next = -1;
-      else                          next = cur + 1;
-      set(ref(db,"activeWine"), next);
-    };
-    pauseBtn.onclick = () => set(ref(db,"activeWine"), 0);
-
-    const clearNoteBtn= document.getElementById("clearNote");
-    if(sendNoteBtn){
-      sendNoteBtn.onclick = () => {
-        const v = noteInput.value.trim();
-        update(ref(db,"/"), { hostNote: v });
-      };
-    }
-    if(clearNoteBtn){
-      clearNoteBtn.onclick = () => {
-        noteInput.value="";
-        update(ref(db,"/"), { hostNote: "" });
-      };
-    }
-
-    // 🔹 Controles de Pantalla 2 (infoScreen)
-    const infoNoneBtn  = document.getElementById("infoNoneBtn");
-    const infoScene1Btn = document.getElementById("infoScene1Btn");
-    const infoScene2Btn = document.getElementById("infoScene2Btn");
-    const infoScene3Btn = document.getElementById("infoScene3Btn");
-    const infoScene4Btn = document.getElementById("infoScene4Btn");
-    const infoScene5Btn = document.getElementById("infoScene5Btn");
-
-    if(infoNoneBtn){
-      infoNoneBtn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "none" });
-    }
-    if(infoScene1Btn){
-      infoScene1Btn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "scene1" });
-    }
-    if(infoScene2Btn){
-      infoScene2Btn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "scene2" });
-    }
-    if(infoScene3Btn){
-      infoScene3Btn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "scene3" });
-    }
-    if(infoScene4Btn){
-      infoScene4Btn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "scene4" });
-    }
-    if(infoScene5Btn){
-      infoScene5Btn.onclick = () =>
-        update(ref(db, "/"), { infoScreen: "scene5" });
-    }
-
-    const expectedInput = document.getElementById("expectedInput");
-    const setExpectedBtn = document.getElementById("setExpectedBtn");
-    const expectedHint = document.getElementById("expectedHint");
-
-    onValue(ref(db, "expectedUsers"), (s)=>{
-      const val = s.val();
-      if(expectedInput && val){
-        expectedInput.value = val;
-        if(expectedHint) expectedHint.textContent = `Ahora mismo esperas ${val} participantes.`;
-      }
-    });
-
-    if(setExpectedBtn){
-      setExpectedBtn.onclick = () => {
-        const n = Number(expectedInput.value || 0);
-        if(!n || n < 1) return;
-        update(ref(db, "/"), { expectedUsers: n });
-        if(expectedHint) expectedHint.textContent = `Guardado: esperas ${n} participantes.`;
-      };
-    }
-
-    const resetDbBtn = document.getElementById("resetDbBtn");
-    if(resetDbBtn){
-      resetDbBtn.onclick = async () => {
-        const ok = confirm(
-          "⚠️ Vas a borrar TODAS las puntuaciones, respuestas y conectados.\n\n" +
-          "Esto no se puede deshacer.\n\n" +
-          "¿Seguro que quieres resetear la base de datos?"
-        );
-        if(!ok) return;
-
-        const expectedUsers = Number(expectedInput?.value || 12);
-
-        await set(ref(db, "/"), {
-          activeWine: -1,
-          hostNote: "",
-          expectedUsers,
-          ratings: {},
-          quiz: {},
-          notes: {},
-          mouth: {},
-          userActions: {},
-          joinedUsers: {},
-          infoScreen: "none"
-        });
-
-        alert("✅ DB reseteada. Todo vuelve a 0.");
-      };
-    }
-  }
-
-  // ===== DASHBOARD MODE =====
-  const dashGrid= document.getElementById("dashGrid");
-
-  function ratingHistogramHTML(rForWine = {}){
-    const max = Math.max(...[1,2,3,4,5].map(s => rForWine[s] || 0), 1);
-    return [5,4,3,2,1].map(s=>{
-      const c = rForWine[s] || 0;
-      const w = Math.round((c/max)*100);
-      return `
-        <div style="display:grid; grid-template-columns:28px 1fr 34px; gap:8px; align-items:center; margin:6px 0;">
-          <div style="font-weight:900">${s}★</div>
-          <div style="height:8px; background:#2a2e3e; border-radius:999px; overflow:hidden; border:1px solid #32364a;">
-            <div style="height:100%; width:${w}%; background:linear-gradient(90deg,var(--accent),var(--accent2));"></div>
-          </div>
-          <div class="small" style="text-align:right">${c}</div>
-        </div>
-      `;
-    }).join("");
-  }
-
-  function topNotesHTML(notesForWine = {}){
-    const pairs = Object.entries(notesForWine)
-      .map(([k,v]) => ({ idx:Number(k), count: v||0 }))
-      .sort((a,b)=>b.count-a.count)
-      .slice(0,3);
-
-    if(!pairs.length || pairs[0].count===0) return `<div class="small">Sin datos aún</div>`;
-
-    const total = Object.values(notesForWine).reduce((a,b)=>a+(b||0),0) || 1;
-
-    return pairs.map(p=>{
-      const pct = Math.round((p.count/total)*100);
-      const label = noteTags[p.idx] || "";
-      return `<div class="note">• ${label} <span class="small">(${pct}%)</span></div>`;
-    }).join("");
-  }
-
-  function topMouthHTML(mouthForWine = {}){
-    const pairs = Object.entries(mouthForWine)
-      .map(([k,v]) => ({ idx:Number(k), count: v||0 }))
-      .sort((a,b)=>b.count-a.count)
-      .slice(0,3);
-
-    if(!pairs.length || pairs[0].count===0) return `<div class="small">Sin datos aún</div>`;
-
-    const total = Object.values(mouthForWine).reduce((a,b)=>a+(b||0),0) || 1;
-
-    return pairs.map(p=>{
-      const pct = Math.round((p.count/total)*100);
-      const label = mouthTags[p.idx] || "";
-      return `<div class="note">• ${label} <span class="small">(${pct}%)</span></div>`;
-    }).join("");
-  }
-
-  function quizSummaryHTML(w, quizForWine = {}){
-    if(!w.quiz) return `<div class="small">Sin quiz</div>`;
-
-    const countsByIndex = w.quiz.options.map((_, i) => quizForWine[i] || 0);
-    const total = countsByIndex.reduce((a,b)=>a+b,0) || 1;
-
-    return w.quiz.options.map((opt, i)=>{
-      const count = countsByIndex[i];
-      const pct = Math.round((count / total) * 100);
-      const isCorrect = i === w.quiz.correct;
-
-      return `
-        <div class="note" style="${isCorrect ? 'font-weight:900;color:var(--ok)' : ''}">
-          • ${opt} <span class="small">(${pct}%)</span> ${isCorrect ? '✓' : ''}
-        </div>
-      `;
-    }).join("");
-  }
-
-  function quizCorrectStats(w, quizForWine = {}){
-    if(!w.quiz) return { correct: 0, total: 0, pct: 0 };
-
-    const countsByIndex = w.quiz.options.map((_, i) => quizForWine[i] || 0);
-    const total = countsByIndex.reduce((a,b)=>a+b,0) || 0;
-    const correct = countsByIndex[w.quiz.correct] || 0;
-    const pct = total ? Math.round((correct / total) * 100) : 0;
-
-    return { correct, total, pct };
-  }
-
-  function userListHTML(wineId, actionsForWine = {}){
-    const ww = wines.find(x=>x.id===wineId);
-
-    const entries = Object.values(actionsForWine || {})
-      .map(a => {
-        const rating = a?.rating || 0;
-        const qa = (a?.quizAnswer ?? null);
-        const isCorrect =
-          (ww && qa !== null && typeof ww.quiz?.correct === "number")
-            ? (Number(qa) === ww.quiz.correct)
-            : null;
-
-        const selNotes = Array.isArray(a?.notesSelected) ? a.notesSelected : [];
-        const top2Notes = selNotes
-          .slice(0,2)
-          .map(i => emojiOnly(noteTags[i] || ""))
-          .join(" ");
-
-        const selMouth = Array.isArray(a?.mouthSelected) ? a.mouthSelected : [];
-        const top2Mouth = selMouth
-          .slice(0,2)
-          .map(i => emojiOnly(mouthTags[i] || ""))
-          .join(" ");
-
-        return {
-          name: a?.name || "INVITADO",
-          rating,
-          isCorrect,
-          top2Notes,
-          top2Mouth,
-          ts: a?.ts || 0
-        };
-      })
-      .sort((a,b)=>b.ts-a.ts)
-      .slice(0,12);
-
-    if(!entries.length) return `<div class="small">Aún no hay participaciones.</div>`;
-
-    const rows = entries.map(e=>{
-      const stars = e.rating
-        ? `<span class="dashStarsWrap">${
-            Array.from({length:5}, (_,i)=>
-              `<span class="dashStar ${i < e.rating ? "filled" : ""}">★</span>`
-            ).join("")
-          }</span>`
-        : "—";
-
-      const quizMark =
-        e.isCorrect === null ? "—" : (e.isCorrect ? "✅" : "❌");
-
-      return `
-        <div class="userRow">
-          <div class="userName">${e.name}</div>
-          <div class="userRight">
-            ${stars} · ${quizMark}
-            ${e.top2Notes ? `· ${e.top2Notes}` : ""}
-            ${e.top2Mouth ? `· ${e.top2Mouth}` : ""}
-          </div>
-        </div>
-      `;
-    }).join("");
-
-    return `
-      <div class="userGrid">
-        <div class="userCol">
-          ${rows}
-        </div>
-      </div>
-    `;
-  }
-
-  function fitParticipants(expectedUsers){
-    if(!isDashboard) return;
-    const factor = Math.max(0.78, Math.min(1.12, 10 / expectedUsers));
-    document.body.style.setProperty("--p-name",  `clamp(${1.0*factor}rem, ${1.6*factor}vw, ${1.7*factor}rem)`);
-    document.body.style.setProperty("--p-right", `clamp(${0.9*factor}rem, ${1.3*factor}vw, ${1.4*factor}rem)`);
-    document.body.style.setProperty("--p-pad",   `clamp(${4*factor}px,  ${0.6*factor}vw, ${8*factor}px)`);
-  }
-
-  function renderDashboard(activeId, ratingsMap={}, quizMap={}, notesMap={}, mouthMap={}, userActionsMap={}, expectedCount=12, joinedCount=0){
-    if(!dashGrid) return;
-
-    if(activeId === -1){
-      dashGrid.innerHTML = `
-        <div class="card">
-          <div class="pill">Bienvenida</div>
-          <div style="margin-top:6px; font-weight:900; font-size:2.2rem; font-family:'Playfair Display', serif;">
-            La degustazione de Puglia
-          </div>
-
-          <div class="welcomeLogoWrap">
-            <img
-              src="img/logoredondo.png"
-              alt="Gorrión Wine Experience"
-              class="welcomeLogo"
-            />
-          </div>
-
-          <div class="note" style="margin-top:12px">
-            Conectados: <b>${joinedCount}/${expectedCount}</b>. El host aún no ha activado el primer vino.
-          </div>
-
-          <div class="section" style="margin-top:14px; padding-top:12px; border-top:1px dashed #2b2f3d;">
-            <h3>Orden de servicio</h3>
-            <ol class="note" style="margin-left:18px">
-              ${wines.map(w=>`<li>${w.id}. ${w.name} – ${w.type}</li>`).join("")}
-            </ol>
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    if(activeId === 0){
-      dashGrid.innerHTML = `
-        <div class="card">
-          <div class="pill">Intermedio</div>
-          <div style="margin-top:6px; font-weight:900; font-size:2.2rem; font-family:'Playfair Display', serif;">
-            Pausa Mediterránea
-          </div>
-          <div class="note" style="margin-top:8px">
-            Ahora mismo no hay vino activo.
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    const w = wines.find(x=>x.id===activeId) || wines[0];
-    const rForWine = ratingsMap[w.id] || {};
-    const stats = computeRatingStats(rForWine);
-    const qsLocal = quizCorrectStats(w, quizMap[w.id] || {});
-
-    const actionsForWine = userActionsMap[w.id] || {};
-    const participants = Object.keys(actionsForWine).length;
-    const quizAnswered = Object.values(actionsForWine)
-      .filter(a => a && a.quizAnswer !== undefined && a.quizAnswer !== null).length;
-
-    const showQuiz = quizAnswered >= expectedCount;
-
-    dashGrid.innerHTML = `
-      <div class="card">
-        <div class="tvLayout">
-
-          <div class="tvCol">
-            <div class="tvBlock participantsBlock" style="flex:1;">
-              <h3>👥 Participantes (${participants}/${expectedCount})</h3>
-              <div class="participantsList">
-                ${userListHTML(w.id, actionsForWine)}
-              </div>
-            </div>
-          </div>
-
-          <div class="tvCol">
-
-            <div class="tvBlock">
-              <h3>⭐ Valoración</h3>
-              <div class="note" style="margin-bottom:8px">
-                Media: <b>${stats.avg ? stats.avg.toFixed(1) : "—"}</b> / 5 · votos: <b>${stats.total}</b>
-              </div>
-              ${ratingHistogramHTML(rForWine)}
-            </div>
-
-            <div class="tvBlock">
-              <div class="noseMouthRow">
-                <div>
-                  <h3 style="margin-bottom:6px">👃 Nariz (top 3)</h3>
-                  ${topNotesHTML(notesMap[w.id] || {})}
-                </div>
-                <div>
-                  <h3 style="margin-bottom:6px">👄 Boca (top 3)</h3>
-                  ${topMouthHTML(mouthMap[w.id] || {})}
-                </div>
-              </div>
-            </div>
-
-            <div class="tvBlock">
-              <h3>❓ Quiz</h3>
-              ${showQuiz ? `
-                <div class="note" style="margin-bottom:8px">
-                  Aciertos: <b>${qsLocal.correct}</b> / ${qsLocal.total}
-                  <span class="small">(${qsLocal.pct}%)</span>
-                </div>
-                ${quizSummaryHTML(w, quizMap[w.id] || {})}
-              ` : `
-                <div class="note">
-                  Esperando respuestas… <b>${quizAnswered}/${expectedCount}</b>
-                </div>
-                <div class="small" style="margin-top:8px">
-                  El quiz se mostrará cuando hayan respondido todos.
-                </div>
-              `}
-            </div>
-
-          </div>
-        </div>
-      </div>
-    `;
-  }
-
-  function toggleDashboardUI(){
-    if(!isDashboard) return;
-    const mainWrap = document.querySelector("main.wrap");
-    if(mainWrap) mainWrap.style.display = "none";
-    const dashEl = document.getElementById("dashboard");
-    if(dashEl) dashEl.style.display = "block";
-    document.body.classList.add("tv");
-  }
-  toggleDashboardUI();
-
-  function syncHeaderHeight(){
-    if(!isDashboard) return;
-    const headerEl = document.querySelector("header");
-    const h = headerEl ? headerEl.offsetHeight : 120;
-    document.documentElement.style.setProperty("--header-h", h + "px");
-  }
-  window.addEventListener("load", syncHeaderHeight);
-  window.addEventListener("resize", syncHeaderHeight);
-  setTimeout(syncHeaderHeight, 250);
-
-  function setupFullscreenBtn(){
-    if(!isDashboard) return;
-    const fsBtn = document.getElementById("fsBtn");
-    if(!fsBtn) return;
-
-    const docEl = document.documentElement;
-
-    function isFs(){
-      return document.fullscreenElement ||
-             document.webkitFullscreenElement ||
-             document.mozFullScreenElement ||
-             document.msFullscreenElement;
-    }
-
-    async function enterFs(){
-      try{
-        if(docEl.requestFullscreen) await docEl.requestFullscreen();
-        else if(docEl.webkitRequestFullscreen) await docEl.webkitRequestFullscreen();
-        else if(docEl.mozRequestFullScreen) await docEl.mozRequestFullScreen();
-        else if(docEl.msRequestFullscreen) await docEl.msRequestFullscreen();
-      }catch(e){}
-    }
-
-    async function exitFs(){
-      try{
-        if(document.exitFullscreen) await document.exitFullscreen();
-        else if(document.webkitExitFullscreen) await document.webkitExitFullscreen();
-        else if(document.mozCancelFullScreen) await document.mozCancelFullScreen();
-        else if(document.msExitFullscreen) await document.msRequestFullscreen();
-      }catch(e){}
-    }
-
-    fsBtn.onclick = async () => {
-      if(isFs()) await exitFs();
-      else await enterFs();
-    };
-
-    function updateLabel(){
-      fsBtn.textContent = isFs() ? "⛶ Salir" : "⛶ Fullscreen";
-    }
-
-    document.addEventListener("fullscreenchange", updateLabel);
-    document.addEventListener("webkitfullscreenchange", updateLabel);
-    updateLabel();
-  }
-  setupFullscreenBtn();
-
-  function updateMobileBar(activeId){
-    if(!mobileBar || !document.body.classList.contains("guest")) return;
-
-    if(activeId === -1){
-      mobileBarTitle.textContent = "Esperando al inicio";
-      mobileBarSub.textContent = "El host activará el primer vino en breve";
-      mobileBarProgress.style.width = "0%";
-    }else if(activeId === 0){
-      mobileBarTitle.textContent = "Intermedio activo";
-      mobileBarSub.textContent = "Agua · pan · charla";
-      mobileBarProgress.style.width = "0%";
-    }else{
-      const w = wines.find(x=>x.id===activeId) || wines[0];
-      mobileBarTitle.textContent = `Vino ${w.id} de ${wines.length}`;
-      mobileBarSub.textContent = w.name;
-      mobileBarProgress.style.width = progressPercent(w.id) + "%";
-    }
-  }
-
-  const rootRef = ref(db, "/");
-  let lastWine = null;
-
-  onValue(rootRef, (snap)=>{
-    const data = snap.val() || {};
-    const activeId      = data.activeWine ?? -1;
-    const hostNote      = data.hostNote || "";
-    const expectedUsers = data.expectedUsers ?? 12;
-
-    const ratingsMap    = data.ratings || {};
-    const quizMap       = data.quiz  || {};
-    const notesMap      = data.notes || {};
-    const mouthMap      = data.mouth || {};
-    const userActionsMap= data.userActions || {};
-    const joinedUsers   = data.joinedUsers || {};
-    const joinedCount   = Object.keys(joinedUsers).length;
-    const infoScreen    = data.infoScreen || "none";
-
-    updateHeaderWine(activeId, joinedCount, expectedUsers);
-
-    // Actualizar overlay de imagen en invitados
-    updateInfoSceneOverlay(infoScreen);
-
-    if(isDashboard){
-      syncHeaderHeight();
-      fitParticipants(expectedUsers);
-      renderDashboard(activeId, ratingsMap, quizMap, notesMap, mouthMap, userActionsMap, expectedUsers, joinedCount);
-      return;
-    }
-
-    window.__activeWine = activeId;
-
-    const themeId = activeId <= 0 ? 0 : activeId;
-    setTheme(themeId);
-
-    if(activeId === -1){
-      if(statusEl) statusEl.textContent = `Pantalla de bienvenida activa.`;
-      renderWelcome(hostNote, joinedCount, expectedUsers);
-    }else if(activeId === 0){
-      if(statusEl) statusEl.textContent = `Intermedio activo.`;
-      renderPause(hostNote);
-    }else{
-      if(statusEl) statusEl.textContent = `Mostrando vino ${activeId}. Sincronizado en tiempo real.`;
-      renderWine(activeId, hostNote, ratingsMap, quizMap, notesMap, mouthMap);
-    }
-
-    updateMobileBar(activeId);
-
-    if(lastWine !== null && lastWine !== activeId){
-      showOverlayFor(activeId);
-      chime();
-    }
-    lastWine = activeId;
-
-  }, (err)=>{
-    if(statusEl) statusEl.textContent = "Error de conexión a Firebase.";
-    console.error(err);
-  });
-
-  if(isHost){
-    onValue(rootRef, (snap)=>{
-      if(snap.val() == null){
-        set(rootRef, {
-          activeWine: -1,
-          hostNote: "",
-          expectedUsers: 12,
-          ratings: {},
-          quiz: {},
-          notes: {},
-          mouth: {},
-          userActions: {},
-          joinedUsers: {},
-          infoScreen: "none"
-        });
-      }
-    }, { onlyOnce:true });
-  }
-
-  renderOrder();
-  setupHostUI();
-</script>
-
-</body>
-</html>
+        ${hostNote ? `<div class="story" style="margin-top:14px">🗣
