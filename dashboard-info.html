@@ -321,37 +321,24 @@
   const sceneSub     = document.getElementById("sceneSub");
   const emptyWrap    = document.getElementById("emptyStateWrap");
   const fsBtn        = document.getElementById("fsBtn");
+  const topBar       = document.getElementById("topBar");
+  const bottomBar    = document.getElementById("bottomBar");
 
   // 🔍 Escenas disponibles (5 escenas + ocultar desde host)
   const scenes = {
     "scene1": {
-      label: "🖼️ Escena 1",
-      title: "Escena 1",
-      sub: "Imagen de apoyo 1 para la degustazione.",
       img: "img/info-scene-1.jpg"
     },
     "scene2": {
-      label: "🖼️ Escena 2",
-      title: "Escena 2",
-      sub: "Imagen de apoyo 2 para la degustazione.",
       img: "img/info-scene-2.jpg"
     },
     "scene3": {
-      label: "🖼️ Escena 3",
-      title: "Escena 3",
-      sub: "Imagen de apoyo 3 para la degustazione.",
       img: "img/info-scene-3.jpg"
     },
     "scene4": {
-      label: "🖼️ Escena 4",
-      title: "Escena 4",
-      sub: "Imagen de apoyo 4 para la degustazione.",
       img: "img/info-scene-4.jpg"
     },
     "scene5": {
-      label: "🖼️ Escena 5",
-      title: "Escena 5",
-      sub: "Imagen de apoyo 5 para la degustazione.",
       img: "img/info-scene-5.jpg"
     }
   };
@@ -359,10 +346,14 @@
   function renderInfo(screenId){
     const scene = scenes[screenId];
 
+    // 🔹 SIN ESCENA: mostrar textos de espera
     if(!scene){
       if(emptyWrap) emptyWrap.style.display = "flex";
       sceneImage.style.display = "none";
       sceneImage.src = "";
+
+      if(topBar)    topBar.style.display = "flex";
+      if(bottomBar) bottomBar.style.display = "block";
 
       sceneLabel.textContent = "Pantalla 2 · Info";
       sceneTitle.textContent = "Esperando orden del host…";
@@ -370,18 +361,18 @@
       return;
     }
 
+    // 🔹 CON ESCENA: solo imagen a pantalla completa, sin textos
     if(emptyWrap) emptyWrap.style.display = "none";
 
-    sceneLabel.textContent = scene.label;
-    sceneTitle.textContent = scene.title;
-    sceneSub.textContent   = scene.sub;
+    if(topBar)    topBar.style.display = "none";
+    if(bottomBar) bottomBar.style.display = "none";
 
     sceneImage.src = scene.img;
-    sceneImage.alt = scene.title;
+    sceneImage.alt = "";
     sceneImage.style.display = "block";
   }
 
-  // 🧷 Ajustar var(--header-h) según altura real del header (por si FireTV cambia algo)
+  // 🧷 Ajustar var(--header-h) según altura real del header
   function syncHeaderHeight(){
     const headerEl = document.querySelector("header");
     const h = headerEl ? headerEl.offsetHeight : 90;
@@ -391,7 +382,7 @@
   window.addEventListener("resize", syncHeaderHeight);
   setTimeout(syncHeaderHeight, 250);
 
-  // ⛶ Fullscreen (igual filosofía que en cata.html)
+  // ⛶ Fullscreen
   function setupFullscreenBtn(){
     if(!fsBtn) return;
     const docEl = document.documentElement;
