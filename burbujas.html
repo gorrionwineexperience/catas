@@ -384,8 +384,7 @@
       Burbujas de aromas suben hacia la superficie.<br>
       Para el vino <b id="instrWineName">Falanghina</b> busca aromas: <b id="instrAromas">cítricos, florales, salinos…</b><br>
       Si revientas burbujas que no encajan con ese vino o dejas escapar aromas buenos, cuentan
-      como fallo o perdida. Tienes 30 segundos.<br>
-      <br>
+      como fallo o perdida. Tienes 30 segundos.<br><br>
       <b>Solo tienes una oportunidad por vino.</b>
     </div>
 
@@ -401,7 +400,7 @@
     </div>
 
     <div class="status" id="statusText">
-      Pulsa <b>“Empezar partida”</b y toca solo las burbujas de aromas correctos para el vino elegido.
+      Pulsa <b>“Empezar partida”</b> y toca solo las burbujas de aromas correctos para el vino elegido.
     </div>
   </div>
 </div>
@@ -445,6 +444,9 @@
   const GAME_DURATION_MS = 30000;
   const SPAWN_INTERVAL_SEC = 0.7; // más caña: burbujas más frecuentes
   const SPEED_PX_PER_SEC = 95;    // más caña: suben más deprisa
+
+  // Orden fijo de los vinos (para pasar al siguiente automáticamente)
+  const WINE_ORDER = ["falanghina","montepulciano","lupo","cinquenoci","triplico"];
 
   // Definición de vinos
   const wines = {
@@ -505,7 +507,7 @@
 
   let currentWineId = "falanghina";
 
-  // NUEVO: registro de vinos ya jugados (solo 1 oportunidad por vino)
+  // registro de vinos ya jugados (solo 1 oportunidad por vino)
   const winePlayed = {
     falanghina:false,
     montepulciano:false,
@@ -554,7 +556,6 @@
     }
   }
 
-  // NUEVO: reflejar en el selector qué vinos ya se han jugado
   function updateWineAvailabilityUI(){
     Array.from(wineSelect.options).forEach(opt => {
       const id = opt.value;
@@ -671,9 +672,6 @@
   }
 
   function updateBubbles(dt){
-    const fieldRect = playfield.getBoundingClientRect();
-    const fieldHeight = fieldRect.height || 420;
-
     bubbles.forEach(bubble=>{
       if(bubble.removed) return;
       bubble.y -= SPEED_PX_PER_SEC * dt;
@@ -733,7 +731,7 @@
     if(remaining.length === 0){
       statusText.textContent = "Has completado los 5 vinos. Resultados listos para el dashboard. 🥳";
     }else{
-      statusText.textContent = "Partida terminada para " + activeWine.short + ". Elige otro vino para seguir jugando.";
+      statusText.textContent = "Partida terminada para " + activeWine.short + ". Pulsa “Jugar con otro vino” o cambia en el menú.";
     }
   }
 
@@ -825,14 +823,34 @@
     endOverlay.classList.remove("show");
   });
 
+  // AQUÍ EL CAMBIO: pasar automáticamente al siguiente vino no jugado
   restartOverlayBtn.addEventListener("click", ()=>{
     endOverlay.classList.remove("show");
-    const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
-    if(remaining.length === 0){
+
+    const remainingNotPlayed = WINE_ORDER.filter(id => !winePlayed[id]);
+    if(remainingNotPlayed.length === 0){
       showToast("Ya has jugado todos los vinos.");
       return;
     }
-    showToast("Elige otro vino en el menú para jugar tu siguiente (y única) partida.");
+
+    // buscar el siguiente en el orden a partir del actual
+    const currentIndex = WINE_ORDER.indexOf(currentWineId);
+    let nextId = currentWineId;
+
+    for(let offset = 1; offset < WINE_ORDER.length; offset++){
+      const idx = (currentIndex + offset) % WINE_ORDER.length;
+      const candidate = WINE_ORDER[idx];
+      if(!winePlayed[candidate]){
+        nextId = candidate;
+        break;
+      }
+    }
+
+    currentWineId = nextId;
+    wineSelect.value = currentWineId;
+    updateWineUI();
+
+    showToast("Ahora juega con: " + getActiveWine().short + ".");
   });
 
   wineSelect.addEventListener("change", ()=>{
