@@ -402,7 +402,51 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
+    authDomain: "catas-9d780.firebaseapp.com",
+    databaseURL: "https://catas-9d780-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "catas-9d780",
+    storageBucket: "catas-9d780.firebasestorage.app",
+    messagingSenderId: "554356727364",
+    appId: "1:554356727364:web:2e8a754067872751efa611",
+    measurementId: "G-F2YRVJ9B00"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const rawName = (localStorage.getItem("gw_name") || "INVITADO").toUpperCase().slice(0, 8);
+  const sessionId = rawName || "INVITADO";
+
+  const qs = new URLSearchParams(location.search);
+  const isHost = qs.get("host") === "1";
+  const isDashboard = qs.get("dashboard") === "1";
+
+  if(!isHost && !isDashboard){
+    const screenRef = ref(db, "miniGames/currentScreen");
+    onValue(screenRef, (snap) => {
+      const screen = snap.val() || "cata";
+      const current = (location.pathname.split("/").pop() || "").toLowerCase();
+
+      if(screen === "cata"){
+        if(current !== "cata.html"){
+          window.location.href = "cata.html";
+        }
+      }else if(screen === "bubbles"){
+        if(!current.includes("burbujas")){
+          window.location.href = "burbujas.html";
+        }
+      }else if(screen === "linea"){
+        // Nos quedamos aquí
+      }
+    });
+  }
+
 (function(){
   const dotEl = document.getElementById("dot");
   const startBtn = document.getElementById("startBtn");
@@ -614,6 +658,37 @@
     const remainingAttempts = Math.max(0, MAX_ATTEMPTS - attemptCount);
 
     if(attemptCount >= MAX_ATTEMPTS){
+      // nuevo: subir resumen final de los 3 intentos a Firebase
+      try{
+        if(typeof db !== "undefined"){
+          const safeId = sessionId || "INVITADO";
+          const attemptsCount = attempts.length || 0;
+          let avgPercent = attemptsCount
+            ? Math.round(attempts.reduce((sum,a)=>sum + (a.percent || 0),0) / attemptsCount)
+            : 0;
+          let avgInsideSec = attemptsCount
+            ? Math.round(attempts.reduce((sum,a)=>sum + (a.insideMs || 0),0) / attemptsCount / 1000)
+            : 0;
+
+          const resultsRef = ref(db, "miniGames/linea/results/" + safeId);
+          const payload = {
+            sessionId: safeId,
+            name: safeId,
+            ts: Date.now(),
+            attempts: attempts.map((att, i) => ({
+              index: i+1,
+              insideMs: att.insideMs,
+              percent: att.percent
+            })),
+            avgPercent,
+            avgInsideSec
+          };
+          set(resultsRef, payload);
+        }
+      }catch(e){
+        console.error("Error guardando resultados de Test alcoholemia", e);
+      }
+
       // Resumen final de los 3 intentos
       overlayTitleEl.textContent = "Resumen final · Test alcoholemia";
       overlaySubEl.textContent = "Media de tus 3 intentos en la carretera 2D.";
