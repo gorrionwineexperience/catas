@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Bubble Pop de Aromas · Demo Mobile</title>
+  <title>Bubble Pop de Aromas 路 Demo Mobile</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
   <style>
@@ -76,7 +76,7 @@
     }
     .pill b{color:var(--text);}
 
-    /* fila de selección de vino */
+    /* fila de selecci贸n de vino */
     .wine-row{
       margin-top:10px;
       display:flex;
@@ -351,7 +351,7 @@
         <div class="subtitle" id="subtitle">Elige un vino de La Cata de Puglia y practica sus aromas.</div>
       </div>
       <div class="pill">
-        🫧 <span>Revienta solo<br><b>las burbujas correctas</b></span>
+        馃 <span>Revienta solo<br><b>las burbujas correctas</b></span>
       </div>
     </div>
 
@@ -362,30 +362,30 @@
         <div class="wine-grapes" id="wineGrapes">Uvas: Falanghina</div>
       </div>
       <select id="wineSelect">
-        <option value="falanghina">1 · Falanghina (blanco)</option>
-        <option value="montepulciano">2 · Montepulciano Riserva</option>
-        <option value="lupo">3 · Lupo Meraviglia Tre di Tre</option>
-        <option value="cinquenoci">4 · Cinquenoci Primitivo</option>
-        <option value="triplico">5 · Triplico Multiplo</option>
+        <option value="falanghina">1 路 Falanghina (blanco)</option>
+        <option value="montepulciano">2 路 Montepulciano Riserva</option>
+        <option value="lupo">3 路 Lupo Meraviglia Tre di Tre</option>
+        <option value="cinquenoci">4 路 Cinquenoci Primitivo</option>
+        <option value="triplico">5 路 Triplico Multiplo</option>
       </select>
     </div>
 
     <div class="top-row">
       <div class="score-wrap">
-        <span>✅ Aciertos: <b id="score">0</b></span>
-        <span class="bad">❌ Fallos: <b id="mistakes">0</b></span>
-        <span>💨 Perdidas: <b id="missed">0</b></span>
+        <span>鉁?Aciertos: <b id="score">0</b></span>
+        <span class="bad">鉂?Fallos: <b id="mistakes">0</b></span>
+        <span>馃挩 Perdidas: <b id="missed">0</b></span>
       </div>
       <div class="timer" id="timer">00:30</div>
     </div>
 
     <div class="instructions">
-      <b>Cómo se juega:</b><br>
+      <b>C贸mo se juega:</b><br>
       Burbujas de aromas suben hacia la superficie.<br>
-      Tu misión es reventar solo las burbujas que encajan con el vino elegido, según lo que
-      recordáis de la cata.<br>
+      Tu misi贸n es reventar solo las burbujas que encajan con el vino elegido, seg煤n lo que
+      record谩is de la cata.<br>
       Si revientas burbujas que no encajan o dejas escapar aromas buenos, cuentan como
-      fallo o pérdida. Tienes 30 segundos por vino.<br><br>
+      fallo o p茅rdida. Tienes 30 segundos por vino.<br><br>
       <b>Solo tienes una oportunidad por vino.</b>
     </div>
 
@@ -396,12 +396,12 @@
     </div>
 
     <div class="btn-row">
-      <button id="startBtn" class="primary">▶ Empezar partida</button>
+      <button id="startBtn" class="primary">鈻?Empezar partida</button>
       <button id="hintBtn" class="small">Pista</button>
     </div>
 
     <div class="status" id="statusText">
-      Pulsa <b>“Empezar partida”</b> y toca solo las burbujas de aromas correctos para el vino elegido, usando lo que recuerdes de la cata.
+      Pulsa <b>鈥淓mpezar partida鈥?/b> y toca solo las burbujas de aromas correctos para el vino elegido, usando lo que recuerdes de la cata.
     </div>
   </div>
 </div>
@@ -411,7 +411,7 @@
 <div class="overlay" id="endOverlay">
   <div class="overlay-card">
     <div class="overlay-title">Fin de la partida</div>
-    <div class="overlay-sub">Resumen de tu Bubble Pop aromático 🍷</div>
+    <div class="overlay-sub">Resumen de tu Bubble Pop arom谩tico 馃嵎</div>
     <div class="overlay-stats" id="finalStats"></div>
     <div class="overlay-buttons">
       <button id="closeOverlayBtn">Cerrar</button>
@@ -420,7 +420,51 @@
   </div>
 </div>
 
-<script>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/10.13.2/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDwlXwWlmgLhwgjONXQmWE7O5H54aZd6dk",
+    authDomain: "catas-9d780.firebaseapp.com",
+    databaseURL: "https://catas-9d780-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "catas-9d780",
+    storageBucket: "catas-9d780.firebasestorage.app",
+    messagingSenderId: "554356727364",
+    appId: "1:554356727364:web:2e8a754067872751efa611",
+    measurementId: "G-F2YRVJ9B00"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  const rawName = (localStorage.getItem("gw_name") || "INVITADO").toUpperCase().slice(0, 8);
+  const sessionId = rawName || "INVITADO";
+
+  const qs = new URLSearchParams(location.search);
+  const isHost = qs.get("host") === "1";
+  const isDashboard = qs.get("dashboard") === "1";
+
+  if(!isHost && !isDashboard){
+    const screenRef = ref(db, "miniGames/currentScreen");
+    onValue(screenRef, (snap) => {
+      const screen = snap.val() || "cata";
+      const current = (location.pathname.split("/").pop() || "").toLowerCase();
+
+      if(screen === "cata"){
+        if(current !== "cata.html"){
+          window.location.href = "cata.html";
+        }
+      }else if(screen === "bubbles"){
+        // Nos quedamos aqu铆
+      }else if(screen === "linea"){
+        if(!current.includes("linea")){
+          window.location.href = "linea.html";
+        }
+      }
+    });
+  }
+
 (function(){
   const playfield = document.getElementById("playfield");
   const startBtn = document.getElementById("startBtn");
@@ -444,24 +488,24 @@
   const wineGrapesEl = document.getElementById("wineGrapes");
 
   const GAME_DURATION_MS = 30000;
-  const SPAWN_INTERVAL_SEC = 0.7; // más caña: burbujas más frecuentes
-  const SPEED_PX_PER_SEC = 95;    // más caña: suben más deprisa
+  const SPAWN_INTERVAL_SEC = 0.7; // m谩s ca帽a: burbujas m谩s frecuentes
+  const SPEED_PX_PER_SEC = 95;    // m谩s ca帽a: suben m谩s deprisa
 
-  // Orden fijo de los vinos (para pasar al siguiente automáticamente)
+  // Orden fijo de los vinos (para pasar al siguiente autom谩ticamente)
   const WINE_ORDER = ["falanghina","montepulciano","lupo","cinquenoci","triplico"];
 
-  // Definición de vinos
+  // Definici贸n de vinos
   const wines = {
     falanghina: {
       id: "falanghina",
-      short: "Favugnë Falanghina Bianco",
+      short: "Favugn毛 Falanghina Bianco",
       color: "blanco",
       grapes: "Falanghina",
       goodKeys: ["citrico","floral","mineral","fruta_blanca"]
     },
     montepulciano: {
       id: "montepulciano",
-      short: "Montepulciano d’Abruzzo Riserva",
+      short: "Montepulciano d鈥橝bruzzo Riserva",
       color: "tinto",
       grapes: "Montepulciano",
       goodKeys: ["fruta_roja","fruta_negra","especia_dulce","hierbas"]
@@ -491,20 +535,20 @@
 
   // Vocabulario general de aromas
   const aromaPool = [
-    { label:"Cítrico 🍋", key:"citrico" },
-    { label:"Floral 🌸", key:"floral" },
-    { label:"Salino / mineral 🧂", key:"mineral" },
-    { label:"Fruta blanca 🍏", key:"fruta_blanca" },
-    { label:"Fruta roja 🍓", key:"fruta_roja" },
-    { label:"Fruta negra 🍇", key:"fruta_negra" },
-    { label:"Mermelada / compota 🍒", key:"mermelada" },
-    { label:"Especia dulce 🌶️", key:"especia_dulce" },
-    { label:"Hierbas mediterráneas 🌿", key:"hierbas" },
-    { label:"Chocolate 🍫", key:"chocolate" },
-    { label:"Café / tostado ☕", key:"cafe" },
-    { label:"Vainilla 🍨", key:"vainilla" },
-    { label:"Caramelo 🍬", key:"caramelo" },
-    { label:"Mantequilla 🧈", key:"mantequilla" }
+    { label:"C铆trico 馃崑", key:"citrico" },
+    { label:"Floral 馃尭", key:"floral" },
+    { label:"Salino / mineral 馃", key:"mineral" },
+    { label:"Fruta blanca 馃崗", key:"fruta_blanca" },
+    { label:"Fruta roja 馃崜", key:"fruta_roja" },
+    { label:"Fruta negra 馃崌", key:"fruta_negra" },
+    { label:"Mermelada / compota 馃崚", key:"mermelada" },
+    { label:"Especia dulce 馃尪锔?, key:"especia_dulce" },
+    { label:"Hierbas mediterr谩neas 馃尶", key:"hierbas" },
+    { label:"Chocolate 馃崼", key:"chocolate" },
+    { label:"Caf茅 / tostado 鈽?, key:"cafe" },
+    { label:"Vainilla 馃崹", key:"vainilla" },
+    { label:"Caramelo 馃崿", key:"caramelo" },
+    { label:"Mantequilla 馃", key:"mantequilla" }
   ];
 
   let currentWineId = "falanghina";
@@ -551,9 +595,9 @@
     wineGrapesEl.textContent = "Uvas: " + w.grapes;
 
     if(winePlayed[currentWineId]){
-      statusText.textContent = "Este vino ya está jugado. Elige otro vino para una nueva partida.";
+      statusText.textContent = "Este vino ya est谩 jugado. Elige otro vino para una nueva partida.";
     }else{
-      statusText.textContent = "Pulsa “Empezar partida” y toca solo las burbujas correctas para " + w.short + ", según lo que recuerdes de la cata.";
+      statusText.textContent = "Pulsa 鈥淓mpezar partida鈥?y toca solo las burbujas correctas para " + w.short + ", seg煤n lo que recuerdes de la cata.";
     }
   }
 
@@ -562,15 +606,15 @@
       const id = opt.value;
       if(winePlayed[id]){
         opt.disabled = true;
-        if(!opt.text.includes("✔")){
-          opt.text += " · ✔ Jugado";
+        if(!opt.text.includes("鉁?)){
+          opt.text += " 路 鉁?Jugado";
         }
       }
     });
 
     const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
     if(remaining.length === 0){
-      statusText.textContent = "Has jugado los 5 vinos. 🥳 Resultados listos para el dashboard.";
+      statusText.textContent = "Has jugado los 5 vinos. 馃コ Resultados listos para el dashboard.";
       startBtn.disabled = true;
     }
   }
@@ -642,13 +686,13 @@
       totalCorrectTaps++;
       scoreEl.textContent = score;
       bubble.el.classList.add("hit-ok");
-      statusText.textContent = "Buen disparo 🫧 Ese aroma encaja con lo que trabajasteis para " + getActiveWine().short + ".";
+      statusText.textContent = "Buen disparo 馃 Ese aroma encaja con lo que trabajasteis para " + getActiveWine().short + ".";
     }else{
       mistakes++;
       totalWrongTaps++;
       mistakesEl.textContent = mistakes;
       bubble.el.classList.add("hit-bad");
-      statusText.textContent = "Esa burbuja no era… 😅 Piensa en lo que olisteis con " + getActiveWine().short + ".";
+      statusText.textContent = "Esa burbuja no era鈥?馃槄 Piensa en lo que olisteis con " + getActiveWine().short + ".";
     }
 
     setTimeout(()=> removeBubble(bubble), 200);
@@ -700,12 +744,12 @@
       html += `
         <div style="margin-bottom:10px;">
           <b>${w.short}</b><br>
-          ✅ Aciertos: <b>${r.score}</b> · ❌ Fallos: <b>${r.mistakes}</b> · 💨 Perdidas: <b>${r.missed}</b><br>
-          🎯 Precisión: <b>${r.accuracy}%</b>
+          鉁?Aciertos: <b>${r.score}</b> 路 鉂?Fallos: <b>${r.mistakes}</b> 路 馃挩 Perdidas: <b>${r.missed}</b><br>
+          馃幆 Precisi贸n: <b>${r.accuracy}%</b>
         </div>
       `;
     });
-    html += `<br><small>Comparte este resultado con el anfitrión para el ranking de la cata.</small>`;
+    html += `<br><small>Comparte este resultado con el anfitri贸n para el ranking de la cata.</small>`;
     return html;
   }
 
@@ -731,15 +775,52 @@
       accuracy
     };
 
+    // nuevo: subir resultados agregados de esta sesi贸n a Firebase
+    try{
+      if(typeof db !== "undefined"){
+        const all = Object.values(wineResults || {});
+        const winesPlayed = all.length;
+        let totalScore = 0;
+        let totalMistakes = 0;
+        let totalMissed = 0;
+        let sumAccuracy = 0;
+        all.forEach(r => {
+          if(!r) return;
+          totalScore    += r.score    || 0;
+          totalMistakes += r.mistakes || 0;
+          totalMissed   += r.missed   || 0;
+          sumAccuracy   += r.accuracy || 0;
+        });
+        const avgAccuracy = winesPlayed ? Math.round(sumAccuracy / winesPlayed) : 0;
+
+        const safeId = sessionId || "INVITADO";
+        const resultsRef = ref(db, "miniGames/bubbles/results/" + safeId);
+        const payload = {
+          sessionId: safeId,
+          name: safeId,
+          ts: Date.now(),
+          winesPlayed,
+          totalScore,
+          totalMistakes,
+          totalMissed,
+          avgAccuracy,
+          perWine: wineResults
+        };
+        set(resultsRef, payload);
+      }
+    }catch(e){
+      console.error("Error guardando resultados de Bubble Pop", e);
+    }
+
     // marcar este vino como jugado
     winePlayed[currentWineId] = true;
     updateWineAvailabilityUI();
 
     let nivel;
-    if(score >= 12) nivel = "Sniper aromático 🫧🍋";
-    else if(score >= 7) nivel = "Muy buena puntería 😏";
-    else if(score >= 3) nivel = "Puntería curiosa 👀";
-    else nivel = "Todavía calentando dedo 😄";
+    if(score >= 12) nivel = "Sniper arom谩tico 馃馃崑";
+    else if(score >= 7) nivel = "Muy buena punter铆a 馃槒";
+    else if(score >= 3) nivel = "Punter铆a curiosa 馃憖";
+    else nivel = "Todav铆a calentando dedo 馃槃";
 
     const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
 
@@ -749,22 +830,22 @@
       overlaySubEl.textContent = "Puntuaciones de tu Bubble Pop de Aromas.";
       finalStatsEl.innerHTML = buildFinalSummaryHTML();
       restartOverlayBtn.style.display = "none";
-      statusText.textContent = "Has completado los 5 vinos. Resultados listos para el dashboard. 🥳";
+      statusText.textContent = "Has completado los 5 vinos. Resultados listos para el dashboard. 馃コ";
     }else{
       // resumen solo del vino actual (como antes)
       overlayTitleEl.textContent = "Fin de la partida";
-      overlaySubEl.textContent = "Resumen de tu Bubble Pop aromático 🍷";
+      overlaySubEl.textContent = "Resumen de tu Bubble Pop arom谩tico 馃嵎";
       finalStatsEl.innerHTML = `
         Vino jugado: <b>${activeWine.short}</b><br>
         Uvas: <b>${activeWine.grapes}</b><br><br>
-        ✅ Aciertos: <b>${score}</b><br>
-        ❌ Burbujas mal reventadas: <span class="bad"><b>${mistakes}</b></span><br>
-        💨 Aromas buenos que se escaparon: <b>${missed}</b><br>
-        🎯 Precisión al tocar: <b>${accuracy}%</b><br><br>
-        Nivel de puntería aromática:<br><b>${nivel}</b><br><br>
+        鉁?Aciertos: <b>${score}</b><br>
+        鉂?Burbujas mal reventadas: <span class="bad"><b>${mistakes}</b></span><br>
+        馃挩 Aromas buenos que se escaparon: <b>${missed}</b><br>
+        馃幆 Precisi贸n al tocar: <b>${accuracy}%</b><br><br>
+        Nivel de punter铆a arom谩tica:<br><b>${nivel}</b><br><br>
         <small>Recuerda: solo tienes una partida por vino.</small>
       `;
-      statusText.textContent = "Partida terminada para " + activeWine.short + ". Pulsa “Jugar con otro vino” o cambia en el menú.";
+      statusText.textContent = "Partida terminada para " + activeWine.short + ". Pulsa 鈥淛ugar con otro vino鈥?o cambia en el men煤.";
       restartOverlayBtn.style.display = "inline-flex";
     }
 
@@ -822,10 +903,10 @@
   function startGame(){
     if(gameRunning) return;
 
-    // si este vino ya está jugado, no permitimos otra partida
+    // si este vino ya est谩 jugado, no permitimos otra partida
     if(winePlayed[currentWineId]){
       showToast("Este vino ya se ha jugado. Elige otro vino.");
-      statusText.textContent = "Este vino ya está jugado. Cambia de vino en el menú desplegable.";
+      statusText.textContent = "Este vino ya est谩 jugado. Cambia de vino en el men煤 desplegable.";
       return;
     }
 
@@ -842,8 +923,8 @@
     endOverlay.classList.remove("show");
 
     const activeWine = getActiveWine();
-    statusText.textContent = "¡A jugar! Revienta solo las burbujas que encajen con lo que recuerdas de " + activeWine.short + ".";
-    showToast("Partida iniciada · 30 segundos de Bubble Pop de aromas");
+    statusText.textContent = "隆A jugar! Revienta solo las burbujas que encajen con lo que recuerdas de " + activeWine.short + ".";
+    showToast("Partida iniciada 路 30 segundos de Bubble Pop de aromas");
     rafId = requestAnimationFrame(loop);
   }
 
@@ -858,7 +939,7 @@
     endOverlay.classList.remove("show");
   });
 
-  // pasar automáticamente al siguiente vino no jugado
+  // pasar autom谩ticamente al siguiente vino no jugado
   restartOverlayBtn.addEventListener("click", ()=>{
     endOverlay.classList.remove("show");
 
