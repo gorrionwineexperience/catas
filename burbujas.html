@@ -65,27 +65,31 @@
       font-size:.82rem;
       color:var(--muted);
     }
-    .pill-row{
+
+    .bubble-legend{
+      margin-top:12px;
+      padding:8px;
+      border-radius:14px;
+      background:#050a17;
+      border:1px dashed #313854;
+      font-size:.78rem;
+      color:var(--muted);
+    }
+    .bubble-legend b{color:var(--text);}
+    .legend-row{
       display:flex;
       flex-wrap:wrap;
       gap:6px;
-      margin-top:10px;
+      margin-top:6px;
     }
-    .pill{
-      display:inline-flex;
-      align-items:center;
-      gap:4px;
-      padding:4px 8px;
+    .legend-pill{
+      padding:4px 7px;
       border-radius:999px;
-      font-size:.78rem;
-      background:#101628;
-      border:1px solid #323b5a;
-      color:var(--muted);
-      white-space:nowrap;
+      border:1px solid #303854;
+      background:#080d1e;
+      font-size:.76rem;
     }
-    .pill b{color:var(--text);}
 
-    /* fila de selección de vino */
     .wine-row{
       margin-top:10px;
       display:flex;
@@ -123,11 +127,8 @@
       border:1px solid #30374f;
       margin-top:6px;
     }
-    .tag span{
-      opacity:.8;
-    }
+    .tag span{opacity:.8;}
 
-    /* Playfield + HUD */
     .play-wrap{
       margin-top:12px;
       background:#050814;
@@ -157,9 +158,7 @@
       border:1px solid #31374f;
       font-size:.78rem;
     }
-    .hud-chip strong{
-      color:var(--accent);
-    }
+    .hud-chip strong{color:var(--accent);}
     .timer{
       font-variant-numeric:tabular-nums;
       font-weight:700;
@@ -200,8 +199,6 @@
       width:52px;
       height:52px;
       border-radius:999px;
-      background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.9), rgba(255,255,255,.05));
-      border:1px solid rgba(255,255,255,.6);
       display:flex;
       align-items:center;
       justify-content:center;
@@ -212,13 +209,12 @@
       box-shadow:0 8px 18px rgba(0,0,0,.65);
       cursor:pointer;
       user-select:none;
+      /* color base neutro, se sobrescribe por JS con colores aleatorios */
+      background:radial-gradient(circle at 30% 20%, rgba(255,255,255,.96), rgba(255,255,255,.25));
+      border:1px solid rgba(255,255,255,.65);
     }
-    .bubble.good{
-      box-shadow:0 0 0 1px rgba(255,255,255,.5),0 10px 18px rgba(0,0,0,.7);
-    }
-    .bubble.bad{
-      opacity:.85;
-    }
+    .bubble.good{}
+    .bubble.bad{}
     .bubble.pop{
       animation:pop .18s ease-out forwards;
     }
@@ -265,30 +261,6 @@
       cursor:default;
     }
 
-    .bubble-legend{
-      margin-top:12px;
-      padding:8px;
-      border-radius:14px;
-      background:#050a17;
-      border:1px dashed #313854;
-      font-size:.78rem;
-      color:var(--muted);
-    }
-    .bubble-legend b{color:var(--text);}
-    .legend-row{
-      display:flex;
-      flex-wrap:wrap;
-      gap:6px;
-      margin-top:6px;
-    }
-    .legend-pill{
-      padding:4px 7px;
-      border-radius:999px;
-      border:1px solid #303854;
-      background:#080d1e;
-      font-size:.76rem;
-    }
-
     .toast{
       position:fixed;
       left:50%;
@@ -311,7 +283,6 @@
       opacity:1;
     }
 
-    /* Overlay final */
     .overlay{
       position:fixed;
       inset:0;
@@ -401,9 +372,14 @@
         </div>
       </div>
 
-      <div class="pill-row">
-        <div class="pill"><b>Objetivo:</b> seleccionar los aromas que mejor representan el vino.</div>
-        <div class="pill"><b>Toques:</b> apunta bien, cada toque cuenta.</div>
+      <div class="bubble-legend">
+        <b>Cómo funciona:</b><br>
+        Cada burbuja tiene un aroma. Toca solo los que encajen bien con el vino. Si revientas una burbuja equivocada, cuenta como fallo.
+        <div class="legend-row">
+          <div class="legend-pill">🫧 Buena burbuja = aroma correcto</div>
+          <div class="legend-pill">🫧 Burbuja trampa = aroma que no va con el vino</div>
+          <div class="legend-pill">💨 Cuando suben y se van, cuenta como “escapan”.</div>
+        </div>
       </div>
 
       <div class="wine-row">
@@ -450,17 +426,6 @@
 
         <div class="btn-row">
           <button id="startBtn" class="primary">Empezar partida</button>
-          <button id="hintBtn">Ver pista de aromas</button>
-        </div>
-      </div>
-
-      <div class="bubble-legend">
-        <b>Cómo funciona:</b><br>
-        Cada burbuja tiene un aroma. Toca solo los que encajen bien con el vino (cítrico, floral, mineral…). Si revientas una burbuja equivocada, cuenta como fallo.
-        <div class="legend-row">
-          <div class="legend-pill">🫧 Buena burbuja = aroma correcto</div>
-          <div class="legend-pill">🫧 Burbuja trampa = aroma que no va con el vino</div>
-          <div class="legend-pill">💨 Cuando suben y se van, cuenta como “escapan”.</div>
         </div>
       </div>
     </div>
@@ -479,9 +444,7 @@
         </div>
         <div class="chip">🫧 Aromas</div>
       </div>
-      <div class="overlay-body" id="finalStats">
-        <!-- resumen se inyecta por JS -->
-      </div>
+      <div class="overlay-body" id="finalStats"></div>
       <div class="overlay-actions">
         <button id="closeOverlayBtn">Cerrar</button>
         <button id="restartOverlayBtn" class="primary">Jugar con otro vino</button>
@@ -530,7 +493,7 @@
           window.location.href = "index.html";
         }
       }else if(screen === "bubbles"){
-        // Nos quedamos en Bubble Pop
+        // Nos quedamos en este juego
         return;
       }else if(screen === "linea"){
         if(!current.includes("linea")){
@@ -541,261 +504,304 @@
   }
 
   (function(){
-  const playfield = document.getElementById("playfield");
-  const startBtn = document.getElementById("startBtn");
-  const hintBtn = document.getElementById("hintBtn");
-  const statusText = document.getElementById("statusText");
-  const scoreEl = document.getElementById("score");
-  const mistakesEl = document.getElementById("mistakes");
-  const missedEl = document.getElementById("missed");
-  const timerEl = document.getElementById("timer");
-  const wineSelect = document.getElementById("wineSelect");
-  const wineInfoEl = document.getElementById("wineInfo");
-  const wineTagsEl = document.getElementById("wineTags");
-  const wineShortEl = document.getElementById("wineShort");
+    const playfield = document.getElementById("playfield");
+    const startBtn = document.getElementById("startBtn");
+    const statusText = document.getElementById("statusText");
+    const scoreEl = document.getElementById("score");
+    const mistakesEl = document.getElementById("mistakes");
+    const missedEl = document.getElementById("missed");
+    const timerEl = document.getElementById("timer");
+    const wineSelect = document.getElementById("wineSelect");
+    const wineInfoEl = document.getElementById("wineInfo");
+    const wineTagsEl = document.getElementById("wineTags");
+    const wineShortEl = document.getElementById("wineShort");
 
-  const endOverlay = document.getElementById("endOverlay");
-  const finalStatsEl = document.getElementById("finalStats");
-  const closeOverlayBtn = document.getElementById("closeOverlayBtn");
-  const restartOverlayBtn = document.getElementById("restartOverlayBtn");
-  const toastEl = document.getElementById("toast");
+    const endOverlay = document.getElementById("endOverlay");
+    const finalStatsEl = document.getElementById("finalStats");
+    const closeOverlayBtn = document.getElementById("closeOverlayBtn");
+    const restartOverlayBtn = document.getElementById("restartOverlayBtn");
+    const toastEl = document.getElementById("toast");
 
-  const GAME_DURATION_MS = 30000;
-  const SPAWN_INTERVAL_SEC = 0.7;
-  const SPEED_PX_PER_SEC = 95;
+    const GAME_DURATION_MS = 30000;
+    const SPAWN_INTERVAL_SEC = 0.7;
+    const SPEED_PX_PER_SEC = 95;
 
-  const WINE_ORDER = ["falanghina","montepulciano","lupo","cinquenoci","triplico"];
+    const WINE_ORDER = ["falanghina","montepulciano","lupo","cinquenoci","triplico"];
 
-  const wines = {
-    falanghina: {
-      id: "falanghina",
-      short: "Falanghina",
-      color: "blanco",
-      grapes: "Falanghina",
-      goodKeys: ["citrico","floral","mineral","fruta_blanca"],
-      description: "Blanco fresco, cítrico y floral, con toque mineral y fruta blanca.",
-      tags: "Cítrico, floral, mineral, fruta blanca"
-    },
-    montepulciano: {
-      id: "montepulciano",
-      short: "Montepulciano",
-      color: "tinto",
-      grapes: "Montepulciano d’Abruzzo",
-      goodKeys: ["fruta_negra","mermelada","especia_dulce","hierbas"],
-      description: "Tinto reserva con fruta negra, especias dulces y toque de hierbas mediterráneas.",
-      tags: "Fruta negra, mermelada, especia dulce, hierbas"
-    },
-    lupo: {
-      id: "lupo",
-      short: "Lupo Meraviglia",
-      color: "tinto",
-      grapes: "Negroamaro, Malvasia Nera",
-      goodKeys: ["fruta_negra","mermelada","chocolate","cafe"],
-      description: "Tinto potente y estructurado, con capas de fruta negra, mermelada y notas de cacao/tostado.",
-      tags: "Fruta negra, mermelada, chocolate, café/tostado"
-    },
-    cinquenoci: {
-      id: "cinquenoci",
-      short: "Cinquenoci",
-      color: "tinto",
-      grapes: "Primitivo",
-      goodKeys: ["fruta_roja","fruta_negra","mermelada","especia_dulce","caramelo"],
-      description: "Primitivo cálido, frutal y algo goloso, con fruta roja/negra, mermelada y especia dulce.",
-      tags: "Fruta roja, fruta negra, mermelada, especia dulce, caramelo"
-    },
-    triplico: {
-      id: "triplico",
-      short: "Triplico Multiplo",
-      color: "tinto",
-      grapes: "Blend tinto",
-      goodKeys: ["fruta_roja","fruta_negra","hierbas","especia_dulce"],
-      description: "Tinto joven y amable, con fruta roja/negra, toque de hierbas y especia dulce suave.",
-      tags: "Fruta roja, fruta negra, hierbas mediterráneas, especia suave"
-    }
-  };
-
-  const aromaPool = [
-    { label:"Cítrico 🍋", key:"citrico" },
-    { label:"Floral 🌸", key:"floral" },
-    { label:"Salino / mineral 🧂", key:"mineral" },
-    { label:"Fruta blanca 🍏", key:"fruta_blanca" },
-    { label:"Fruta roja 🍓", key:"fruta_roja" },
-    { label:"Fruta negra 🍇", key:"fruta_negra" },
-    { label:"Mermelada / compota 🍒", key:"mermelada" },
-    { label:"Especia dulce 🌶️", key:"especia_dulce" },
-    { label:"Hierbas mediterráneas 🌿", key:"hierbas" },
-    { label:"Chocolate 🍫", key:"chocolate" },
-    { label:"Café / tostado ☕", key:"cafe" },
-    { label:"Vainilla 🍨", key:"vainilla" },
-    { label:"Caramelo 🍬", key:"caramelo" },
-    { label:"Mantequilla 🧈", key:"mantequilla" },
-    { label:"Pan tostado 🥖", key:"tostado_pan" },
-    { label:"Pimienta negra ⚫", key:"pimienta" },
-    { label:"Humo / ahumado 🔥", key:"ahumado" }
-  ];
-
-  let bubbles = [];
-  let gameRunning = false;
-  let lastFrameTime = null;
-  let remainingMs = GAME_DURATION_MS;
-  let spawnAccumulator = 0;
-
-  let score = 0;
-  let mistakes = 0;
-  let missed = 0;
-
-  let currentWineId = "falanghina";
-  let wineResults = {};
-  let winePlayed = {
-    falanghina:false,
-    montepulciano:false,
-    lupo:false,
-    cinquenoci:false,
-    triplico:false
-  };
-
-  function showToast(msg){
-    toastEl.textContent = msg;
-    toastEl.classList.add("show");
-    clearTimeout(showToast._t);
-    showToast._t = setTimeout(()=>{
-      toastEl.classList.remove("show");
-    }, 2200);
-  }
-
-  function formatTime(ms){
-    const t = Math.max(0, Math.floor(ms / 1000));
-    const s = t % 60;
-    const m = Math.floor(t / 60);
-    const ss = String(s).padStart(2,"0");
-    const mm = String(m).padStart(2,"0");
-    return `${mm}:${ss}`;
-  }
-
-  function getActiveWine(){
-    return wines[currentWineId];
-  }
-
-  function updateWineUI(){
-    const w = getActiveWine();
-    wineShortEl.textContent = w.short;
-    wineInfoEl.textContent = w.description;
-    wineTagsEl.innerHTML = `
-      <span>🎯 Aromas clave:</span>
-      <b>${w.tags}</b>
-    `;
-  }
-
-  function resetCounters(){
-    score = 0;
-    mistakes = 0;
-    missed = 0;
-    scoreEl.textContent = "0";
-    mistakesEl.textContent = "0";
-    missedEl.textContent = "0";
-  }
-
-  function spawnBubble(){
-    const w = getActiveWine();
-    if(!w) return;
-
-    const isGood = Math.random() < 0.6;
-    const goodList = aromaPool.filter(a => w.goodKeys.includes(a.key));
-    const badList  = aromaPool.filter(a => !w.goodKeys.includes(a.key));
-
-    let chosen;
-    if(isGood && goodList.length){
-      chosen = goodList[Math.floor(Math.random()*goodList.length)];
-    }else if(badList.length){
-      chosen = badList[Math.floor(Math.random()*badList.length)];
-    }else if(goodList.length){
-      chosen = goodList[Math.floor(Math.random()*goodList.length)];
-    }else{
-      return;
-    }
-
-    const bubble = document.createElement("div");
-    bubble.className = "bubble" + (w.goodKeys.includes(chosen.key) ? " good" : " bad");
-    bubble.textContent = chosen.label;
-    bubble.dataset.key = chosen.key;
-    bubble.dataset.good = w.goodKeys.includes(chosen.key) ? "1" : "0";
-
-    const fieldRect = playfield.getBoundingClientRect();
-    const margin = 10;
-    const x = margin + Math.random()*(fieldRect.width - margin*2 - 52);
-    const startY = fieldRect.height + 10;
-
-    bubble.style.left = x + "px";
-    bubble.style.top  = startY + "px";
-
-    bubble.__y = startY;
-    bubble.__speed = SPEED_PX_PER_SEC * (0.9 + Math.random()*0.3);
-
-    bubble.addEventListener("pointerdown", (ev)=>{
-      ev.preventDefault();
-      if(!gameRunning) return;
-      const isGood = bubble.dataset.good === "1";
-
-      if(isGood){
-        score++;
-        scoreEl.textContent = String(score);
-        showToast("✅ Aroma acertado para el vino");
-      }else{
-        mistakes++;
-        mistakesEl.textContent = String(mistakes);
-        showToast("❌ Ese aroma no encaja con el vino");
+    const wines = {
+      falanghina: {
+        id: "falanghina",
+        short: "Falanghina",
+        color: "blanco",
+        grapes: "Falanghina",
+        goodKeys: ["citrico","floral","mineral","fruta_blanca"],
+        description: "Blanco fresco, cítrico y floral, con toque mineral y fruta blanca.",
+        tags: "Cítrico, floral, mineral, fruta blanca"
+      },
+      montepulciano: {
+        id: "montepulciano",
+        short: "Montepulciano",
+        color: "tinto",
+        grapes: "Montepulciano d’Abruzzo",
+        goodKeys: ["fruta_negra","mermelada","especia_dulce","hierbas"],
+        description: "Tinto reserva con fruta negra, especias dulces y toque de hierbas mediterráneas.",
+        tags: "Fruta negra, mermelada, especia dulce, hierbas"
+      },
+      lupo: {
+        id: "lupo",
+        short: "Lupo Meraviglia",
+        color: "tinto",
+        grapes: "Negroamaro, Malvasia Nera",
+        goodKeys: ["fruta_negra","mermelada","chocolate","cafe"],
+        description: "Tinto potente y estructurado, con capas de fruta negra, mermelada y notas de cacao/tostado.",
+        tags: "Fruta negra, mermelada, chocolate, café/tostado"
+      },
+      cinquenoci: {
+        id: "cinquenoci",
+        short: "Cinquenoci",
+        color: "tinto",
+        grapes: "Primitivo",
+        goodKeys: ["fruta_roja","fruta_negra","mermelada","especia_dulce","caramelo"],
+        description: "Primitivo cálido, frutal y algo goloso, con fruta roja/negra, mermelada y especia dulce.",
+        tags: "Fruta roja, fruta negra, mermelada, especia dulce, caramelo"
+      },
+      triplico: {
+        id: "triplico",
+        short: "Triplico Multiplo",
+        color: "tinto",
+        grapes: "Blend tinto",
+        goodKeys: ["fruta_roja","fruta_negra","hierbas","especia_dulce"],
+        description: "Tinto joven y amable, con fruta roja/negra, toque de hierbas y especia dulce suave.",
+        tags: "Fruta roja, fruta negra, hierbas mediterráneas, especia suave"
       }
-
-      bubble.classList.add("pop");
-      setTimeout(()=>{
-        if(playfield.contains(bubble)){
-          playfield.removeChild(bubble);
-        }
-      }, 150);
-      bubbles = bubbles.filter(b => b !== bubble);
-    });
-
-    playfield.appendChild(bubble);
-    bubbles.push(bubble);
-  }
-
-  function clearBubbles(){
-    bubbles.forEach(b => {
-      if(playfield.contains(b)){
-        playfield.removeChild(b);
-      }
-    });
-    bubbles = [];
-  }
-
-  function endGame(){
-    gameRunning = false;
-    lastFrameTime = null;
-
-    wineSelect.disabled = false;
-    timerEl.textContent = "00:00";
-
-    const totalTouches = score + mistakes;
-    const accuracy = totalTouches ? Math.round((score / totalTouches) * 100) : 0;
-    const activeWine = getActiveWine();
-
-    // guardar resultados de este vino
-    wineResults[currentWineId] = {
-      score,
-      mistakes,
-      missed,
-      accuracy
     };
 
-    // nuevo: subir resultados agregados de esta sesión a Firebase
-    try{
-      if(typeof db !== "undefined"){
+    const aromaPool = [
+      { label:"Cítrico 🍋", key:"citrico" },
+      { label:"Floral 🌸", key:"floral" },
+      { label:"Salino / mineral 🧂", key:"mineral" },
+      { label:"Fruta blanca 🍏", key:"fruta_blanca" },
+      { label:"Fruta roja 🍓", key:"fruta_roja" },
+      { label:"Fruta negra 🍇", key:"fruta_negra" },
+      { label:"Mermelada / compota 🍒", key:"mermelada" },
+      { label:"Especia dulce 🌶️", key:"especia_dulce" },
+      { label:"Hierbas mediterráneas 🌿", key:"hierbas" },
+      { label:"Chocolate 🍫", key:"chocolate" },
+      { label:"Café / tostado ☕", key:"cafe" },
+      { label:"Vainilla 🍨", key:"vainilla" },
+      { label:"Caramelo 🍬", key:"caramelo" },
+      { label:"Mantequilla 🧈", key:"mantequilla" },
+      { label:"Pan tostado 🥖", key:"tostado_pan" },
+      { label:"Pimienta negra ⚫", key:"pimienta" },
+      { label:"Humo / ahumado 🔥", key:"ahumado" }
+    ];
+
+    const bubblePalettes = [
+      { bg2:"#ffe5e0", border:"#ffb3a1" },
+      { bg2:"#ffe9a3", border:"#ffd76b" },
+      { bg2:"#c7f5ff", border:"#8ee7ff" },
+      { bg2:"#e3d1ff", border:"#c3a4ff" },
+      { bg2:"#c6f6d5", border:"#9ae6b4" },
+      { bg2:"#ffd6e0", border:"#ff9fb8" }
+    ];
+
+    let bubbles = [];
+    let gameRunning = false;
+    let lastFrameTime = null;
+    let remainingMs = GAME_DURATION_MS;
+    let spawnAccumulator = 0;
+
+    let score = 0;
+    let mistakes = 0;
+    let missed = 0;
+
+    let currentWineId = "falanghina";
+    let wineResults = {};
+    let winePlayed = {
+      falanghina:false,
+      montepulciano:false,
+      lupo:false,
+      cinquenoci:false,
+      triplico:false
+    };
+
+    function showToast(msg){
+      toastEl.textContent = msg;
+      toastEl.classList.add("show");
+      clearTimeout(showToast._t);
+      toastEl._t = setTimeout(()=>toastEl.classList.remove("show"), 2200);
+    }
+
+    function formatTime(ms){
+      const t = Math.max(0, Math.floor(ms / 1000));
+      const s = t % 60;
+      const m = Math.floor(t / 60);
+      return String(m).padStart(2,"0") + ":" + String(s).padStart(2,"0");
+    }
+
+    function getActiveWine(){ return wines[currentWineId]; }
+
+    function updateWineUI(){
+      const w = getActiveWine();
+      wineShortEl.textContent = w.short;
+      wineInfoEl.textContent = w.description;
+      wineTagsEl.innerHTML = `<span>🎯 Aromas clave:</span><b>${w.tags}</b>`;
+    }
+
+    function resetCounters(){
+      score = 0; mistakes = 0; missed = 0;
+      scoreEl.textContent = "0";
+      mistakesEl.textContent = "0";
+      missedEl.textContent = "0";
+    }
+
+    function applyRandomBubbleColor(bubble){
+      const pal = bubblePalettes[Math.floor(Math.random()*bubblePalettes.length)];
+      bubble.style.background = `radial-gradient(circle at 30% 20%, rgba(255,255,255,.96), ${pal.bg2})`;
+      bubble.style.borderColor = pal.border;
+    }
+
+    function spawnBubble(){
+      const w = getActiveWine();
+      if(!w) return;
+
+      const isGoodCandidate = Math.random() < 0.6;
+      const goodList = aromaPool.filter(a => w.goodKeys.includes(a.key));
+      const badList  = aromaPool.filter(a => !w.goodKeys.includes(a.key));
+
+      let chosen;
+      if(isGoodCandidate && goodList.length){
+        chosen = goodList[Math.floor(Math.random()*goodList.length)];
+      }else if(badList.length){
+        chosen = badList[Math.floor(Math.random()*badList.length)];
+      }else if(goodList.length){
+        chosen = goodList[Math.floor(Math.random()*goodList.length)];
+      }else{
+        return;
+      }
+
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = chosen.label;
+      bubble.dataset.key = chosen.key;
+      bubble.dataset.good = w.goodKeys.includes(chosen.key) ? "1" : "0";
+
+      // Colores aleatorios: no indican si el aroma es correcto o no
+      applyRandomBubbleColor(bubble);
+
+      const fieldRect = playfield.getBoundingClientRect();
+      const margin = 10;
+      const x = margin + Math.random()*(fieldRect.width - margin*2 - 52);
+      const startY = fieldRect.height + 10;
+
+      bubble.style.left = x + "px";
+      bubble.style.top  = startY + "px";
+
+      bubble.__y = startY;
+      bubble.__speed = SPEED_PX_PER_SEC * (0.9 + Math.random()*0.3);
+
+      bubble.addEventListener("pointerdown", (ev)=>{
+        ev.preventDefault();
+        if(!gameRunning) return;
+        const isGood = bubble.dataset.good === "1";
+
+        if(isGood){
+          score++;
+          scoreEl.textContent = String(score);
+          showToast("✅ Aroma acertado para el vino");
+        }else{
+          mistakes++;
+          mistakesEl.textContent = String(mistakes);
+          showToast("❌ Ese aroma no encaja con el vino");
+        }
+
+        bubble.classList.add("pop");
+        setTimeout(()=>{
+          if(playfield.contains(bubble)) playfield.removeChild(bubble);
+        },150);
+        bubbles = bubbles.filter(b => b !== bubble);
+      });
+
+      playfield.appendChild(bubble);
+      bubbles.push(bubble);
+    }
+
+    function clearBubbles(){
+      bubbles.forEach(b => { if(playfield.contains(b)) playfield.removeChild(b); });
+      bubbles = [];
+    }
+
+    function buildFinalSummaryHTML(){
+      let html = "Resumen de tus 5 vinos jugados:<br><br>";
+      const ids = WINE_ORDER;
+      ids.forEach(id => {
+        const w = wines[id];
+        const r = wineResults[id];
+        if(!r) return;
+        html += `
+          <div style="margin-bottom:10px;">
+            <b>${w.short}</b><br>
+            ✅ Aciertos: <b>${r.score}</b> · ❌ Malas: <b>${r.mistakes}</b> · 💨 Escapan: <b>${r.missed}</b><br>
+            🎯 Precisión: <b>${r.accuracy}%</b>
+          </div>
+        `;
+      });
+
+      const all = Object.values(wineResults || {});
+      if(all.length){
+        let totalScore = 0, totalMistakes = 0, totalMissed = 0, sumAcc = 0;
+        all.forEach(r => {
+          totalScore    += r.score    || 0;
+          totalMistakes += r.mistakes || 0;
+          totalMissed   += r.missed   || 0;
+          sumAcc        += r.accuracy || 0;
+        });
+        const avgAcc = Math.round(sumAcc / all.length);
+        html += `
+          <br>
+          <b>Resumen global:</b><br>
+          ✅ Aciertos totales: <b>${totalScore}</b><br>
+          ❌ Fallos totales: <b>${totalMistakes}</b><br>
+          💨 Burbujas buenas que se escaparon: <b>${totalMissed}</b><br>
+          🎯 Precisión media: <b>${avgAcc}%</b>
+        `;
+      }
+      return html;
+    }
+
+    function updateWineAvailabilityUI(){
+      const options = Array.from(wineSelect.options);
+      options.forEach(opt => {
+        const id = opt.value;
+        if(winePlayed[id] && !opt.textContent.includes("✅")){
+          opt.textContent = opt.textContent + " ✅";
+        }
+      });
+    }
+
+    function endGame(){
+      gameRunning = false;
+      lastFrameTime = null;
+
+      wineSelect.disabled = false;
+      timerEl.textContent = "00:00";
+
+      const totalTouches = score + mistakes;
+      const accuracy = totalTouches ? Math.round((score / totalTouches) * 100) : 0;
+      const activeWine = getActiveWine();
+
+      wineResults[currentWineId] = {
+        score,
+        mistakes,
+        missed,
+        accuracy
+      };
+
+      // Guardar resumen agregado de la sesión en Firebase
+      try{
         const all = Object.values(wineResults || {});
         const winesPlayed = all.length;
-        let totalScore = 0;
-        let totalMistakes = 0;
-        let totalMissed = 0;
-        let sumAccuracy = 0;
+        let totalScore = 0, totalMistakes = 0, totalMissed = 0, sumAccuracy = 0;
         all.forEach(r => {
           if(!r) return;
           totalScore    += r.score    || 0;
@@ -819,219 +825,157 @@
           perWine: wineResults
         };
         set(resultsRef, payload);
+      }catch(e){
+        console.error("Error guardando resultados de Bubble Pop", e);
       }
-    }catch(e){
-      console.error("Error guardando resultados de Bubble Pop", e);
+
+      winePlayed[currentWineId] = true;
+      updateWineAvailabilityUI();
+
+      let nivel;
+      if(score >= 12) nivel = "Sniper aromático 🫧🍋";
+      else if(score >= 7) nivel = "Muy buena puntería 😏";
+      else if(score >= 3) nivel = "Puntería curiosa 👀";
+      else nivel = "Todavía calentando dedo 😄";
+
+      const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
+
+      if(remaining.length === 0){
+        // Resumen final de todos los vinos
+        document.querySelector(".overlay-title").textContent = "Resumen final de tus 5 vinos";
+        document.querySelector(".overlay-sub").textContent = "Puntuaciones de tu Bubble Pop de Aromas.";
+        finalStatsEl.innerHTML = buildFinalSummaryHTML();
+        restartOverlayBtn.style.display = "none";
+        statusText.textContent = "Has completado los 5 vinos. Resultados listos para el dashboard. 🥳";
+      }else{
+        document.querySelector(".overlay-title").textContent = "Fin de la partida";
+        document.querySelector(".overlay-sub").textContent = "Resumen de tu Bubble Pop aromático 🍷";
+        finalStatsEl.innerHTML = `
+          Vino jugado: <b>${activeWine.short}</b><br>
+          Uvas: <b>${activeWine.grapes}</b><br><br>
+          ✅ Aciertos: <b>${score}</b><br>
+          ❌ Burbujas mal reventadas: <span class="bad"><b>${mistakes}</b></span><br>
+          💨 Aromas buenos que se escaparon: <b>${missed}</b><br>
+          🎯 Precisión al tocar: <b>${accuracy}%</b><br><br>
+          Nivel de puntería aromática:<br><b>${nivel}</b><br><br>
+          <small>Recuerda: solo tienes una partida por vino.</small>
+        `;
+        restartOverlayBtn.style.display = "inline-flex";
+        statusText.textContent = "Partida terminada para " + activeWine.short + ". Pulsa “Jugar con otro vino” o cambia en el menú.";
+      }
+
+      endOverlay.classList.add("show");
     }
 
-    // marcar este vino como jugado
-    winePlayed[currentWineId] = true;
-    updateWineAvailabilityUI();
+    function loop(timestamp){
+      if(!gameRunning) return;
 
-    let nivel;
-    if(score >= 12) nivel = "Sniper aromático 🫧🍋";
-    else if(score >= 7) nivel = "Muy buena puntería 😏";
-    else if(score >= 3) nivel = "Puntería curiosa 👀";
-    else nivel = "Todavía calentando dedo 😄";
+      if(lastFrameTime === null){
+        lastFrameTime = timestamp;
+        requestAnimationFrame(loop);
+        return;
+      }
 
-    const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
-
-    if(remaining.length === 0){
-      // RESUMEN FINAL DE LOS 5 VINOS
-      overlayTitleEl.textContent = "Resumen final de tus 5 vinos";
-      overlaySubEl.textContent = "Puntuaciones de tu Bubble Pop de Aromas.";
-      finalStatsEl.innerHTML = buildFinalSummaryHTML();
-      restartOverlayBtn.style.display = "none";
-      statusText.textContent = "Has completado los 5 vinos. Resultados listos para el dashboard. 🥳";
-    }else{
-      // resumen solo del vino actual (como antes)
-      overlayTitleEl.textContent = "Fin de la partida";
-      overlaySubEl.textContent = "Resumen de tu Bubble Pop aromático 🍷";
-      finalStatsEl.innerHTML = `
-        Vino jugado: <b>${activeWine.short}</b><br>
-        Uvas: <b>${activeWine.grapes}</b><br><br>
-        ✅ Aciertos: <b>${score}</b><br>
-        ❌ Burbujas mal reventadas: <span class="bad"><b>${mistakes}</b></span><br>
-        💨 Aromas buenos que se escaparon: <b>${missed}</b><br>
-        🎯 Precisión al tocar: <b>${accuracy}%</b><br><br>
-        Nivel de puntería aromática:<br><b>${nivel}</b><br><br>
-        <small>Recuerda: solo tienes una partida por vino.</small>
-      `;
-      statusText.textContent = "Partida terminada para " + activeWine.short + ". Pulsa “Jugar con otro vino” o cambia en el menú.";
-      restartOverlayBtn.style.display = "inline-flex";
-    }
-
-    endOverlay.classList.add("show");
-  }
-
-  function buildFinalSummaryHTML(){
-    let html = "Resumen de tus 5 vinos jugados:<br><br>";
-    const ids = WINE_ORDER;
-    ids.forEach(id => {
-      const w = wines[id];
-      const r = wineResults[id];
-      if(!r) return;
-      html += `
-        <div style="margin-bottom:10px;">
-          <b>${w.short}</b><br>
-          ✅ Aciertos: <b>${r.score}</b> · ❌ Malas: <b>${r.mistakes}</b> · 💨 Escapan: <b>${r.missed}</b><br>
-          🎯 Precisión: <b>${r.accuracy}%</b>
-        </div>
-      `;
-    });
-
-    const all = Object.values(wineResults || {});
-    if(all.length){
-      let totalScore = 0;
-      let totalMistakes = 0;
-      let totalMissed = 0;
-      let sumAcc = 0;
-      all.forEach(r => {
-        totalScore += r.score || 0;
-        totalMistakes += r.mistakes || 0;
-        totalMissed += r.missed || 0;
-        sumAcc += r.accuracy || 0;
-      });
-      const avgAcc = Math.round(sumAcc / all.length);
-      html += `
-        <br>
-        <b>Resumen global:</b><br>
-        ✅ Aciertos totales: <b>${totalScore}</b><br>
-        ❌ Fallos totales: <b>${totalMistakes}</b><br>
-        💨 Burbujas buenas que se escaparon: <b>${totalMissed}</b><br>
-        🎯 Precisión media: <b>${avgAcc}%</b>
-      `;
-    }
-    return html;
-  }
-
-  function loop(timestamp){
-    if(!gameRunning) return;
-
-    if(lastFrameTime === null){
+      const dt = (timestamp - lastFrameTime) / 1000;
       lastFrameTime = timestamp;
-      requestAnimationFrame(loop);
-      return;
-    }
 
-    const dt = (timestamp - lastFrameTime) / 1000;
-    lastFrameTime = timestamp;
+      remainingMs -= dt*1000;
+      if(remainingMs < 0) remainingMs = 0;
+      timerEl.textContent = formatTime(remainingMs);
 
-    remainingMs -= dt * 1000;
-    if(remainingMs < 0) remainingMs = 0;
-    timerEl.textContent = formatTime(remainingMs);
+      spawnAccumulator += dt;
+      if(spawnAccumulator >= SPAWN_INTERVAL_SEC){
+        spawnAccumulator = 0;
+        spawnBubble();
+      }
 
-    spawnAccumulator += dt;
-    if(spawnAccumulator >= SPAWN_INTERVAL_SEC){
-      spawnAccumulator = 0;
-      spawnBubble();
-    }
-
-    const fieldRect = playfield.getBoundingClientRect();
-    const toRemove = [];
-    bubbles.forEach(b => {
-      b.__y -= b.__speed * dt;
-      b.style.top = b.__y + "px";
-      if(b.__y + 50 < 0){
-        toRemove.push(b);
-        const isGood = b.dataset.good === "1";
-        if(isGood){
-          missed++;
-          missedEl.textContent = String(missed);
+      const fieldRect = playfield.getBoundingClientRect();
+      const toRemove = [];
+      bubbles.forEach(b => {
+        b.__y -= b.__speed * dt;
+        b.style.top = b.__y + "px";
+        if(b.__y + 50 < 0){
+          toRemove.push(b);
+          if(b.dataset.good === "1"){
+            missed++;
+            missedEl.textContent = String(missed);
+          }
         }
-      }
-    });
-    toRemove.forEach(b => {
-      if(playfield.contains(b)){
-        playfield.removeChild(b);
-      }
-      bubbles = bubbles.filter(x => x !== b);
-    });
+      });
+      toRemove.forEach(b => {
+        if(playfield.contains(b)) playfield.removeChild(b);
+        bubbles = bubbles.filter(x => x !== b);
+      });
 
-    if(remainingMs <= 0){
-      gameRunning = false;
+      if(remainingMs <= 0){
+        gameRunning = false;
+        clearBubbles();
+        endGame();
+        return;
+      }
+
+      requestAnimationFrame(loop);
+    }
+
+    function startGame(){
+      if(gameRunning) return;
+
+      if(winePlayed[currentWineId]){
+        showToast("Este vino ya está jugado. Elige otro vino.");
+        statusText.textContent = "Este vino ya está jugado. Cambia de vino en el menú desplegable.";
+        return;
+      }
+
+      const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
+      if(remaining.length === 0){
+        showToast("Ya has jugado los 5 vinos. Revisa el resumen final.");
+        statusText.textContent = "Has jugado los 5 vinos. Usa de nuevo la cata para comentar los resultados.";
+        return;
+      }
+
+      gameRunning = true;
+      lastFrameTime = null;
+      remainingMs = GAME_DURATION_MS;
+      spawnAccumulator = 0;
       clearBubbles();
-      endGame();
-      return;
+      resetCounters();
+
+      wineSelect.disabled = true;
+
+      statusText.textContent = "Partida en curso: toca solo los aromas que encajen con el vino.";
+      showToast("Partida iniciada · revienta las burbujas correctas 🫧");
+
+      requestAnimationFrame(loop);
     }
 
-    requestAnimationFrame(loop);
-  }
+    // Eventos
+    startBtn.addEventListener("click", startGame);
 
-  function updateWineAvailabilityUI(){
-    const options = Array.from(wineSelect.options);
-    options.forEach(opt => {
-      const id = opt.value;
-      if(winePlayed[id]){
-        opt.textContent = opt.textContent.replace("·","· ✅");
-        opt.disabled = false;
-      }
-    });
-  }
-
-  function startGame(){
-    if(gameRunning) return;
-
-    if(winePlayed[currentWineId]){
-      showToast("Este vino ya está jugado. Elige otro vino.");
-      statusText.textContent = "Este vino ya está jugado. Cambia de vino en el menú desplegable.";
-      return;
-    }
-
-    const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
-    if(remaining.length === 0){
-      showToast("Ya has jugado los 5 vinos. Revisa el resumen final.");
-      statusText.textContent = "Has jugado los 5 vinos. Usa de nuevo la cata para comentar los resultados.";
-      return;
-    }
-
-    gameRunning = true;
-    lastFrameTime = null;
-    remainingMs = GAME_DURATION_MS;
-    spawnAccumulator = 0;
-    clearBubbles();
-    resetCounters();
-
-    wineSelect.disabled = true;
-
-    statusText.textContent = "Partida en curso: toca solo los aromas que encajen con el vino.";
-    showToast("Partida iniciada · revienta las burbujas correctas 🫧");
-
-    requestAnimationFrame(loop);
-  }
-
-  hintBtn.addEventListener("click", ()=>{
-    const w = getActiveWine();
-    showToast("Pista: " + w.tags);
-    statusText.textContent = "Pista de aromas clave para este vino: " + w.tags + ".";
-  });
-
-  startBtn.addEventListener("click", startGame);
-
-  wineSelect.addEventListener("change", ()=>{
-    if(gameRunning) return;
-    currentWineId = wineSelect.value;
-    updateWineUI();
-  });
-
-  closeOverlayBtn.addEventListener("click", ()=>{
-    endOverlay.classList.remove("show");
-  });
-
-  restartOverlayBtn.addEventListener("click", ()=>{
-    endOverlay.classList.remove("show");
-    const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
-    if(remaining.length){
-      currentWineId = remaining[0];
-      wineSelect.value = currentWineId;
+    wineSelect.addEventListener("change", ()=>{
+      if(gameRunning) return;
+      currentWineId = wineSelect.value;
       updateWineUI();
-    }
-    startGame();
-  });
+    });
 
-  timerEl.textContent = formatTime(GAME_DURATION_MS);
-  updateWineUI();
-})();
+    closeOverlayBtn.addEventListener("click", ()=>{
+      endOverlay.classList.remove("show");
+    });
+
+    restartOverlayBtn.addEventListener("click", ()=>{
+      endOverlay.classList.remove("show");
+      const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
+      if(remaining.length){
+        currentWineId = remaining[0];
+        wineSelect.value = currentWineId;
+        updateWineUI();
+      }
+      startGame();
+    });
+
+    // Estado inicial
+    timerEl.textContent = formatTime(GAME_DURATION_MS);
+    updateWineUI();
+  })();
   </script>
 </body>
 </html>
