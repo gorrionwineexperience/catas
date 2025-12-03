@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="utf-8" />
-  <title>Test línea recta 2D · Carretera hardcore</title>
+  <title>Test alcoholemia · Carretera hardcore</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
 
   <style>
@@ -344,8 +344,8 @@
   <div class="card">
     <div class="header">
       <div>
-        <div class="title">Test línea recta 2D</div>
-        <div class="subtitle">Carretera vertical · modo imposible</div>
+        <div class="title">Test alcoholemia</div>
+        <div class="subtitle">Carretera vertical · 3 intentos máximo</div>
       </div>
       <div class="pill">
         🚫🚗 <span><b>Solo es un juego</b><br>no sirve para conducir</span>
@@ -363,8 +363,8 @@
       <b>Cómo se juega:</b><br>
       Sujeta el móvil frente a ti.<br>
       Inclínalo suave arriba/abajo/izquierda/derecha para mantener el punto
-      dentro del <b>micro-recuadro verde</b> en mitad de la carretera durante 15 segundos.<br>
-      Es casi imposible a propósito 😈
+      dentro del <b>micro-recuadro verde</b> en mitad de la carretera durante 15 segundos.<br><br>
+      Tienes <b>3 intentos</b>. Al final verás la media de tus resultados.
     </div>
 
     <div class="field-wrap">
@@ -383,7 +383,7 @@
     </div>
 
     <div class="status" id="statusText">
-      Pulsa <b>“Activar sensores y empezar”</b>, sujeta el móvil cómodo, deja que calibre el centro y luego mueve lo mínimo posible en todas las direcciones.
+      Pulsa <b>“Activar sensores y empezar”</b>. Tienes 3 intentos: sujeta el móvil cómodo, deja que calibre el centro y luego muévete lo mínimo posible.
     </div>
   </div>
 </div>
@@ -416,9 +416,13 @@
   const closeOverlayBtn = document.getElementById("closeOverlayBtn");
   const restartOverlayBtn = document.getElementById("restartOverlayBtn");
 
+  const overlayTitleEl = document.querySelector(".overlay-title");
+  const overlaySubEl = document.querySelector(".overlay-sub");
+
   const GAME_DURATION_MS = 15000;
   const MAX_TILT = 8;    // rango máximo que mapeamos
   const SAFE_TILT = 2.0; // zona segura muy pequeña en X e Y
+  const MAX_ATTEMPTS = 3;
 
   let gameRunning = false;
   let sensorActive = false;
@@ -433,6 +437,9 @@
   let insideMs = 0;
 
   let rafId = null;
+
+  let attemptCount = 0;
+  const attempts = []; // {insideMs, percent}
 
   function formatTime(ms){
     const t = Math.max(0, Math.floor(ms / 1000));
@@ -542,10 +549,53 @@
     insidePercentEl.textContent = p + "%";
 
     if(inside){
-      statusText.textContent = "En el tramo verde ✅ · No respires fuerte…";
+      statusText.textContent = "En el tramo verde ✅ · Mantén el pulso firme…";
     }else{
       statusText.textContent = "Fuera del tramo 😅 · Cualquier mínimo temblor te saca de la carretera.";
     }
+  }
+
+  function buildFinalSummaryHTML(){
+    let html = "Resumen de tus 3 intentos:<br><br>";
+    attempts.forEach((att, i) => {
+      const sec = Math.round(att.insideMs / 1000);
+      html += `
+        <div style="margin-bottom:8px;">
+          Intento ${i+1}:<br>
+          ✅ Tiempo en verde: <b>${sec} s</b><br>
+          📊 Porcentaje en tramo: <b>${att.percent}%</b>
+        </div>
+      `;
+    });
+
+    const avgPercent = Math.round(
+      attempts.reduce((sum,a)=>sum + a.percent,0) / attempts.length
+    );
+    const avgInsideSec = Math.round(
+      attempts.reduce((sum,a)=>sum + a.insideMs,0) / attempts.length / 1000
+    );
+
+    let nivel;
+    if(avgPercent >= 50){
+      nivel = "Pulso sobrenatural en este Test de alcoholemia 🧠🍷";
+    }else if(avgPercent >= 20){
+      nivel = "Muy buen control medio para lo pequeño del tramo 😏";
+    }else if(avgPercent >= 5){
+      nivel = "Has pasado por el tramo verde varias veces, nada mal 😄";
+    }else{
+      nivel = "Modo lavadora · la carretera iba por un lado y tú por otro 🤣";
+    }
+
+    html += `
+      <br>
+      <b>Media de los 3 intentos</b><br>
+      ✅ Tiempo medio en verde: <b>${avgInsideSec} s</b><br>
+      📊 Porcentaje medio en tramo: <b>${avgPercent}%</b><br><br>
+      Diagnóstico global:<br>
+      <b>${nivel}</b><br><br>
+      <small>Comparte este resultado con el anfitrión para el ranking de la cata.</small>
+    `;
+    return html;
   }
 
   function endGame(){
@@ -558,27 +608,48 @@
     timerEl.textContent = "00:00";
 
     const percent = Math.max(0, Math.min(100, Math.round(insideMs / GAME_DURATION_MS * 100)));
-    let nivel;
-    if(percent >= 50){
-      nivel = "Pulso sobrenatural en carretera hardcore 🧠🍷";
-    }else if(percent >= 20){
-      nivel = "Muy buen control para lo pequeño del tramo 😏";
-    }else if(percent >= 5){
-      nivel = "Has tocado el tramo verde, que ya es mucho 😄";
+    attempts.push({ insideMs, percent });
+    attemptCount = attempts.length;
+
+    const remainingAttempts = Math.max(0, MAX_ATTEMPTS - attemptCount);
+
+    if(attemptCount >= MAX_ATTEMPTS){
+      // Resumen final de los 3 intentos
+      overlayTitleEl.textContent = "Resumen final · Test alcoholemia";
+      overlaySubEl.textContent = "Media de tus 3 intentos en la carretera 2D.";
+      finalStatsEl.innerHTML = buildFinalSummaryHTML();
+      restartOverlayBtn.style.display = "none";
+      startBtn.disabled = true;
+      recalBtn.disabled = true;
+      statusText.textContent = "Has completado tus 3 intentos. Enseña el resumen al anfitrión de la cata.";
     }else{
-      nivel = "Modo lavadora · la carretera iba por un lado y tú por otro 🤣";
+      // Resumen solo de este intento
+      let nivel;
+      if(percent >= 50){
+        nivel = "Pulso sobrenatural en carretera hardcore 🧠🍷";
+      }else if(percent >= 20){
+        nivel = "Muy buen control para lo pequeño del tramo 😏";
+      }else if(percent >= 5){
+        nivel = "Has tocado el tramo verde, que ya es mucho 😄";
+      }else{
+        nivel = "Modo lavadora · la carretera iba por un lado y tú por otro 🤣";
+      }
+
+      overlayTitleEl.textContent = "Fin del intento " + attemptCount + " de 3";
+      overlaySubEl.textContent = "Puedes repetir hasta completar tus 3 intentos.";
+      finalStatsEl.innerHTML = `
+        ⏱️ Tiempo total: <b>${(GAME_DURATION_MS/1000).toFixed(0)} s</b><br>
+        ✅ Tiempo dentro del tramo verde: <b>${Math.round(insideMs/1000)} s</b><br>
+        📊 Porcentaje en el tramo: <b>${percent}%</b><br><br>
+        Diagnóstico de este intento:<br>
+        <b>${nivel}</b><br><br>
+        <small>Te quedan <b>${remainingAttempts}</b> intento(s) de Test alcoholemia.</small>
+      `;
+      restartOverlayBtn.style.display = "inline-flex";
+      statusText.textContent = "Intento " + attemptCount + " completado. Puedes repetir hasta llegar a 3 intentos.";
     }
 
-    finalStatsEl.innerHTML = `
-      ⏱️ Tiempo total: <b>${(GAME_DURATION_MS/1000).toFixed(0)} s</b><br>
-      ✅ Tiempo dentro del tramo verde: <b>${Math.round(insideMs/1000)} s</b><br>
-      📊 Porcentaje en el tramo: <b>${percent}%</b><br><br>
-      Diagnóstico de la casa:<br>
-      <b>${nivel}</b>
-    `;
-
     endOverlay.classList.add("show");
-    statusText.textContent = "Prueba terminada. Mira tu resumen y repite si quieres humillar al resto de la mesa.";
   }
 
   function loop(timestamp){
@@ -610,6 +681,12 @@
   async function startGame(){
     if(gameRunning) return;
 
+    if(attemptCount >= MAX_ATTEMPTS){
+      showToast("Ya has usado tus 3 intentos del Test alcoholemia.");
+      statusText.textContent = "Has terminado tus 3 intentos. No puedes repetir más esta prueba.";
+      return;
+    }
+
     resetState();
 
     const granted = await requestSensorPermission();
@@ -623,12 +700,16 @@
 
     gameRunning = true;
     endOverlay.classList.remove("show");
-    statusText.textContent = "Mantén el punto en el micro-tramo verde inclinando el móvil lo mínimo posible. Suerte… la vas a necesitar 😈";
-    showToast("Test iniciado · 15 s de carretera 2D imposible");
+    statusText.textContent = "Mantén el punto en el micro-tramo verde inclinando el móvil lo mínimo posible. Intento " + (attemptCount+1) + " de 3.";
+    showToast("Test iniciado · 15 s de carretera 2D (intento " + (attemptCount+1) + " de 3)");
     rafId = requestAnimationFrame(loop);
   }
 
   function recalibrate(){
+    if(attemptCount >= MAX_ATTEMPTS){
+      showToast("Test alcoholemia completado. Ya no hace falta recalibrar.");
+      return;
+    }
     baselineGamma = latestGamma;
     baselineBeta  = latestBeta;
     showToast("Centro recalibrado. Esta orientación es tu nuevo “recto” en carretera.");
@@ -646,7 +727,7 @@
     startGame();
   });
 
-  statusText.textContent = "Pulsa “Activar sensores y empezar”, sujeta el móvil cómodo, deja que calibre y luego muévete lo mínimo posible.";
+  statusText.textContent = "Pulsa “Activar sensores y empezar”. Tienes 3 intentos: sujeta el móvil cómodo, deja que calibre y luego muévete lo mínimo posible.";
 })();
 </script>
 
