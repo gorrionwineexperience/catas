@@ -695,6 +695,22 @@
         </div>
       </div>
 
+        <!-- Mini-juegos -->
+        <div class="section" style="margin-top:16px; padding-top:12px; border-top:1px dashed #343a56;">
+          <h3 style="margin:0 0 6px; font-size:1rem;">🎮 Mini-juegos</h3>
+          <div class="small" style="margin-bottom:6px; opacity:.9;">
+            Lanza mini-juegos a los invitados. Tú sigues viendo la cata normal.
+          </div>
+          <div class="row">
+            <button id="miniCataBtn">🍷 Volver a la cata</button>
+            <button id="miniBubblesBtn" class="primary">🫧 Bubble Pop de Aromas</button>
+            <button id="miniLineaBtn">📈 Test alcoholemia</button>
+          </div>
+          <div class="small" style="margin-top:6px; opacity:.9;">
+            Solo los invitados (sin <code>?host=1</code> ni <code>?dashboard=1</code>) cambiarán de página automáticamente.
+          </div>
+        </div>
+
       <div id="orderSection" class="section">
         <h3>Orden de servicio</h3>
         <ol class="note" id="orderList" style="margin-left:18px"></ol>
@@ -1001,6 +1017,29 @@
     if(sw) sw.style.display = "none";
     const os = document.getElementById("orderSection");
     if(os) os.style.display = "none";
+  }
+
+  // Invitados: escuchar mini-juegos y cambiar de página automáticamente
+  if(!isHost && !isDashboard){
+    const miniGamesRef = ref(db, "miniGames/currentScreen");
+    onValue(miniGamesRef, (snap) => {
+      const screen = snap.val() || "cata";
+      const current = (location.pathname.split("/").pop() || "").toLowerCase();
+
+      if(screen === "cata"){
+        // La cata vive en cata.html (esta página)
+        // No hacemos nada especial: si están en otro sitio, los otros juegos los redirigirán.
+        return;
+      }else if(screen === "bubbles"){
+        if(!current.includes("burbujas")){
+          window.location.href = "burbujas.html";
+        }
+      }else if(screen === "linea"){
+        if(!current.includes("linea")){
+          window.location.href = "linea.html";
+        }
+      }
+    });
   }
 
   function getDeviceId(){
@@ -1731,6 +1770,7 @@
 
         await set(ref(db, "/"), {
           activeWine: -1,
+          miniGames: { currentScreen: "cata" },
           hostNote: "",
           expectedUsers,
           ratings: {},
