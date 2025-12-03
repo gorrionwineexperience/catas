@@ -449,18 +449,13 @@
     const screenRef = ref(db, "miniGames/currentScreen");
     onValue(screenRef, (snap) => {
       const screen = snap.val() || "cata";
-      const current = (location.pathname.split("/").pop() || "").toLowerCase();
 
       if(screen === "cata"){
-        if(current !== "index.html"){
-          window.location.href = "index.html";
-        }
+        window.location.href = "index.html";
       }else if(screen === "bubbles"){
-        // Nos quedamos aqu铆
+        window.location.href = "burbujas.html";
       }else if(screen === "linea"){
-        if(!current.includes("linea")){
-          window.location.href = "linea.html";
-        }
+        window.location.href = "linea.html";
       }
     });
   }
