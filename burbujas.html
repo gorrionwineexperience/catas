@@ -436,6 +436,9 @@
   const closeOverlayBtn = document.getElementById("closeOverlayBtn");
   const restartOverlayBtn = document.getElementById("restartOverlayBtn");
 
+  const overlayTitleEl = document.querySelector(".overlay-title");
+  const overlaySubEl = document.querySelector(".overlay-sub");
+
   const wineSelect = document.getElementById("wineSelect");
   const wineNameEl = document.getElementById("wineName");
   const wineGrapesEl = document.getElementById("wineGrapes");
@@ -513,6 +516,15 @@
     lupo:false,
     cinquenoci:false,
     triplico:false
+  };
+
+  // resultados por vino
+  const wineResults = {
+    falanghina:null,
+    montepulciano:null,
+    lupo:null,
+    cinquenoci:null,
+    triplico:null
   };
 
   let bubbles = [];
@@ -679,6 +691,24 @@
     });
   }
 
+  function buildFinalSummaryHTML(){
+    let html = "Resumen de tus vinos:<br><br>";
+    WINE_ORDER.forEach(id => {
+      const w = wines[id];
+      const r = wineResults[id];
+      if(!r) return;
+      html += `
+        <div style="margin-bottom:10px;">
+          <b>${w.short}</b><br>
+          ✅ Aciertos: <b>${r.score}</b> · ❌ Fallos: <b>${r.mistakes}</b> · 💨 Perdidas: <b>${r.missed}</b><br>
+          🎯 Precisión: <b>${r.accuracy}%</b>
+        </div>
+      `;
+    });
+    html += `<br><small>Comparte este resultado con el anfitrión para el ranking de la cata.</small>`;
+    return html;
+  }
+
   function endGame(){
     gameRunning = false;
     if(rafId !== null){
@@ -689,13 +719,21 @@
     wineSelect.disabled = false;
     timerEl.textContent = "00:00";
 
-    // marcar este vino como jugado
-    winePlayed[currentWineId] = true;
-    updateWineAvailabilityUI();
-
     const totalTouches = totalCorrectTaps + totalWrongTaps;
     const accuracy = totalTouches ? Math.round((totalCorrectTaps / totalTouches) * 100) : 0;
     const activeWine = getActiveWine();
+
+    // guardar resultados de este vino
+    wineResults[currentWineId] = {
+      score,
+      mistakes,
+      missed,
+      accuracy
+    };
+
+    // marcar este vino como jugado
+    winePlayed[currentWineId] = true;
+    updateWineAvailabilityUI();
 
     let nivel;
     if(score >= 12) nivel = "Sniper aromático 🫧🍋";
@@ -703,25 +741,34 @@
     else if(score >= 3) nivel = "Puntería curiosa 👀";
     else nivel = "Todavía calentando dedo 😄";
 
-    finalStatsEl.innerHTML = `
-      Vino jugado: <b>${activeWine.short}</b><br>
-      Uvas: <b>${activeWine.grapes}</b><br><br>
-      ✅ Aciertos: <b>${score}</b><br>
-      ❌ Burbujas mal reventadas: <span class="bad"><b>${mistakes}</b></span><br>
-      💨 Aromas buenos que se escaparon: <b>${missed}</b><br>
-      🎯 Precisión al tocar: <b>${accuracy}%</b><br><br>
-      Nivel de puntería aromática:<br><b>${nivel}</b><br><br>
-      <small>Recuerda: solo tienes una partida por vino.</small>
-    `;
-
-    endOverlay.classList.add("show");
-
     const remaining = Object.keys(wines).filter(id => !winePlayed[id]);
+
     if(remaining.length === 0){
+      // RESUMEN FINAL DE LOS 5 VINOS
+      overlayTitleEl.textContent = "Resumen final de tus 5 vinos";
+      overlaySubEl.textContent = "Puntuaciones de tu Bubble Pop de Aromas.";
+      finalStatsEl.innerHTML = buildFinalSummaryHTML();
+      restartOverlayBtn.style.display = "none";
       statusText.textContent = "Has completado los 5 vinos. Resultados listos para el dashboard. 🥳";
     }else{
+      // resumen solo del vino actual (como antes)
+      overlayTitleEl.textContent = "Fin de la partida";
+      overlaySubEl.textContent = "Resumen de tu Bubble Pop aromático 🍷";
+      finalStatsEl.innerHTML = `
+        Vino jugado: <b>${activeWine.short}</b><br>
+        Uvas: <b>${activeWine.grapes}</b><br><br>
+        ✅ Aciertos: <b>${score}</b><br>
+        ❌ Burbujas mal reventadas: <span class="bad"><b>${mistakes}</b></span><br>
+        💨 Aromas buenos que se escaparon: <b>${missed}</b><br>
+        🎯 Precisión al tocar: <b>${accuracy}%</b><br><br>
+        Nivel de puntería aromática:<br><b>${nivel}</b><br><br>
+        <small>Recuerda: solo tienes una partida por vino.</small>
+      `;
       statusText.textContent = "Partida terminada para " + activeWine.short + ". Pulsa “Jugar con otro vino” o cambia en el menú.";
+      restartOverlayBtn.style.display = "inline-flex";
     }
+
+    endOverlay.classList.add("show");
   }
 
   function loop(timestamp){
