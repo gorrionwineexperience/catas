@@ -1735,6 +1735,24 @@
         update(ref(db, "/"), { infoScreen: "scene5" });
     }
 
+    const miniCataBtn   = document.getElementById("miniCataBtn");
+    const miniBubblesBtn= document.getElementById("miniBubblesBtn");
+    const miniLineaBtn  = document.getElementById("miniLineaBtn");
+
+    const setMiniScreen = (screen) => {
+      update(ref(db, "/miniGames"), { currentScreen: screen });
+    };
+
+    if(miniCataBtn){
+      miniCataBtn.onclick = () => setMiniScreen("cata");
+    }
+    if(miniBubblesBtn){
+      miniBubblesBtn.onclick = () => setMiniScreen("bubbles");
+    }
+    if(miniLineaBtn){
+      miniLineaBtn.onclick = () => setMiniScreen("linea");
+    }
+
     const expectedInput = document.getElementById("expectedInput");
     const setExpectedBtn = document.getElementById("setExpectedBtn");
     const expectedHint = document.getElementById("expectedHint");
