@@ -382,9 +382,10 @@
     <div class="instructions">
       <b>Cómo se juega:</b><br>
       Burbujas de aromas suben hacia la superficie.<br>
-      Para el vino <b id="instrWineName">Falanghina</b> busca aromas: <b id="instrAromas">cítricos, florales, salinos…</b><br>
-      Si revientas burbujas que no encajan con ese vino o dejas escapar aromas buenos, cuentan
-      como fallo o perdida. Tienes 30 segundos.<br><br>
+      Tu misión es reventar solo las burbujas que encajan con el vino elegido, según lo que
+      recordáis de la cata.<br>
+      Si revientas burbujas que no encajan o dejas escapar aromas buenos, cuentan como
+      fallo o pérdida. Tienes 30 segundos por vino.<br><br>
       <b>Solo tienes una oportunidad por vino.</b>
     </div>
 
@@ -396,11 +397,11 @@
 
     <div class="btn-row">
       <button id="startBtn" class="primary">▶ Empezar partida</button>
-      <button id="hintBtn" class="small">Ver aromas buenos</button>
+      <button id="hintBtn" class="small">Pista</button>
     </div>
 
     <div class="status" id="statusText">
-      Pulsa <b>“Empezar partida”</b> y toca solo las burbujas de aromas correctos para el vino elegido.
+      Pulsa <b>“Empezar partida”</b> y toca solo las burbujas de aromas correctos para el vino elegido, usando lo que recuerdes de la cata.
     </div>
   </div>
 </div>
@@ -438,8 +439,6 @@
   const wineSelect = document.getElementById("wineSelect");
   const wineNameEl = document.getElementById("wineName");
   const wineGrapesEl = document.getElementById("wineGrapes");
-  const instrWineNameEl = document.getElementById("instrWineName");
-  const instrAromasEl = document.getElementById("instrAromas");
 
   const GAME_DURATION_MS = 30000;
   const SPAWN_INTERVAL_SEC = 0.7; // más caña: burbujas más frecuentes
@@ -534,25 +533,15 @@
     return wines[currentWineId];
   }
 
-  function getGoodLabelsForActiveWine(){
-    const w = getActiveWine();
-    return aromaPool
-      .filter(a => w.goodKeys.includes(a.key))
-      .map(a => a.label);
-  }
-
   function updateWineUI(){
     const w = getActiveWine();
     wineNameEl.textContent = w.short + " (" + w.color + ")";
     wineGrapesEl.textContent = "Uvas: " + w.grapes;
-    const goodLabels = getGoodLabelsForActiveWine();
-    instrWineNameEl.textContent = w.short;
-    instrAromasEl.textContent = goodLabels.join(" · ");
 
     if(winePlayed[currentWineId]){
       statusText.textContent = "Este vino ya está jugado. Elige otro vino para una nueva partida.";
     }else{
-      statusText.textContent = "Pulsa “Empezar partida” y toca solo las burbujas correctas para " + w.short + ".";
+      statusText.textContent = "Pulsa “Empezar partida” y toca solo las burbujas correctas para " + w.short + ", según lo que recuerdes de la cata.";
     }
   }
 
@@ -641,13 +630,13 @@
       totalCorrectTaps++;
       scoreEl.textContent = score;
       bubble.el.classList.add("hit-ok");
-      statusText.textContent = "Buen disparo 🫧 ¡Ese aroma encaja con " + getActiveWine().short + "!";
+      statusText.textContent = "Buen disparo 🫧 Ese aroma encaja con lo que trabajasteis para " + getActiveWine().short + ".";
     }else{
       mistakes++;
       totalWrongTaps++;
       mistakesEl.textContent = mistakes;
       bubble.el.classList.add("hit-bad");
-      statusText.textContent = "Esa burbuja no era… 😅 busca las que van con " + getActiveWine().short + ".";
+      statusText.textContent = "Esa burbuja no era… 😅 Piensa en lo que olisteis con " + getActiveWine().short + ".";
     }
 
     setTimeout(()=> removeBubble(bubble), 200);
@@ -805,8 +794,8 @@
     wineSelect.disabled = true;
     endOverlay.classList.remove("show");
 
-    const goodLabels = getGoodLabelsForActiveWine();
-    statusText.textContent = "¡A jugar! Revienta las burbujas de " + goodLabels.join(" · ") + ".";
+    const activeWine = getActiveWine();
+    statusText.textContent = "¡A jugar! Revienta solo las burbujas que encajen con lo que recuerdas de " + activeWine.short + ".";
     showToast("Partida iniciada · 30 segundos de Bubble Pop de aromas");
     rafId = requestAnimationFrame(loop);
   }
@@ -815,15 +804,14 @@
 
   hintBtn.addEventListener("click", ()=>{
     const w = getActiveWine();
-    const good = getGoodLabelsForActiveWine().join(" · ");
-    showToast("Aromas buenos para " + w.short + ": " + good);
+    showToast("Piensa en los aromas que comentasteis para " + w.short + " durante la cata.");
   });
 
   closeOverlayBtn.addEventListener("click", ()=>{
     endOverlay.classList.remove("show");
   });
 
-  // AQUÍ EL CAMBIO: pasar automáticamente al siguiente vino no jugado
+  // pasar automáticamente al siguiente vino no jugado
   restartOverlayBtn.addEventListener("click", ()=>{
     endOverlay.classList.remove("show");
 
