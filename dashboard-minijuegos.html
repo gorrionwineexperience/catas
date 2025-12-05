@@ -94,7 +94,8 @@
       border-color:var(--accentLinea);
       box-shadow:0 0 12px rgba(155,231,161,.35);
     }
-    .pill-game.active[data-game="cata"]{
+    .pill-game.active[data-game="cata"],
+    .pill-game.active[data-game="summary"]{
       border-color:var(--accent);
       box-shadow:0 0 12px rgba(255,179,71,.35);
     }
@@ -240,6 +241,36 @@
       font-weight:700;
     }
 
+    /* Podio resumen */
+    #summaryPodium{
+      display:none;
+      margin-top:10px;
+    }
+    .podio-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:16px;
+    }
+    .podio-block-title{
+      font-size:.85rem;
+      color:var(--muted);
+      margin-bottom:6px;
+    }
+    .podio-line{
+      display:flex;
+      align-items:center;
+      gap:8px;
+      margin-bottom:4px;
+    }
+    .podio-rank{
+      font-size:1.1rem;
+      font-weight:800;
+    }
+    .podio-name{
+      font-size:1rem;
+      font-weight:700;
+    }
+
     /* ===================== MODO TV ===================== */
     body.tv-mode{
       padding:10px;
@@ -262,6 +293,14 @@
     }
     body.tv-mode .badge-row{
       display:none;
+    }
+    body.tv-mode .pill-game{
+      font-size:.95rem;
+      padding:6px 14px;
+    }
+    body.tv-mode #gameHint{
+      font-size:.9rem;
+      max-width:none;
     }
 
     body.tv-mode .layout{
@@ -308,20 +347,16 @@
       box-shadow:0 0 25px rgba(255,179,71,.25);
     }
 
-    body.tv-mode #tableWrap{
-      max-height:none;
-    }
     body.tv-mode .empty{
       font-size:1rem;
       text-align:center;
     }
-    body.tv-mode .pill-game{
-      font-size:.95rem;
-      padding:6px 14px;
+
+    body.tv-mode #summaryPodium .podio-rank{
+      font-size:1.6rem;
     }
-    body.tv-mode #gameHint{
-      font-size:.9rem;
-      max-width:none;
+    body.tv-mode #summaryPodium .podio-name{
+      font-size:1.3rem;
     }
   </style>
 </head>
@@ -373,13 +408,16 @@
                 <th id="secondaryMetricHead">Extra</th>
               </tr>
             </thead>
-            <tbody id="rankingBody">
-              <!-- filas de ranking -->
-            </tbody>
+            <tbody id="rankingBody"></tbody>
           </table>
         </div>
         <div class="empty" id="emptyMsg" style="display:none;">
           Nadie ha terminado todavía este mini-juego. Cuando lleguen resultados, aparecerán aquí.
+        </div>
+
+        <!-- Vista de podio resumen (summary) -->
+        <div id="summaryPodium">
+          <!-- Se rellena por JS -->
         </div>
       </section>
 
@@ -460,8 +498,10 @@
     const rankingSub = document.getElementById("rankingSub");
     const rankingBody = document.getElementById("rankingBody");
     const emptyMsg = document.getElementById("emptyMsg");
+    const tableWrap = document.getElementById("tableWrap");
     const mainMetricHead = document.getElementById("mainMetricHead");
     const secondaryMetricHead = document.getElementById("secondaryMetricHead");
+    const summaryPodium = document.getElementById("summaryPodium");
 
     const statPlayers = document.getElementById("statPlayers");
     const statPlayersHelp = document.getElementById("statPlayersHelp");
@@ -474,6 +514,11 @@
     const statUpdatedHelp = document.getElementById("statUpdatedHelp");
 
     let currentResultsUnsub = null;
+    let currentMode = "cata";
+
+    let bubblesResultsCache = {};
+    let lineaResultsCache = {};
+    let summaryListenersAttached = false;
 
     function localTimeString(ts){
       if(!ts) return "–";
@@ -486,13 +531,16 @@
     }
 
     function setGamePill(game){
-      pillCata.dataset.game = game || "cata";
+      currentMode = game || "cata";
+      pillCata.dataset.game = currentMode;
       pillCata.classList.add("active");
 
       if(game === "bubbles"){
         currentGameLabel.textContent = "Bubble Pop de Aromas";
       }else if(game === "linea"){
         currentGameLabel.textContent = "Test alcoholemia";
+      }else if(game === "summary"){
+        currentGameLabel.textContent = "Podio final";
       }else{
         currentGameLabel.textContent = "Cata";
       }
@@ -508,6 +556,10 @@
       rankingIcon.textContent = "⏳";
       rankingTitle.textContent = "Esperando mini-juego activo";
       rankingSub.textContent = "Cuando el host lance Bubble Pop o el Test alcoholemia, el ranking aparecerá aquí.";
+
+      tableWrap.style.display = "";
+      summaryPodium.style.display = "none";
+
       clearRanking();
       emptyMsg.style.display = "block";
       emptyMsg.textContent = "Sin mini-juego activo ahora mismo.";
@@ -533,14 +585,14 @@
 
       if(game === "bubbles"){
         const rRef = ref(db, "miniGames/bubbles/results");
-        const unsub = onValue(rRef, snap => {
+        onValue(rRef, snap => {
           const data = snap.val() || {};
           renderBubblesRanking(data);
         });
         currentResultsUnsub = () => off(rRef);
       }else if(game === "linea"){
         const rRef = ref(db, "miniGames/linea/results");
-        const unsub = onValue(rRef, snap => {
+        onValue(rRef, snap => {
           const data = snap.val() || {};
           renderLineaRanking(data);
         });
@@ -548,11 +600,136 @@
       }
     }
 
+    // Helpers para resumen (Top 3 de ambos juegos)
+    function buildTop3FromBubbles(results){
+      const arr = Object.values(results || {}).filter(r => r && typeof r === "object");
+      arr.sort((a,b)=>{
+        const aScore = a.totalScore || 0;
+        const bScore = b.totalScore || 0;
+        if(bScore !== aScore) return bScore - aScore;
+        const aAcc = a.avgAccuracy || 0;
+        const bAcc = b.avgAccuracy || 0;
+        if(bAcc !== aAcc) return bAcc - aAcc;
+        const aTs = a.ts || 0;
+        const bTs = b.ts || 0;
+        return aTs - bTs;
+      });
+      return arr.slice(0, 3);
+    }
+
+    function buildTop3FromLinea(results){
+      const arr = Object.values(results || {}).filter(r => r && typeof r === "object");
+      arr.sort((a,b)=>{
+        const aPct = a.avgPercent || 0;
+        const bPct = b.avgPercent || 0;
+        if(bPct !== aPct) return bPct - aPct;
+        const aSec = a.avgInsideSec || 0;
+        const bSec = b.avgInsideSec || 0;
+        if(bSec !== aSec) return bSec - aSec;
+        const aTs = a.ts || 0;
+        const bTs = b.ts || 0;
+        return aTs - bTs;
+      });
+      return arr.slice(0, 3);
+    }
+
+    function renderSummaryPodium(){
+      if(currentMode !== "summary") return;
+      tableWrap.style.display = "none";
+      emptyMsg.style.display = "none";
+      summaryPodium.style.display = "block";
+
+      const topB = buildTop3FromBubbles(bubblesResultsCache);
+      const topL = buildTop3FromLinea(lineaResultsCache);
+
+      if(!topB.length && !topL.length){
+        summaryPodium.innerHTML = '<div class="empty">Todavía no hay resultados suficientes en los mini-juegos.</div>';
+        statPlayers.textContent = "0";
+        statWinner.textContent = "–";
+        statMetricLabel.textContent = "Resumen";
+        statMetricValue.textContent = "–";
+        statUpdated.textContent = "–";
+        return;
+      }
+
+      const renderList = (items) => {
+        if(!items.length) return '<div class="empty">Sin datos aún</div>';
+        return items.map((p, idx) => {
+          const pos = idx+1;
+          const medal = pos === 1 ? "🥇" : (pos === 2 ? "🥈" : "🥉");
+          const name = (p.name || p.sessionId || "Invitado").toString().toUpperCase();
+          return `
+            <div class="podio-line">
+              <div class="podio-rank">${medal} ${pos}º</div>
+              <div class="podio-name">${name}</div>
+            </div>
+          `;
+        }).join("");
+      };
+
+      summaryPodium.innerHTML = `
+        <div class="podio-grid">
+          <div>
+            <div class="podio-block-title">🫧 Bubble Pop de Aromas</div>
+            ${renderList(topB)}
+          </div>
+          <div>
+            <div class="podio-block-title">📈 Test alcoholemia</div>
+            ${renderList(topL)}
+          </div>
+        </div>
+      `;
+
+      // Estadísticas laterales sencillas
+      statPlayers.textContent = String(
+        new Set([
+          ...Object.keys(bubblesResultsCache || {}),
+          ...Object.keys(lineaResultsCache || {})
+        ]).size
+      );
+      statWinner.textContent = [
+        topB[0]?.name || topB[0]?.sessionId,
+        topL[0]?.name || topL[0]?.sessionId
+      ].filter(Boolean).map(n => n.toString().toUpperCase()).join(" · ") || "—";
+
+      statMetricLabel.textContent = "Ganadores";
+      statMetricValue.textContent = "Top 3 de cada juego";
+      statMetricHelp.textContent = "Se calcula con los rankings de Bubble Pop y Test alcoholemia.";
+
+      // Última actualización combinada
+      let lastTs = 0;
+      Object.values(bubblesResultsCache || {}).forEach(r => { lastTs = Math.max(lastTs, r?.ts || 0); });
+      Object.values(lineaResultsCache || {}).forEach(r => { lastTs = Math.max(lastTs, r?.ts || 0); });
+      statUpdated.textContent = localTimeString(lastTs);
+      gameHint.textContent = "Vista de podio final · Top 3 de ambos mini-juegos.";
+    }
+
+    function attachSummaryListenersOnce(){
+      if(summaryListenersAttached) return;
+      summaryListenersAttached = true;
+
+      const bubblesResultsRef = ref(db, "miniGames/bubbles/results");
+      const lineaResultsRef   = ref(db, "miniGames/linea/results");
+
+      onValue(bubblesResultsRef, (snap)=>{
+        bubblesResultsCache = snap.val() || {};
+        renderSummaryPodium();
+      });
+
+      onValue(lineaResultsRef, (snap)=>{
+        lineaResultsCache = snap.val() || {};
+        renderSummaryPodium();
+      });
+    }
+
     function renderBubblesRanking(results){
       setGamePill("bubbles");
       rankingIcon.textContent = "🫧";
       rankingTitle.textContent = "Ranking · Bubble Pop de Aromas";
       rankingSub.textContent = "Ordenado por aciertos totales (y precisión media como desempate).";
+
+      tableWrap.style.display = "";
+      summaryPodium.style.display = "none";
 
       mainMetricHead.textContent = "Aciertos totales";
       secondaryMetricHead.textContent = "Precisión media / Fallos";
@@ -568,7 +745,6 @@
         ts: r?.ts ?? 0
       }));
 
-      // Ordenamos y limitamos a top 12 para marcador TV
       entries.sort((a,b)=>{
         if(b.totalScore !== a.totalScore) return b.totalScore - a.totalScore;
         if(b.avgAccuracy !== a.avgAccuracy) return b.avgAccuracy - a.avgAccuracy;
@@ -624,6 +800,9 @@
       rankingIcon.textContent = "📈";
       rankingTitle.textContent = "Ranking · Test alcoholemia";
       rankingSub.textContent = "Ordenado por % medio en el tramo verde (y segundos medios como desempate).";
+
+      tableWrap.style.display = "";
+      summaryPodium.style.display = "none";
 
       mainMetricHead.textContent = "% medio en tramo";
       secondaryMetricHead.textContent = "Segundos medios / intentos";
@@ -695,10 +874,20 @@
     const currentScreenRef = ref(db, "miniGames/currentScreen");
     onValue(currentScreenRef, snap => {
       const val = snap.val() || "cata";
+
       if(val === "bubbles"){
         attachResultsListener("bubbles");
+        subtitleMain.textContent = "Ranking en directo · Bubble Pop de Aromas.";
       }else if(val === "linea"){
         attachResultsListener("linea");
+        subtitleMain.textContent = "Ranking en directo · Test alcoholemia.";
+      }else if(val === "summary"){
+        setGamePill("summary");
+        rankingIcon.textContent = "🏁";
+        rankingTitle.textContent = "Podio final mini-juegos";
+        rankingSub.textContent = "Ganadores y Top 3 de Bubble Pop y Test alcoholemia.";
+        attachSummaryListenersOnce();
+        renderSummaryPodium();
       }else{
         if(currentResultsUnsub){
           currentResultsUnsub();
