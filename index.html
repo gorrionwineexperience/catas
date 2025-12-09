@@ -1590,8 +1590,8 @@ if(!isHost && !isDashboard){
     wineCard.innerHTML = `
       <div class="pill">Intermedio</div>
       <div class="pauseBox" style="margin-top:12px">
-        <h2 class="pauseTitle">Pausa Mediterránea</h2>
-        <div class="pauseSub">Agua · pan · charla · prepárate para el siguiente vino</div>
+        <h2 class="pauseTitle">Pausa Gorrionera</h2>
+        <div class="pauseSub">Agua · vino · charla · prepárate para el siguiente vino</div>
         ${hostNote ? `<div class="story" style="margin-top:14px">🗣️ ${hostNote}</div>` : ``}
       </div>
       <div class="section">
@@ -1755,7 +1755,7 @@ if(!isHost && !isDashboard){
     }else if(activeId === 0){
       ovBig.textContent = `Intermedio`;
       ovWine.textContent = `Pausa Mediterránea`;
-      ovSub.textContent = `Agua · pan · charla`;
+      ovSub.textContent = `Agua · charla`;
     }else{
       const w = wines.find(x=>x.id===activeId) || wines[0];
       ovBig.textContent = `Vino ${w.id}`;
@@ -2381,6 +2381,7 @@ if(miniSummaryBtn){
 
 </body>
 </html>
+
 
 
 
