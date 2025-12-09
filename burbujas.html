@@ -394,9 +394,10 @@
           <div id="wineInfo" class="wine-info">
            
           </div>
+          <!-- Ahora sin información de aromas clave, solo un mensaje genérico -->
           <div id="wineTags" class="tag">
-            <span>🎯 Aromas clave:</span>
-            <b>Cítrico, floral, mineral, fruta blanca</b>
+            <span>🤫 Sin pista de aromas:</span>
+            <b>Intenta deducir qué burbujas encajan con el vino.</b>
           </div>
         </div>
       </div>
@@ -506,7 +507,7 @@
   (function(){
     const playfield = document.getElementById("playfield");
     const startBtn = document.getElementById("startBtn");
-    const statusText = document.getElementById("statusText");
+    const statusText = document.getElementId("statusText");
     const scoreEl = document.getElementById("score");
     const mistakesEl = document.getElementById("mistakes");
     const missedEl = document.getElementById("missed");
@@ -645,7 +646,8 @@
       const w = getActiveWine();
       wineShortEl.textContent = w.short;
       wineInfoEl.textContent = w.description;
-      wineTagsEl.innerHTML = `<span>🎯 Aromas clave:</span><b>${w.tags}</b>`;
+      // Aquí dejamos de mostrar la lista de aromas concretos
+      wineTagsEl.innerHTML = '<span>🤫 Sin pista de aromas:</span><b>Intenta deducir qué burbujas encajan con el vino.</b>';
     }
 
     function resetCounters(){
@@ -979,4 +981,3 @@
   </script>
 </body>
 </html>
-
