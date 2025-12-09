@@ -392,12 +392,11 @@
             <option value="triplico">5 · Triplico Multiplo</option>
           </select>
           <div id="wineInfo" class="wine-info">
-           
+            Blanco fresco con notas cítricas, florales y toque mineral. Ideal para aromas ligeros y vibrantes.
           </div>
-          <!-- Ahora sin información de aromas clave, solo un mensaje genérico -->
           <div id="wineTags" class="tag">
-            <span>🤫 Sin pista de aromas:</span>
-            <b>Intenta deducir qué burbujas encajan con el vino.</b>
+            <span>🎯 Aromas clave:</span>
+            <b>Cítrico, floral, mineral, fruta blanca</b>
           </div>
         </div>
       </div>
@@ -507,7 +506,7 @@
   (function(){
     const playfield = document.getElementById("playfield");
     const startBtn = document.getElementById("startBtn");
-    const statusText = document.getElementId("statusText");
+    const statusText = document.getElementById("statusText");
     const scoreEl = document.getElementById("score");
     const mistakesEl = document.getElementById("mistakes");
     const missedEl = document.getElementById("missed");
@@ -646,8 +645,7 @@
       const w = getActiveWine();
       wineShortEl.textContent = w.short;
       wineInfoEl.textContent = w.description;
-      // Aquí dejamos de mostrar la lista de aromas concretos
-      wineTagsEl.innerHTML = '<span>🤫 Sin pista de aromas:</span><b>Intenta deducir qué burbujas encajan con el vino.</b>';
+      wineTagsEl.innerHTML = `<span>🎯 Aromas clave:</span><b>${w.tags}</b>`;
     }
 
     function resetCounters(){
