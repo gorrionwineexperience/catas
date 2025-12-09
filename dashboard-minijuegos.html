@@ -271,6 +271,35 @@
       font-weight:700;
     }
 
+    /* ===== Botón Fullscreen ===== */
+    .fs-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      padding:8px 10px;
+      border-radius:12px;
+      border:1px solid #313856;
+      background:#0b0f20;
+      color:var(--text);
+      font-size:.78rem;
+      cursor:pointer;
+      transition:.15s ease;
+      box-shadow:0 6px 16px rgba(0,0,0,.25);
+    }
+    .fs-btn:hover{
+      border-color:var(--accent);
+      box-shadow:0 0 12px rgba(255,179,71,.25);
+      transform:translateY(-1px);
+    }
+    .fs-btn:active{
+      transform:translateY(0);
+    }
+    .fs-btn .fs-ico{
+      font-size:1rem;
+      line-height:1;
+    }
+
     /* ===================== MODO TV ===================== */
     body.tv-mode{
       padding:10px;
@@ -358,6 +387,12 @@
     body.tv-mode #summaryPodium .podio-name{
       font-size:1.3rem;
     }
+
+    body.tv-mode .fs-btn{
+      font-size:.95rem;
+      padding:10px 14px;
+      border-radius:14px;
+    }
   </style>
 </head>
 <body>
@@ -377,7 +412,15 @@
           </div>
         </div>
       </div>
+
       <div>
+        <div style="display:flex; justify-content:flex-end; gap:8px; margin-bottom:8px;">
+          <button class="fs-btn" id="btnFullscreen" type="button" aria-label="Pantalla completa">
+            <span class="fs-ico" id="fsIcon">⛶</span>
+            <span id="fsLabel">Fullscreen</span>
+          </button>
+        </div>
+
         <div class="pill-game active" data-game="cata" id="pillCata">
           <span>🎬</span>
           <span>Pantalla: <strong class="game-label" id="currentGameLabel">Cata</strong></span>
@@ -489,6 +532,8 @@
       }
     }
 
+    const subtitleMain = document.getElementById("subtitleMain");
+
     const pillCata = document.getElementById("pillCata");
     const currentGameLabel = document.getElementById("currentGameLabel");
     const gameHint = document.getElementById("gameHint");
@@ -512,6 +557,50 @@
     const statMetricHelp = document.getElementById("statMetricHelp");
     const statUpdated = document.getElementById("statUpdated");
     const statUpdatedHelp = document.getElementById("statUpdatedHelp");
+
+    // ================= Fullscreen =================
+    const btnFullscreen = document.getElementById("btnFullscreen");
+    const fsIcon = document.getElementById("fsIcon");
+    const fsLabel = document.getElementById("fsLabel");
+
+    function isFullscreen(){
+      return !!document.fullscreenElement;
+    }
+
+    function updateFsUI(){
+      if(!btnFullscreen) return;
+      if(isFullscreen()){
+        if(fsIcon) fsIcon.textContent = "🧩";
+        if(fsLabel) fsLabel.textContent = "Salir";
+        btnFullscreen.setAttribute("aria-label", "Salir de pantalla completa");
+      }else{
+        if(fsIcon) fsIcon.textContent = "⛶";
+        if(fsLabel) fsLabel.textContent = "Fullscreen";
+        btnFullscreen.setAttribute("aria-label", "Entrar en pantalla completa");
+      }
+    }
+
+    async function toggleFullscreen(){
+      try{
+        if(!isFullscreen()){
+          await document.documentElement.requestFullscreen();
+        }else{
+          await document.exitFullscreen();
+        }
+      }catch(_e){
+        // Algunos navegadores pueden bloquear la llamada si no es un gesto de usuario válido
+      }finally{
+        updateFsUI();
+      }
+    }
+
+    if(btnFullscreen){
+      btnFullscreen.addEventListener("click", toggleFullscreen);
+      document.addEventListener("fullscreenchange", updateFsUI);
+      updateFsUI();
+    }
+
+    // =================================================
 
     let currentResultsUnsub = null;
     let currentMode = "cata";
@@ -649,6 +738,7 @@
         statMetricLabel.textContent = "Resumen";
         statMetricValue.textContent = "–";
         statUpdated.textContent = "–";
+        gameHint.textContent = "Vista de podio final · Esperando resultados.";
         return;
       }
 
@@ -763,6 +853,7 @@
         statMetricValue.textContent = "–";
         statMetricHelp.textContent = "Se actualizará cuando haya resultados.";
         statUpdated.textContent = "–";
+        gameHint.textContent = "Mini-juego activo: Bubble Pop de Aromas.";
         return;
       }
 
@@ -834,6 +925,7 @@
         statMetricValue.textContent = "–";
         statMetricHelp.textContent = "Se actualizará cuando haya resultados.";
         statUpdated.textContent = "–";
+        gameHint.textContent = "Mini-juego activo: Test alcoholemia.";
         return;
       }
 
@@ -877,10 +969,10 @@
 
       if(val === "bubbles"){
         attachResultsListener("bubbles");
-        subtitleMain.textContent = "Ranking en directo · Bubble Pop de Aromas.";
+        if(subtitleMain) subtitleMain.textContent = "Ranking en directo · Bubble Pop de Aromas.";
       }else if(val === "linea"){
         attachResultsListener("linea");
-        subtitleMain.textContent = "Ranking en directo · Test alcoholemia.";
+        if(subtitleMain) subtitleMain.textContent = "Ranking en directo · Test alcoholemia.";
       }else if(val === "summary"){
         setGamePill("summary");
         rankingIcon.textContent = "🏁";
@@ -888,12 +980,16 @@
         rankingSub.textContent = "Ganadores y Top 3 de Bubble Pop y Test alcoholemia.";
         attachSummaryListenersOnce();
         renderSummaryPodium();
+        if(subtitleMain) subtitleMain.textContent = "Podio final de los mini-juegos.";
       }else{
         if(currentResultsUnsub){
           currentResultsUnsub();
           currentResultsUnsub = null;
         }
         renderNoGame();
+        if(subtitleMain && !tvMode){
+          subtitleMain.textContent = "Ranking en directo de los invitados según el mini-juego activo: Bubble Pop de Aromas 🫧 o Test alcoholemia 📈.";
+        }
       }
     });
 
